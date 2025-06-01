@@ -62,12 +62,18 @@ export default function Navbar() {
             </li>
             <li className="nav-item">
               <Link
-                href="/learningpath"
-                className={`nav-link ${
-                  isActive("/learningpath") ? "active" : ""
-                }`}
+                href="/fixtures"
+                className={`nav-link ${isActive("/fixtures") ? "active" : ""}`}
               >
-                Learning Path
+                Fixtures
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                href="/schools"
+                className={`nav-link ${isActive("/schools") ? "active" : ""}`}
+              >
+                Schools
               </Link>
             </li>
             <li className="nav-item">
@@ -76,14 +82,6 @@ export default function Navbar() {
                 className={`nav-link ${isActive("/about") ? "active" : ""}`}
               >
                 About
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                href="/contact"
-                className={`nav-link ${isActive("/contact") ? "active" : ""}`}
-              >
-                Contact Us
               </Link>
             </li>
           </ul>

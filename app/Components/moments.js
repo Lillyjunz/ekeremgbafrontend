@@ -8,12 +8,12 @@ const ExcitingMomentsCarousel = () => {
   const slides = [
     {
       id: 1,
-      image: "/images/for.jpg",
+      image: "/images/forr.jpg",
       alt: "Exciting moment 1",
     },
     {
       id: 2,
-      image: "/images/forr.jpg",
+      image: "/images/f.jpg",
       alt: "Exciting moment 2",
     },
     {
@@ -23,7 +23,7 @@ const ExcitingMomentsCarousel = () => {
     },
     {
       id: 4,
-      image: "/images/forr.jpg",
+      image: "/images/f.jpg",
       alt: "Exciting moment 4",
     },
   ];

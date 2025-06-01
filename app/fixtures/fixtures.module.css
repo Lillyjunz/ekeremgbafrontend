@@ -1,0 +1,125 @@
+/* GroupsTable.module.css */
+.tableWrapper {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+.groupsTable {
+  background: #fff;
+
+  overflow: hidden;
+}
+
+/* Fix border radius for table corners */
+.groupsTable thead tr:first-child th:first-child {
+  border-top-left-radius: 8px !important;
+}
+
+.groupsTable thead tr:first-child th:last-child {
+  border-top-right-radius: 8px !important;
+}
+
+.groupsTable tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px !important;
+}
+
+.groupsTable tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px !important;
+}
+
+.filterButton {
+  border: 1px solid #dee2e6 !important;
+  color: #6c757d !important;
+  background-color: #fff !important;
+  font-size: 0.875rem !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.filterButton:hover {
+  border-color: #adb5bd !important;
+  color: #495057 !important;
+  background-color: #f8f9fa !important;
+}
+
+.filterButton:focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
+}
+
+.tableHeader {
+  background-color: #f8f9fa !important;
+  border: none !important;
+  padding: 12px 16px !important;
+  font-size: 0.875rem !important;
+  color: #6c757d !important;
+  font-weight: 400 !important;
+}
+
+.tableCell {
+  border: none !important;
+  padding: 16px !important;
+  vertical-align: top !important;
+}
+
+.teamRow {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.teamRow:last-child {
+  border-bottom: none;
+}
+
+.teamRow:hover {
+  background-color: #f8f9fa;
+}
+
+.representatives {
+  line-height: 1.4;
+}
+
+.repName {
+  font-size: 0.875rem !important;
+  color: #6c757d !important;
+  margin-bottom: 4px !important;
+}
+
+.repName:last-child {
+  margin-bottom: 0 !important;
+}
+
+.group-title h5 {
+  font-size: 1.125rem;
+  margin-bottom: 0;
+  color: #c71d12 !important;
+}
+
+.groupsHeader span {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.groupSection:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .groupsTable {
+    font-size: 0.875rem;
+  }
+
+  .tableHeader,
+  .tableCell {
+    padding: 12px 8px !important;
+  }
+
+  .repName {
+    font-size: 0.8125rem !important;
+  }
+}

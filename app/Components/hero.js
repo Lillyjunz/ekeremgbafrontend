@@ -1,128 +1,84 @@
 "use client";
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/navigation";
-// import "swiper/css/pagination";
-import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-// Styles should be added to your global.css file
+import { useEffect, useState } from "react";
 
-const HeroSwiper = () => {
-  const heroSlides = [
-    {
-      id: 1,
-      backgroundImage: "/images/for.jpg",
-      title: "Discover Amazing Places",
-      subtitle: "Explore the world with us",
-      description:
-        "Embark on unforgettable journeys to breathtaking destinations around the globe.",
-      primaryButton: {
-        text: "Register your school",
-        link: "#explore",
-      },
-      secondaryButton: {
-        text: "View fixtures",
-        link: "#video",
-      },
-    },
-    {
-      id: 2,
-      backgroundImage: "/images/forr.jpg",
-      title: "Adventure Awaits",
-      subtitle: "Push your boundaries",
-      description:
-        "Challenge yourself with thrilling adventures and create memories that last a lifetime.",
-      primaryButton: {
-        text: "Book Adventure",
-        link: "#book",
-      },
-      secondaryButton: {
-        text: "Learn More",
-        link: "#about",
-      },
-    },
-    {
-      id: 3,
-      backgroundImage: "/images/for.jpg",
-      title: "Relax & Unwind",
-      subtitle: "Find your peace",
-      description:
-        "Escape to serene locations where tranquility meets natural beauty.",
-      primaryButton: {
-        text: "Find Peace",
-        link: "#relax",
-      },
-      secondaryButton: {
-        text: "View Gallery",
-        link: "#gallery",
-      },
-    },
-  ];
+const HeroSection = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Sample images - replace with your actual image URLs
+  const images = ["/images/f.jpg", "/images/forr.jpg", "/images/f.jpg"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   return (
     <section className="hero-section">
-      <Swiper
-        modules={[Navigation, Pagination, Autoplay, EffectFade]}
-        spaceBetween={0}
-        slidesPerView={1}
-        navigation
-        // pagination={{ clickable: true }}
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-        }}
-        effect="fade"
-        fadeEffect={{ crossFade: true }}
-        loop={true}
-        className="hero-swiper"
-      >
-        {heroSlides.map((slide) => (
-          <SwiperSlide key={slide.id}>
-            <div className="slide-content">
-              <div
-                className="slide-background"
-                style={{ backgroundImage: `url(${slide.backgroundImage})` }}
-              >
-                <div className="slide-overlay"></div>
-              </div>
+      {/* Background Images */}
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className={`hero-background ${
+            index === currentImageIndex ? "active" : ""
+          }`}
+          style={{
+            backgroundImage: `url(${image})`,
+            opacity: index === currentImageIndex ? 1 : 0,
+          }}
+        />
+      ))}
 
-              <div className="container h-100">
-                <div className="row h-100 align-items-center justify-content-center text-center">
-                  <div className="col-lg-8 col-xl-6">
-                    <div className="slide-text">
-                      <p className="hero-subtitle text-uppercase mb-3">
-                        {slide.subtitle}
-                      </p>
-                      <h1 className="hero-title display-2 fw-bold mb-4">
-                        {slide.title}
-                      </h1>
-                      <p className="hero-description lead mb-4">
-                        {slide.description}
-                      </p>
-                      <div className="hero-buttons d-flex flex-column flex-sm-row gap-3 justify-content-center align-items-center">
-                        <a
-                          href={slide.primaryButton.link}
-                          className="btn hero-btn-primary btn-lg px-5 py-3"
-                        >
-                          {slide.primaryButton.text}
-                        </a>
-                        <a
-                          href={slide.secondaryButton.link}
-                          className="btn hero-btn-secondary btn-lg px-5 py-3"
-                        >
-                          {slide.secondaryButton.text}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
+      {/* Overlay */}
+      <div className="hero-overlay"></div>
+
+      {/* Content */}
+      <div className="hero-content">
+        <div className="hero-badge">Ekeremgba 5.0 is coming soon</div>
+
+        <h1 className="hero-title">
+          Championing Academic Excellence
+          <br />
+          Through Competition
+        </h1>
+
+        <p className="hero-description">
+          Ekeremgba Academic Competition brings schools together in a test of
+          <br />
+          knowledge, skill, and critical thinking in subjects like Math,
+          English,
+          <br />
+          Science, and Debate
+        </p>
+
+        <div className="hero-buttons">
+          <a href="#register" className="btn btn-primary-custom">
+            Register your School
+          </a>
+          <a href="#fixtures" className="btn btn-secondary-custom">
+            View Fixtures
+          </a>
+        </div>
+      </div>
+
+      {/* Image Indicators */}
+      <div className="image-indicators">
+        {images.map((_, index) => (
+          <div
+            key={index}
+            className={`indicator ${
+              index === currentImageIndex ? "active" : ""
+            }`}
+            onClick={() => setCurrentImageIndex(index)}
+          />
         ))}
-      </Swiper>
+      </div>
     </section>
   );
 };
 
-export default HeroSwiper;
+export default HeroSection;

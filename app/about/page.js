@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
 import MeetOurTeam from "../Components/team";
-import Topbar from "../Components/topbar";
 import styles from "./about.module.css";
 
 const About = () => {
@@ -29,40 +28,33 @@ const About = () => {
   // Subjects data
   const subjects = [
     {
-      icon: "🧮",
-      title: "Mathematics",
-      description:
-        "Problem-solving, calculations, and mathematical reasoning across various topics and difficulty levels.",
+      icon: "bi-mortarboard", // Math
+      title: "Transparent Judging",
+      description: "Every score follows a clear rubric—no bias, no guesswork.",
     },
     {
-      icon: "🔬",
-      title: "Science",
+      icon: "bi-trophy", // Science
+      title: "Flexible comprtition format",
       description:
-        "Exploring physics, chemistry, biology, and general science concepts through practical applications.",
+        "From knockout to round-robin, we adapt structures to fit subject and scale.",
     },
     {
-      icon: "🗣️",
-      title: "Debate",
+      icon: "bi-clipboard-data", // Debate
+      title: "Real-time Leaderboard",
       description:
-        "Developing critical thinking, public speaking, and argumentation skills through structured debates.",
+        "Rankings update live so schools and students can follow progress instantly.",
     },
     {
-      icon: "📚",
-      title: "English Language",
+      icon: "bi-globe", // English
+      title: "National-level Recognition",
       description:
-        "Grammar, comprehension, vocabulary, and communication skills in the English language.",
+        "Top performers earn digital certificates, trophies, and spotlight features across platforms",
     },
     {
-      icon: "🌍",
-      title: "Geography",
+      icon: "bi-laptop", // Geography
+      title: "School Dashboard access",
       description:
-        "Understanding world geography, physical features, climate, and cultural diversity.",
-    },
-    {
-      icon: "⏳",
-      title: "History",
-      description:
-        "Exploring historical events, civilizations, and their impact on modern society.",
+        "Each school gets a personalized portal to manage teams, track scores, and view schedules.",
     },
   ];
 
@@ -119,22 +111,74 @@ const About = () => {
 
   return (
     <div>
-      <Topbar></Topbar>
       <Navbar></Navbar>
       <section className={styles.hero}>
-        <div className={`${styles.circle} ${styles.circle1}`}></div>
-        <div className={`${styles.circle} ${styles.circle2}`}></div>
-        <div className={`${styles.circle} ${styles.circle3}`}></div>
-
         <div className={styles.textContainer}>
-          <h2 className={styles.title}>ABOUT EKEREMGBA</h2>
+          <h2 className={styles.title}>ABOUT EKEREMGBA TOURNAMENT</h2>
           <p className={styles.description}>
-            Everything about the Ekeremgba competition you need to know about
+            Fostering academic brilliance and healthy school rivalry through
+            structured contests. This competition is organized by Rev. Emmanuel
+            and started in 2021 featuring top schools in the Igbo community.
           </p>
+        </div>
+
+        <div className="container">
+          <div
+            id="carouselExampleAutoplaying"
+            className="carousel slide carousel-fade"
+            data-bs-ride="carousel"
+            data-bs-interval="3000" // <-- slides every 3s
+          >
+            <div className="carousel-inner">
+              <div className="carousel-item active">
+                <img
+                  src="/images/forr.jpg"
+                  className="d-block w-100 rounded-4"
+                  alt="..."
+                />
+              </div>
+              <div className="carousel-item">
+                <img
+                  src="/images/f.jpg"
+                  className="d-block w-100 rounded-4"
+                  alt="..."
+                />
+              </div>
+              <div className="carousel-item">
+                <img
+                  src="/images/forr.jpg"
+                  className="d-block w-100 rounded-4"
+                  alt="..."
+                />
+              </div>
+            </div>
+            <button
+              className="carousel-control-prev"
+              type="button"
+              data-bs-target="#carouselExampleAutoplaying"
+              data-bs-slide="prev"
+            >
+              <span className="carousel-control-prev-icon" aria-hidden="true" />
+              <span className="visually-hidden">Previous</span>
+            </button>
+            <button
+              className="carousel-control-next"
+              type="button"
+              data-bs-target="#carouselExampleAutoplaying"
+              data-bs-slide="next"
+            >
+              <span className="carousel-control-next-icon" aria-hidden="true" />
+              <span className="visually-hidden">Next</span>
+            </button>
+          </div>
         </div>
       </section>
 
-      <section ref={sectionRef} className="school-legacy-section py-5">
+      <section
+        ref={sectionRef}
+        className="school-legacy-section py-5"
+        style={{ backgroundColor: "#FDF3F2" }}
+      >
         <div className="container">
           <div className="row align-items-center">
             {/* Left Content */}
@@ -200,42 +244,57 @@ const About = () => {
         </div>
       </section>
 
-      <section className="subjects-section container py-5">
-        <h2 className="fw-bold mb-2">Subjects & Events</h2>
-        <p className="text-muted mb-4">
-          The competition will feature the following
-        </p>
-        <div className="row gy-4">
-          {subjects.map((item, idx) => (
-            <div key={idx} className="col-md-4">
-              <div className="subject-card p-4 h-100 rounded-4 bg-light">
-                <div className="subject-icon mb-3 fs-2">{item.icon}</div>
-                <h5 className="fw-semibold">{item.title}</h5>
-                <p className="mb-0">{item.description}</p>
+      <section
+        className="subjects-sectionn py-5"
+        style={{ backgroundColor: "black" }}
+      >
+        <div className="container">
+          <h2 className="fw-bold mb-2 text-light pb-4">
+            What makes us different
+          </h2>
+
+          <div className="row gy-4">
+            {subjects.map((item, idx) => (
+              <div key={idx} className="col-md-4">
+                <div
+                  className="subject-card p-4 h-100 rounded-4 text-light"
+                  style={{
+                    backgroundColor: "#1C1A1A",
+                    border: "0.5px solid #494848",
+                  }}
+                >
+                  <div className="subject-icon mb-3">
+                    <div className="icon-circle d-inline-flex align-items-center justify-content-center">
+                      <i className={`bi ${item.icon}`}></i>
+                    </div>
+                  </div>
+                  <h5 className="fw-semibold">{item.title}</h5>
+                  <p className="mb-0">{item.description}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       <MeetOurTeam></MeetOurTeam>
 
-      <div className={`container my-5 ${styles.joinSection}`}>
-        <div className={`position-relative rounded-4 overflow-hidden`}>
-          {/* Blurred background image */}
-          <div className={styles.blurBackground}></div>
-
-          {/* Foreground content */}
-          <div
-            className={`position-relative text-center text-white p-5 ${styles.content}`}
-          >
-            <h2 className="fw-bold mb-4">Want to Join the Next Edition?</h2>
-            <button className="btn btn-danger px-4 py-2 rounded-pill">
-              Register your School
-            </button>
+      <section className="py-5" style={{ backgroundColor: "#fafafa" }}>
+        <div className="cta-section container">
+          <div className="cta-background"></div>
+          <div className="cta-overlay"></div>
+          <div className="container">
+            <div className="row justify-content-center">
+              <div className="col-lg-8 col-md-10 text-center">
+                <div className="cta-content">
+                  <h3 className="cta-title">Want to join the next edition?</h3>
+                  <button className="btn-register">Register your School</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer></Footer>
     </div>
