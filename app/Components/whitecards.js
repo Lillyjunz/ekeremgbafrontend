@@ -35,7 +35,9 @@ const subjects = [
 export default function SubjectsEvents() {
   return (
     <section className="subjects-section container py-5">
-      <h2 className="fw-bold mb-2">Subjects & Events</h2>
+      <h2 className="fw-bold mb-2" style={{ color: "#4f4f4f" }}>
+        Subjects & Events
+      </h2>
       <p className="text-muted mb-4">
         The competition will feature the following
       </p>

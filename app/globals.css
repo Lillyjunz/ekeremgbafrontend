@@ -77,11 +77,18 @@ a {
 .navbar-nav .nav-link {
   padding: 0.5rem 1rem;
   line-height: 1.5;
-  color: #680b05;
+  color: #828282;
 }
 
 .nav-link:hover {
-  color: #8c110a;
+  background: linear-gradient(
+    to right,
+    #c71d12,
+    #680b05
+  ) !important; /* Example colors */
+  -webkit-background-clip: text !important;
+  background-clip: text;
+  -webkit-text-fill-color: transparent !important;
 }
 
 .nav-link.active {
@@ -130,15 +137,25 @@ a {
 }
 
 .side-text {
-  color: #680b05;
+  color: #828282;
+  padding: 0.5rem 1rem;
 }
 
 .side-text:hover {
-  color: #f35348;
+  background: linear-gradient(
+    to right,
+    #c71d12,
+    #680b05
+  ) !important; /* Example colors */
+  -webkit-background-clip: text !important;
+  background-clip: text;
+  -webkit-text-fill-color: transparent !important;
 }
 
 .side-text.active {
-  color: #f35348 !important;
+  color: #680b05 !important;
+  border-radius: 30px !important;
+  background-color: #fee4e2;
 }
 
 .side-but:hover {
@@ -627,8 +644,7 @@ a {
 /* Top Schools Component Styles */
 .top-schools-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)),
-    url("/images/forr.jpg");
+  background: url("/images/Bg.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -998,131 +1014,44 @@ a {
 }
 
 /* Call to Action Section */
-.cta-section {
-  position: relative;
-  height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+.bannerContainer {
+  background-image: url("/images/Bg.png");
+  background-size: cover;
+  background-position: center;
   border-radius: 20px;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-  background-color: #fafafa;
+  height: 300px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
 }
 
-.cta-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)),
-    url("/images/forr.jpg");
-  background-size: 400% 400%;
-  filter: blur(1px);
-}
-
-.cta-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-}
-
-.cta-content {
-  position: relative;
-  z-index: 2;
-}
-
-.cta-title {
-  font-size: 3rem;
-  font-weight: 400;
+.registerBtn {
+  background: linear-gradient(to right, #d31c00, #460700);
+  border-radius: 30px;
+  padding: 10px 25px;
   color: white;
-  margin-bottom: 2.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  line-height: 1.2;
-}
-
-.btn-register {
-  background: linear-gradient(135deg, #c71d12 0%, #680b05 100%);
-  border: none;
-  color: white;
-  padding: 15px 40px;
-  border-radius: 50px;
-  font-size: 1.1rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(233, 69, 96, 0.3);
-  text-transform: none;
+  text-decoration: none;
 }
 
-.btn-register:hover {
-  background: linear-gradient(135deg, #c71d12 0%, #680b05 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px #c71e129b;
+.registerBtn:hover {
+  opacity: 0.9;
+  color: white;
 }
 
-.btn-register:active {
-  transform: translateY(0);
-}
-
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* CTA Responsive Design */
-@media (max-width: 768px) {
-  .cta-section {
-    height: 300px;
-
-    border-radius: 15px;
-  }
-
-  .cta-title {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .btn-register {
-    padding: 12px 32px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .cta-section {
-    height: 250px;
-  }
-
-  .cta-title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .btn-register {
-    padding: 10px 28px;
-    font-size: 0.95rem;
-  }
-}
 /* cta end */
 
 /* exciting moments start */
 /* Exciting Moments Carousel Styles */
 .exciting-moments-section {
   padding: 60px 0;
+  background-color: #f8f9fa;
+}
+
+/* for about hero */
+.exciting-momentss-section {
+  padding: 10px 0;
   background-color: #f8f9fa;
 }
 
@@ -1135,7 +1064,8 @@ a {
 }
 
 .carousel-container {
-  max-width: 900px;
+  /* max-width: 1200px; */
+  width: 100%;
   margin: 0 auto;
   border-radius: 20px;
   overflow: hidden;
@@ -1143,8 +1073,10 @@ a {
 }
 
 .carousel-image {
-  height: 500px;
+  height: 600px;
+  width: 100%;
   object-fit: cover;
+  object-position: top center; /* Focuses the top part of the image */
   border-radius: 20px;
 }
 
@@ -1220,7 +1152,7 @@ a {
   }
 
   .carousel-container {
-    margin: 0 15px;
+    margin: 0 auto;
     border-radius: 15px;
   }
 

@@ -7,11 +7,6 @@
   background: linear-gradient(135deg, #fafafa 0%, #fafafa 100%);
 }
 
-.carousel {
-  height: 500px !important;
-  border: 2px solid red !important;
-}
-
 /* Text container */
 .textContainer {
   position: relative;
@@ -34,28 +29,6 @@
   color: #666;
 }
 
-/* Decorative dots */
-.dotLeft {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background-color: #f35b09;
-  border-radius: 50%;
-  top: 50px;
-  left: 50px;
-  opacity: 0.7;
-}
-
-.dotRight {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  background-color: #5a54f2;
-  border-radius: 50%;
-  top: 100px;
-  right: 80px;
-  opacity: 0.7;
-}
 /* hero end */
 
 /* black section */

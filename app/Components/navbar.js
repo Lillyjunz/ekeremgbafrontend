@@ -87,14 +87,18 @@ export default function Navbar() {
           </ul>
 
           {/* Right: Desktop login/signup buttons */}
-          <div className="d-none d-md-flex gap-2">
-            {/* <Link
+          <div className="d-none d-md-flex gap-2 align-items-center">
+            <Link
               href="/login"
-              className="btn btn-outline-light nava"
-              style={{ borderRadius: "15px" }}
+              className="btn"
+              style={{
+                borderRadius: "10px",
+                color: "#333333",
+                border: "2px solid #f2f2f2",
+              }}
             >
-              Language
-            </Link> */}
+              English <i className="fa-solid fa-angle-down"></i>
+            </Link>
             <Link
               href="/register"
               className="btn btn-light navaa p-3"
@@ -143,26 +147,26 @@ export default function Navbar() {
           </li>
           <li className="mb-3">
             <Link
-              href="/learningpath"
+              href="/fixtures"
               className={`text-decoration-none side-text ${
-                isActive("/learningpath") ? "active" : ""
+                isActive("/fixtures") ? "active" : ""
               }`}
               onClick={toggleNavbar}
             >
               <i className="fa-solid fa-book-open-reader me-2"></i>
-              Learning Path
+              Fixtures
             </Link>
           </li>
           <li className="mb-3">
             <Link
-              href="/about"
+              href="/schools"
               className={`text-decoration-none side-text ${
-                isActive("/about") ? "active" : ""
+                isActive("/schools") ? "active" : ""
               }`}
               onClick={toggleNavbar}
             >
               <i className="fa-solid fa-circle-info me-2"></i>
-              About
+              Schools
             </Link>
           </li>
           <li className="mb-3">
@@ -173,26 +177,31 @@ export default function Navbar() {
               }`}
               onClick={toggleNavbar}
             >
-              <i className="fa-solid fa-phone me-2"></i>
-              Contact Us
+              <i className="fa-solid fa-circle-info me-2"></i>
+              About Us
             </Link>
           </li>
         </ul>
 
         <div className="d-flex gap-2 mt-auto flex-column">
-          <Link
-            href="/login"
-            className="btn side-butt w-100"
+          <div
+            className="btn  w-100"
             onClick={toggleNavbar}
+            style={{
+              borderRadius: "10px",
+              color: "#333333",
+              border: "2px solid #f2f2f2",
+            }}
           >
-            Login
-          </Link>
+            English <i className="fa-solid fa-angle-down"></i>
+          </div>
+
           <Link
-            href="/signup"
-            className="btn side-but w-100"
-            onClick={toggleNavbar}
+            href="/register"
+            className="btn text-light navaa p-2 side-butt w-100"
+            style={{ borderRadius: "35px" }}
           >
-            Sign Up
+            Register your School
           </Link>
         </div>
       </div>

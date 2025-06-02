@@ -22,7 +22,10 @@ const Footer = () => {
             </div>
 
             <div className="col-lg-2 col-md-6">
-              <div className="d-flex flex-column help-link">
+              <div
+                className="d-flex flex-column help-link"
+                style={{ color: "#4f4f4f" }}
+              >
                 <Link href="/about" className="mb-2 ">
                   About
                 </Link>
@@ -33,7 +36,10 @@ const Footer = () => {
             </div>
 
             <div className="col-lg-2 col-md-6">
-              <div className=" d-flex flex-column help-link">
+              <div
+                className=" d-flex flex-column help-link"
+                style={{ color: "#4f4f4f" }}
+              >
                 <Link href="" className="mb-2 ">
                   Events
                 </Link>
@@ -51,7 +57,10 @@ const Footer = () => {
             </div>
 
             <div className="col-lg-3 col-md-6 align-items-center">
-              <div className=" d-flex flex-column help-link">
+              <div
+                className=" d-flex flex-column help-link"
+                style={{ color: "#4f4f4f" }}
+              >
                 <Link href="" className="mb-2 ">
                   Contact
                 </Link>

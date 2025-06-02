@@ -1,0 +1,21 @@
+.formContainer {
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #606060 !important;
+}
+
+.loginBtn {
+  background: linear-gradient(#c71d12 0%, #680b05 100%);
+  border: none;
+  padding: 12px 0;
+  border-radius: 40px;
+  font-size: 1.1rem;
+}
+
+.loginBtn:hover {
+  opacity: 0.9;
+}
+
+.bgLight {
+  background-color: #fff;
+}

@@ -1,0 +1,292 @@
+/* Group Tabs Styling */
+.groupTabs {
+  display: flex;
+  gap: 8px;
+}
+
+.groupTab {
+  background: transparent;
+  border: 1px solid #e5e5e5;
+  border-radius: 25px;
+  padding: 8px 24px;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.groupTab:hover {
+  background: #f8f9fa;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.groupTab.active {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+/* Proceed Button */
+.proceedBtn {
+  background: #dc3545;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.proceedBtn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Tournament Table */
+.tournamentTable {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.tournamentTable thead th {
+  background: #f8f9fa;
+  border: none;
+  padding: 16px 20px;
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tournamentTable tbody td {
+  border: none;
+  border-bottom: 1px solid #f1f3f4;
+  padding: 20px;
+  vertical-align: top;
+}
+
+.teamRow:last-child td {
+  border-bottom: none;
+}
+
+.teamRow:hover {
+  background: #f8f9fa;
+}
+
+/* Table Column Widths */
+.rankingCol,
+.rankingCell {
+  width: 10%;
+  text-align: center;
+}
+
+.nameCol,
+.nameCell {
+  width: 20%;
+}
+
+.representativeCol,
+.representativeCell {
+  width: 40%;
+}
+
+.scoresCol,
+.scoresCell {
+  width: 15%;
+  text-align: center;
+}
+
+.overallCol,
+.overallCell {
+  width: 15%;
+  text-align: center;
+}
+
+/* Cell Content Styling */
+.rankingCell {
+  font-size: 18px;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.nameCell {
+  font-weight: 600;
+  color: #495057;
+  font-size: 16px;
+}
+
+.representativesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.representativeName {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.scoresCell,
+.overallCell {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .groupTabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .proceedBtn {
+    align-self: center;
+  }
+
+  .tournamentTable {
+    font-size: 12px;
+  }
+
+  .tournamentTable thead th,
+  .tournamentTable tbody td {
+    padding: 12px 8px;
+  }
+
+  .representativeName {
+    font-size: 12px;
+  }
+}
+
+/* Pagination Styling */
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
+.entriesInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.entriesDropdown {
+  position: relative;
+}
+
+.entriesSelect {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #495057;
+  width: auto;
+  min-width: 120px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+}
+
+.entriesSelect:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  outline: 0;
+}
+
+.showingText {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.pagination {
+  margin: 0;
+  gap: 4px;
+}
+
+.pageItem {
+  margin: 0;
+}
+
+.pageLink {
+  background: white;
+  border: 1px solid #e5e5e5;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin: 0 2px;
+}
+
+.pageLink:hover {
+  background: #f8f9fa;
+  border-color: #dc3545;
+  color: #dc3545;
+  text-decoration: none;
+}
+
+.pageLink.active {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.pageLink.active:hover {
+  background: #c82333;
+  border-color: #c82333;
+  color: white;
+}
+
+.ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: #6c757d;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Mobile Pagination */
+@media (max-width: 768px) {
+  .paginationContainer {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .entriesInfo {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+
+  .pageLink {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .showingText {
+    text-align: center;
+    font-size: 12px;
+  }
+}

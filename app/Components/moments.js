@@ -13,17 +13,22 @@ const ExcitingMomentsCarousel = () => {
     },
     {
       id: 2,
-      image: "/images/f.jpg",
+      image: "/images/day1.jpg",
       alt: "Exciting moment 2",
     },
     {
       id: 3,
-      image: "/images/forr.jpg",
+      image: "/images/day2.jpg",
       alt: "Exciting moment 3",
     },
     {
       id: 4,
-      image: "/images/f.jpg",
+      image: "/images/day3.jpg",
+      alt: "Exciting moment 4",
+    },
+    {
+      id: 5,
+      image: "/images/day5.jpg",
       alt: "Exciting moment 4",
     },
   ];
@@ -32,7 +37,7 @@ const ExcitingMomentsCarousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 4000); // Change slide every 4 seconds
+    }, 1000); // Change slide every 4 seconds
 
     return () => clearInterval(interval);
   }, [slides.length]);
@@ -52,7 +57,10 @@ const ExcitingMomentsCarousel = () => {
   return (
     <div className="exciting-moments-section">
       <div className="container">
-        <h2 className="section-title text-center mb-4">
+        <h2
+          className="section-title text-center mb-4 fw-bold"
+          style={{ color: "#4f4f4f" }}
+        >
           Some of our exciting Moments
         </h2>
 

@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import AboutMomentsCarousel from "../Components/aboutmomemt";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
 import MeetOurTeam from "../Components/team";
@@ -121,57 +123,7 @@ const About = () => {
             and started in 2021 featuring top schools in the Igbo community.
           </p>
         </div>
-
-        <div className="container">
-          <div
-            id="carouselExampleAutoplaying"
-            className="carousel slide carousel-fade"
-            data-bs-ride="carousel"
-            data-bs-interval="3000" // <-- slides every 3s
-          >
-            <div className="carousel-inner">
-              <div className="carousel-item active">
-                <img
-                  src="/images/forr.jpg"
-                  className="d-block w-100 rounded-4"
-                  alt="..."
-                />
-              </div>
-              <div className="carousel-item">
-                <img
-                  src="/images/f.jpg"
-                  className="d-block w-100 rounded-4"
-                  alt="..."
-                />
-              </div>
-              <div className="carousel-item">
-                <img
-                  src="/images/forr.jpg"
-                  className="d-block w-100 rounded-4"
-                  alt="..."
-                />
-              </div>
-            </div>
-            <button
-              className="carousel-control-prev"
-              type="button"
-              data-bs-target="#carouselExampleAutoplaying"
-              data-bs-slide="prev"
-            >
-              <span className="carousel-control-prev-icon" aria-hidden="true" />
-              <span className="visually-hidden">Previous</span>
-            </button>
-            <button
-              className="carousel-control-next"
-              type="button"
-              data-bs-target="#carouselExampleAutoplaying"
-              data-bs-slide="next"
-            >
-              <span className="carousel-control-next-icon" aria-hidden="true" />
-              <span className="visually-hidden">Next</span>
-            </button>
-          </div>
-        </div>
+        <AboutMomentsCarousel></AboutMomentsCarousel>
       </section>
 
       <section
@@ -280,19 +232,11 @@ const About = () => {
       <MeetOurTeam></MeetOurTeam>
 
       <section className="py-5" style={{ backgroundColor: "#fafafa" }}>
-        <div className="cta-section container">
-          <div className="cta-background"></div>
-          <div className="cta-overlay"></div>
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-lg-8 col-md-10 text-center">
-                <div className="cta-content">
-                  <h3 className="cta-title">Want to join the next edition?</h3>
-                  <button className="btn-register">Register your School</button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-white text-center">
+          <h2 className="fw-bold mb-3">Want to join the next edition?</h2>
+          <Link href="/register" className="btn registerBtn">
+            Register your School
+          </Link>
         </div>
       </section>
 
