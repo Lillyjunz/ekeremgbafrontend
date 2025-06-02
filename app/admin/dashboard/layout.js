@@ -84,25 +84,24 @@ export default function Layout({ children }) {
               </div>
 
               <span className={styles.adminText}>
-                Admin <i className="bi bi-chevron-down ms-1"></i>
+                Admin <i className="bi bi-chevron-down ms-1 me-2"></i>
               </span>
             </button>
-            <ul className="dropdown-menu">
+            <ul className="dropdown-menu mt-2">
               <li>
                 <a className="dropdown-item" href="#">
-                  Profile
-                </a>
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">
-                  Settings
+                  Change Password
                 </a>
               </li>
               <li>
                 <hr className="dropdown-divider" />
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a
+                  className="dropdown-item"
+                  href="#"
+                  style={{ color: "rgba(255, 0, 0, 1)" }}
+                >
                   Logout
                 </a>
               </li>
