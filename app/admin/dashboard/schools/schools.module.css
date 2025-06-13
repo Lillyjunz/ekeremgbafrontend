@@ -98,9 +98,9 @@
 }
 
 .startBtn:hover {
-  background: linear-gradient(#c71d12, #680b05);
-  border: none;
   color: white;
+  border: 2px solid #f2f2f2;
+  transform: scale(1.1);
 }
 
 /* Responsive Design */

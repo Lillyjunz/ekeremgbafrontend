@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./admin.module.css";
 
 export default function LoginPage() {
@@ -72,12 +73,14 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <button
-              type="submit"
-              className={`btn text-white w-100 ${styles.loginBtn}`}
-            >
-              Login
-            </button>
+            <Link href="/admin/dashboard">
+              <button
+                type="submit"
+                className={`btn text-white w-100 ${styles.loginBtn}`}
+              >
+                Login
+              </button>
+            </Link>
           </form>
         </div>
       </div>

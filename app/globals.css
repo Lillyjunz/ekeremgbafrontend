@@ -1623,44 +1623,185 @@ a {
     padding: 0 10px;
   }
 }
+/* indicator end */
 
-/* register modal */
+/* Modal Overlay */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-image: url("/images/forr.jpg"); /* Replace with your actual image path */
-  background-size: cover;
-  background-position: center;
-  backdrop-filter: blur(10px);
-  z-index: 1050;
-  overflow-y: auto; /* Enables scrolling */
-  padding: 2rem; /* Adds space around the modal for smaller screens */
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.modal-content-custom {
+/* Modal Content */
+.modal-content {
+  width: 90%;
   max-width: 500px;
-  width: 100%;
-  border-radius: 1rem;
-  background-color: white;
-  padding: 2rem;
-  margin: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
-.join-button {
-  background: linear-gradient(to right, #b31217, #e52d27);
+/* Hide scrollbar for webkit browsers */
+.modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Close Button - Inside modal, top-right corner */
+.close-button-modal {
+  top: 15px;
+  right: 15px;
+  z-index: 10000;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-size: 20px;
+  font-weight: 300;
+  color: #c41e3a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.close-button-modal:hover {
+  background-color: rgba(255, 255, 255, 1);
+  color: #460700;
+  transform: scale(1.1);
+}
+
+/* Form Inputs */
+.form-input {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+}
+
+.form-input:focus {
+  border-color: #c41e3a;
+  box-shadow: 0 0 0 0.2rem rgba(196, 30, 58, 0.25);
+  background-color: #fff;
+}
+
+.custom-checkbox {
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Representatives Grid */
+.representatives-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.rep-input-wrapper {
+  position: relative;
+}
+
+.rep-label {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: #555;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.rep-input {
+  padding-left: 2rem; /* leave space for number */
+  border-radius: 10px;
+  background-color: #f2f2f2;
+  color: #555; /* editable text in gray */
+  border: 1px solid #ccc;
+}
+
+.rep-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #666; /* Gray text */
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #c41e3a !important;
+}
+
+.rep-input:hover {
+  border-color: #c41e3a;
+  background-color: #fff;
+}
+
+.form-check-input:checked {
+  background-color: #c41e3a;
+  border-color: #c41e3a;
+}
+
+.form-check-input:focus {
+  border-color: #c41e3a;
+  box-shadow: none !important;
+}
+
+/* Submit Button */
+.submit-button {
+  background: linear-gradient(to right, #d31c00, #460700);
   color: white;
   border-radius: 25px;
-  padding: 10px 0;
+  border: none;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
 }
-/* end */
 
-/* icon in about */
-.icon-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: #2c2c2c; /* Or use 'transparent' with border */
-  color: white;
-  font-size: 1.5rem;
-  border: 1px solid #ffffff50;
+.submit-button:hover {
+  background-color: #a01729;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .representatives-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

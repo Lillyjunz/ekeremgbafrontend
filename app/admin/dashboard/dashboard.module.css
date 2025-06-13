@@ -196,9 +196,9 @@
 }
 
 .startBtn:hover {
-  background: linear-gradient(#c71d12, #680b05);
-  border: none;
   color: white;
+  border: 2px solid #f2f2f2;
+  transform: scale(1.1);
 }
 
 /* Responsive Design */
@@ -251,4 +251,27 @@
   .navLinks {
     gap: 0.5rem;
   }
+}
+
+/* modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  z-index: 1055;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modalPanel {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  padding: 2rem;
+  overflow-y: auto;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
 }

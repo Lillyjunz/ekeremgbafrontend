@@ -7,6 +7,8 @@ import { useState } from "react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedReps, setSelectedReps] = useState("");
   const pathname = usePathname();
 
   const toggleNavbar = () => {
@@ -15,7 +17,26 @@ export default function Navbar() {
 
   const isActive = (href) => pathname === href;
 
-  const [showModal, setShowModal] = useState(true);
+  const openModal = () => {
+    setShowModal(true);
+    // Close mobile menu if open
+    setIsOpen(false);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log("Form submitted");
+    closeModal();
+  };
+
+  const handleRepsSelection = (value) => {
+    setSelectedReps(value);
+  };
 
   return (
     <>
@@ -99,13 +120,13 @@ export default function Navbar() {
             >
               English <i className="fa-solid fa-angle-down"></i>
             </Link>
-            <Link
-              href="/register"
+            <button
+              onClick={openModal}
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
             >
               Register your School
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
@@ -185,7 +206,7 @@ export default function Navbar() {
 
         <div className="d-flex gap-2 mt-auto flex-column">
           <div
-            className="btn  w-100"
+            className="btn w-100"
             onClick={toggleNavbar}
             style={{
               borderRadius: "10px",
@@ -196,15 +217,142 @@ export default function Navbar() {
             English <i className="fa-solid fa-angle-down"></i>
           </div>
 
-          <Link
-            href="/register"
+          <button
+            onClick={openModal}
             className="btn text-light navaa p-2 side-butt w-100"
             style={{ borderRadius: "35px" }}
           >
             Register your School
-          </Link>
+          </button>
         </div>
       </div>
+
+      {/* Modal Overlay */}
+      {showModal && (
+        <div
+          className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          onClick={closeModal}
+        >
+          <div
+            className="modal-content bg-white rounded-4 p-4 position-relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button - Inside the modal, top-right corner */}
+            <button
+              onClick={closeModal}
+              className="close-button-modal position-absolute"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            {/* Modal Header */}
+            <div className="text-center mb-4">
+              <h2 className="fw-bold mb-2" style={{ color: "#333" }}>
+                Register your School
+              </h2>
+              <p className="text-muted mb-0">
+                Kindly fill this form to reach out to a Consultant
+              </p>
+            </div>
+
+            {/* Registration Form */}
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="schoolName" className="form-label text-muted">
+                  School name*
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-input"
+                  id="schoolName"
+                  placeholder="Noah Academy"
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="address" className="form-label text-muted">
+                  Address*
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-input"
+                  id="address"
+                  placeholder="noa@gmail.com"
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="phoneNumber" className="form-label text-muted">
+                  Phone number*
+                </label>
+                <input
+                  type="tel"
+                  className="form-control form-input"
+                  id="phoneNumber"
+                  placeholder="noa@gmail.com"
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="emailAddress" className="form-label text-muted">
+                  Email address*
+                </label>
+                <input
+                  type="email"
+                  className="form-control form-input"
+                  id="emailAddress"
+                  placeholder="noa@gmail.com"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3">
+                  Number of Representatives
+                </label>
+                <div className="representatives-grid">
+                  {[1, 2, 3, 4].map((num) => (
+                    <div key={num} className="rep-input-wrapper">
+                      <span className="rep-label">{num}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        required
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-check mb-4 checkbox-container">
+                <input
+                  className="form-check-input custom-checkbox"
+                  type="checkbox"
+                  id="termsConditions"
+                  required
+                />
+                <label
+                  className="form-check-label text-muted"
+                  htmlFor="termsConditions"
+                >
+                  Accept our Terms and Conditions
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="btn w-100 text-white fw-bold py-3 submit-button"
+              >
+                Join the Tournament
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }

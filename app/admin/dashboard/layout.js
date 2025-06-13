@@ -2,6 +2,7 @@
 
 // Layout.js (your main layout component)
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 
@@ -96,14 +97,15 @@ export default function Layout({ children }) {
               <li>
                 <hr className="dropdown-divider" />
               </li>
+
               <li>
-                <a
+                <Link
+                  href="/admin"
                   className="dropdown-item"
-                  href="#"
                   style={{ color: "rgba(255, 0, 0, 1)" }}
                 >
                   Logout
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
