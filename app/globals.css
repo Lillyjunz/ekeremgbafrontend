@@ -275,7 +275,7 @@ a {
 }
 
 .btn-primary-custom {
-  background: linear-gradient(135deg, #dc3545, #c82333);
+  background: linear-gradient(#c71d12, #680b05);
   border: none;
   padding: 15px 30px;
   font-weight: 600;

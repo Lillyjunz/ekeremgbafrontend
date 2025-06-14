@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const HeroSection = () => {
@@ -56,17 +57,17 @@ const HeroSection = () => {
         </p>
 
         <div className="hero-buttons">
-          <a href="#register" className="btn btn-primary-custom">
+          <Link href="#register" className="btn btn-primary-custom">
             Register your School
-          </a>
-          <a href="#fixtures" className="btn btn-secondary-custom">
+          </Link>
+          <Link href="#fixtures" className="btn btn-secondary-custom">
             View Fixtures
-          </a>
+          </Link>
         </div>
       </div>
 
       {/* Image Indicators */}
-      <div className="image-indicators">
+      {/* <div className="image-indicators">
         {images.map((_, index) => (
           <div
             key={index}
@@ -76,7 +77,7 @@ const HeroSection = () => {
             onClick={() => setCurrentImageIndex(index)}
           />
         ))}
-      </div>
+      </div> */}
     </section>
   );
 };
