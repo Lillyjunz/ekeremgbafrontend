@@ -12,6 +12,7 @@
   border-bottom: 1px solid #e9ecef;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
 .brand {
@@ -23,28 +24,84 @@
   align-items: center;
 }
 
+/* Mobile Toggle Button */
+.toggleBtn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.toggleIcon {
+  width: 20px;
+  height: 2px;
+  background-color: #6c757d;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+
+.toggleBtn:hover .toggleIcon {
+  background-color: #c71d12;
+}
+
+/* Navigation Links Container */
+.navLinksContainer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-top: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.navLinksContainer.navLinksOpen {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
 /* Navigation Links */
 .navLinks {
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem;
 }
 
 .navLink {
   color: #6c757d !important;
   text-decoration: none !important;
-  padding: 0.5rem 1rem !important;
+  padding: 1rem !important;
   border: none !important;
   background: none !important;
   font-weight: 500;
   transition: color 0.2s ease;
+  text-align: left;
+  width: 100%;
+  border-bottom: 1px solid #f8f9fa !important;
+}
+
+.navLink:last-child {
+  border-bottom: none !important;
 }
 
 .navLink:hover {
-  background: linear-gradient(
-    to right,
-    #c71d12,
-    #680b05
-  ) !important; /* Example colors */
+  background: linear-gradient(to right, #c71d12, #680b05) !important;
   -webkit-background-clip: text !important;
   background-clip: text;
   -webkit-text-fill-color: transparent !important;
@@ -52,15 +109,15 @@
 
 .navLink.active {
   color: #8c110a !important;
-  border-radius: 30px !important;
+  border-radius: 8px !important;
   background-color: #fee4e2 !important;
 }
 
 /* Admin Profile */
 .adminDropdown {
-  margin-left: auto;
   border: 2px solid #f2f2f2;
   border-radius: 15px;
+  order: 2;
 }
 
 .adminBtn {
@@ -94,6 +151,93 @@
 
 .adminText {
   font-size: 14px;
+}
+
+/* Desktop Styles */
+@media (min-width: 992px) {
+  .toggleBtn {
+    display: none;
+  }
+
+  .navLinksContainer {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    background: none;
+    border: none;
+    box-shadow: none;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    order: 1;
+  }
+
+  .navLinks {
+    flex-direction: row;
+    gap: 2rem;
+    padding: 0;
+  }
+
+  .navLink {
+    padding: 0.5rem 1rem !important;
+    border-bottom: none !important;
+    width: auto;
+  }
+
+  .navLink.active {
+    border-radius: 30px !important;
+  }
+
+  .adminDropdown {
+    margin-left: 0;
+    order: 3;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  .navbar .container-fluid {
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    margin-right: 1rem;
+    flex: 1;
+  }
+
+  .adminDropdown {
+    margin-left: 0;
+  }
+
+  .adminText {
+    display: none !important;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+  .navbar {
+    padding: 0.5rem 0;
+  }
+
+  .brand img {
+    width: 100px !important;
+    height: 50px !important;
+  }
+
+  .adminBtn {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .navLinks {
+    padding: 0.5rem;
+  }
+
+  .navLink {
+    padding: 0.75rem !important;
+    font-size: 0.95rem;
+  }
 }
 
 /* Main Content */
@@ -134,7 +278,8 @@
 }
 
 .createBtn:hover {
-  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
   color: white;
 }
 
@@ -198,7 +343,7 @@
 .startBtn:hover {
   color: white;
   border: 2px solid #f2f2f2;
-  transform: scale(1.1);
+  transform: translateY(-2px);
 }
 
 /* Responsive Design */
@@ -274,4 +419,163 @@
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Add these styles to your existing dashboard.module.css */
+
+/* Modal Panel Wide for Add Schools */
+.modalPanelWide {
+  max-width: 500px !important;
+  width: 90% !important;
+}
+
+/* Add Schools Container */
+.addSchoolsContainer {
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add All Button */
+.addAllBtn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  text-decoration: none;
+}
+
+.addAllBtn:hover {
+  color: #b02a37;
+  text-decoration: underline;
+}
+
+/* Schools List */
+.schoolsList {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+  padding-right: 5px;
+}
+
+.schoolsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.schoolsList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.schoolsList::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.schoolsList::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* School Item */
+.schoolItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.schoolItem:last-child {
+  border-bottom: none;
+}
+
+.schoolName {
+  color: #6c757d;
+  font-size: 14px;
+  flex: 1;
+}
+
+/* Add Button */
+.addBtn {
+  background: none;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 60px;
+  transition: all 0.2s ease;
+}
+
+.addBtn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.addBtnActive {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.addBtnActive:hover {
+  background-color: #b02a37 !important;
+}
+
+/* Add New School Button */
+.addNewSchoolBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 0;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.addNewSchoolBtn:hover {
+  color: #b02a37;
+}
+
+.addNewSchoolBtn i {
+  font-size: 16px;
+}
+
+/* Add School Input */
+.addSchoolInput {
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .modalPanelWide {
+    max-width: 95% !important;
+    padding: 20px;
+  }
+
+  .schoolItem {
+    padding: 10px 0;
+  }
+
+  .schoolName {
+    font-size: 13px;
+  }
+
+  .addBtn {
+    font-size: 11px;
+    padding: 3px 10px;
+    min-width: 50px;
+  }
+
+  .addNewSchoolBtn {
+    font-size: 13px;
+  }
 }

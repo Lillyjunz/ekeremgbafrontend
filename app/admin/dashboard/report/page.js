@@ -1,12 +1,7 @@
 "use client";
-import { useState } from "react";
 import styles from "./report.module.css";
 
 const Report = () => {
-  const [activeGroup, setActiveGroup] = useState("Group 1");
-
-  const groups = ["Group 1", "Group 2", "Group 3", "Group 4"];
-
   const teamData = [
     {
       ranking: 1,
@@ -60,27 +55,11 @@ const Report = () => {
 
   return (
     <div className="container-fluid px-4 py-4">
-      {/* Group Tabs */}
+      {/* Header with Export Button */}
       <div className="row mb-4">
-        <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className={styles.groupTabs}>
-              {groups.map((group) => (
-                <button
-                  key={group}
-                  className={`btn ${styles.groupTab} ${
-                    activeGroup === group ? styles.active : ""
-                  }`}
-                  onClick={() => setActiveGroup(group)}
-                >
-                  {group}
-                </button>
-              ))}
-            </div>
-            <button className={`btn btn-danger ${styles.proceedBtn}`}>
-              Proceed to Tournament
-            </button>
-          </div>
+        <div className="col-12 d-flex justify-content-between">
+          <h2>Report</h2>
+          <button className={styles.createBtn}>Export</button>
         </div>
       </div>
 
@@ -91,21 +70,11 @@ const Report = () => {
             <table className={`table ${styles.tournamentTable}`}>
               <thead>
                 <tr>
-                  <th scope="col" className={styles.rankingCol}>
-                    Ranking
-                  </th>
-                  <th scope="col" className={styles.nameCol}>
-                    Name
-                  </th>
-                  <th scope="col" className={styles.representativeCol}>
-                    Representative
-                  </th>
-                  <th scope="col" className={styles.scoresCol}>
-                    Scores
-                  </th>
-                  <th scope="col" className={styles.overallCol}>
-                    Overall
-                  </th>
+                  <th className={styles.rankingCol}>Ranking</th>
+                  <th className={styles.nameCol}>Name</th>
+                  <th className={styles.representativeCol}>Representative</th>
+                  <th className={styles.scoresCol}>Scores</th>
+                  <th className={styles.overallCol}>Overall</th>
                 </tr>
               </thead>
               <tbody>

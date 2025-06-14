@@ -1,0 +1,261 @@
+/* Tournament Container */
+.tournamentContainer {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 80px);
+}
+
+/* Group Tabs */
+.groupTabs {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.groupTab {
+  background: none;
+  border: 2px solid #e9ecef;
+  color: #6c757d;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.groupTab:hover {
+  border-color: #c71d12;
+  color: #c71d12;
+}
+
+.groupTabActive {
+  background-color: #c71d12 !important;
+  border-color: #c71d12 !important;
+  color: #ffffff !important;
+}
+
+.proceedBtn {
+  background: linear-gradient(to right, #c71d12, #8c110a);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.proceedBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(199, 29, 18, 0.3);
+}
+
+/* Tournament Table */
+.tournamentTable {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Header */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 80px 200px 1fr 100px 100px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.headerCell {
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 14px;
+  color: #495057;
+  text-align: left;
+}
+
+/* Table Body */
+.tableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 80px 200px 1fr 100px 100px;
+  border-bottom: 1px solid #f1f3f4;
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: #f8f9fa;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableCell {
+  padding: 1.5rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  min-height: 120px;
+}
+
+/* Table Content */
+.ranking {
+  font-weight: 600;
+  font-size: 16px;
+  color: #495057;
+}
+
+.schoolName {
+  font-weight: 500;
+  font-size: 14px;
+  color: #495057;
+}
+
+.representatives {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.representative {
+  font-size: 14px;
+  color: #6c757d;
+  padding: 0.25rem 0;
+}
+
+.scores,
+.overall {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Empty Group */
+.emptyGroup {
+  padding: 3rem;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.emptyGroup p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 60px 150px 1fr 80px 80px;
+  }
+
+  .headerCell,
+  .tableCell {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .tableCell {
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tournamentContainer {
+    padding: 1rem;
+  }
+
+  .groupTabs {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .groupTab {
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+  }
+
+  .proceedBtn {
+    padding: 0.5rem 1.5rem;
+    font-size: 13px;
+    margin-left: 0;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 50px 120px 1fr 70px 70px;
+  }
+
+  .headerCell,
+  .tableCell {
+    padding: 0.5rem 0.25rem;
+    font-size: 12px;
+  }
+
+  .tableCell {
+    min-height: 80px;
+  }
+
+  .representative {
+    font-size: 12px;
+  }
+
+  .ranking {
+    font-size: 14px;
+  }
+
+  .schoolName {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Stack layout for mobile */
+  .tableHeader {
+    display: none;
+  }
+
+  .tableRow {
+    display: block;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .tableCell {
+    display: block;
+    padding: 0.5rem 0;
+    min-height: auto;
+    border-bottom: 1px solid #f1f3f4;
+  }
+
+  .tableCell:last-child {
+    border-bottom: none;
+  }
+
+  .tableCell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #495057;
+    font-size: 12px;
+  }
+
+  .representatives {
+    gap: 0.25rem;
+  }
+}

@@ -1,0 +1,274 @@
+/* tournament.module.css */
+
+.tournamentContainer {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.tournamentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.tournamentTitle {
+  flex: 1;
+}
+
+.tournamentDropdown {
+  background: white;
+  border: 2px solid #f2f2f2;
+  border-radius: 15px;
+  padding: 10px 20px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: none;
+}
+
+.tournamentDropdown:hover,
+.tournamentDropdown:focus {
+  background: white;
+  border-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.createTournamentBtn {
+  background: linear-gradient(to right, #b30000, #660000);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.createTournamentBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(179, 0, 0, 0.3);
+}
+
+.roundNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.roundTabs {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 25px;
+  padding: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.roundTab {
+  background: transparent;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 20px;
+  color: #666;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.roundTab:hover {
+  color: #333;
+  background: #f8f9fa;
+}
+
+.roundTabActive {
+  background: #dc3545;
+  color: white;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.roundTabActive:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.viewGroupsBtn {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #666;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.viewGroupsBtn:hover {
+  background: #f8f9fa;
+  border-color: #ccc;
+}
+
+.matchesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+}
+
+.matchCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.matchCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.matchHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.matchTitle {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.matchOptions {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.matchOptions:hover {
+  background: #f8f9fa;
+  color: #666;
+}
+
+.matchContent {
+  margin-bottom: 16px;
+}
+
+.team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.teamName {
+  font-weight: 500;
+  color: #333;
+  font-size: 15px;
+}
+
+.teamScore {
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.vsSection {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.vsText {
+  background: #f8f9fa;
+  color: #666;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.matchTime {
+  display: flex;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.matchTime i {
+  font-size: 14px;
+}
+
+.matchTime span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tournamentContainer {
+    padding: 15px;
+  }
+
+  .tournamentHeader {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .roundNavigation {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .roundTabs {
+    order: 2;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 4px;
+  }
+
+  .viewGroupsBtn {
+    order: 1;
+    justify-content: center;
+  }
+
+  .matchesGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .matchCard {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .roundTabs {
+    gap: 0;
+  }
+
+  .roundTab {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .teamName {
+    font-size: 14px;
+  }
+
+  .matchCard {
+    padding: 14px;
+  }
+}
