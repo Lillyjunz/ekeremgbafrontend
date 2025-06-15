@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Sample images - replace with your actual image URLs
-  const images = ["/images/f.jpg", "/images/forr.jpg", "/images/f.jpg"];
+  const images = ["/images/day5.jpg", "/images/day3.jpg", "/images/day2.jpg"];
 
   useEffect(() => {
     const interval = setInterval(() => {

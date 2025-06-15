@@ -122,7 +122,7 @@ export default function Navbar() {
             </Link>
             <button
               onClick={openModal}
-              className="btn btn-light navaa p-2 px-3"
+              className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
             >
               Register your School
