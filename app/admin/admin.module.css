@@ -1,3 +1,21 @@
+/* Container for full viewport centering */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Wrapper for the centered content */
+.centerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+}
+
 .formContainer {
   width: 100%;
   max-width: 450px;
@@ -18,4 +36,15 @@
 
 .bgLight {
   background-color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .container {
+    padding: 15px;
+  }
+
+  .formContainer {
+    max-width: 100%;
+  }
 }
