@@ -9,6 +9,7 @@ export default function TournamentBracket() {
   const [selectedRound, setSelectedRound] = useState("Round of 16");
   const [viewMode, setViewMode] = useState("list"); // 'list' or 'groups'
   const [activeMatch, setActiveMatch] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Sample tournament data
   const tournamentData = {
@@ -210,7 +211,7 @@ export default function TournamentBracket() {
       <div className={styles.matchesGrid}>
         {currentMatches.map((match) => (
           <div
-            onClick={() => setActiveMatch(match)}
+            onClick={() => setIsModalOpen(true)}
             key={match.id}
             className={styles.matchCard}
           >
@@ -246,8 +247,9 @@ export default function TournamentBracket() {
       </div>
 
       <MatchDetailsPanel
-        match={activeMatch}
-        onClose={() => setActiveMatch(null)}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        match={tournamentData}
       />
     </div>
   );

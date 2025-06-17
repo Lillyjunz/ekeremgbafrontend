@@ -27,13 +27,12 @@
 }
 
 .groupTab:hover {
-  border-color: #c71d12;
-  color: #c71d12;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(199, 29, 18, 0.3);
 }
 
 .groupTabActive {
-  background-color: #c71d12 !important;
-  border-color: #c71d12 !important;
+  background: linear-gradient(#c71d12, #680b05) !important;
   color: #ffffff !important;
 }
 

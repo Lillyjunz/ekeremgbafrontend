@@ -1,5 +1,6 @@
 "use client";
 
+import AddSchoolModal from "@/app/Components/addschool";
 import { useState } from "react";
 import styles from "./schoollist.module.css";
 
@@ -56,12 +57,15 @@ const schoolsData = [
 
 export default function SchoolsTable() {
   const [dropdownIndex, setDropdownIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="container mt-2">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Schools</h4>
-        <button className={styles.createBtn}>Add Schools</button>
+        <button onClick={() => setShowModal(true)} className={styles.createBtn}>
+          Add Schools
+        </button>
       </div>
 
       <div className="table-responsive bg-white rounded-4 p-3">
@@ -134,6 +138,8 @@ export default function SchoolsTable() {
           </div>
         </div>
       </div>
+      {/* Right Slide Modal */}
+      <AddSchoolModal show={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 }
