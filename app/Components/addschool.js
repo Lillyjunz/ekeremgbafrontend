@@ -34,19 +34,27 @@ export default function AddSchoolModal({ show, onClose }) {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label">School name*</label>
+              <label className="form-label">
+                School name<span className="text-danger">*</span>
+              </label>
               <input type="text" className="form-control" required />
             </div>
             <div className="mb-3">
-              <label className="form-label">Address*</label>
+              <label className="form-label">
+                Address<span className="text-danger">*</span>
+              </label>
               <input type="text" className="form-control" required />
             </div>
             <div className="mb-3">
-              <label className="form-label">Phone number*</label>
+              <label className="form-label">
+                Phone number<span className="text-danger">*</span>
+              </label>
               <input type="text" className="form-control" required />
             </div>
             <div className="mb-3">
-              <label className="form-label">Email address*</label>
+              <label className="form-label">
+                Email address<span className="text-danger">*</span>
+              </label>
               <input type="email" className="form-control" required />
             </div>
             <div className="mb-3">
