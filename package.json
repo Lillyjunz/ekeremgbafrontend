@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "^15.3.5",
     "eslint": "^9",
     "eslint-config-next": "15.1.8"
   }

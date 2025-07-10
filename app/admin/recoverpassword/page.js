@@ -204,10 +204,7 @@ export default function RecoverPasswordPage() {
             </form>
 
             <div className="text-center">
-              <Link
-                href="/admin/login"
-                className="text-danger text-decoration-none"
-              >
+              <Link href="/admin" className="text-danger text-decoration-none">
                 <i className="bi bi-arrow-left me-1"></i>
                 Back to login page
               </Link>
