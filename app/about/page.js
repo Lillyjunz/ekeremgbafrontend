@@ -19,14 +19,6 @@ const About = () => {
 
   const sectionRef = useRef(null);
 
-  // Target values for animation
-  const targetValues = {
-    schools: 10,
-    students: 500,
-    subjects: 10,
-    price: 9,
-  };
-
   // Subjects data
   const subjects = [
     {
@@ -81,6 +73,14 @@ const About = () => {
   // Animate counters when component becomes visible
   useEffect(() => {
     if (!isVisible) return;
+
+    // Target values for animation - moved inside useEffect
+    const targetValues = {
+      schools: 10,
+      students: 500,
+      subjects: 10,
+      price: 9,
+    };
 
     const duration = 2000; // 2 seconds
     const steps = 60; // 60 steps for smooth animation

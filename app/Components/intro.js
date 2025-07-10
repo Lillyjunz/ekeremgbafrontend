@@ -12,13 +12,13 @@ const SchoolLegacyStats = () => {
 
   const sectionRef = useRef(null);
 
-  // Target values for animation
-  const targetValues = {
+  // Target values for animation - moved inside useEffect to avoid dependency issue
+  const targetValues = useRef({
     schools: 10,
     students: 500,
     subjects: 10,
     price: 9,
-  };
+  });
 
   // Intersection Observer to trigger animation when component is visible
   useEffect(() => {
@@ -55,16 +55,16 @@ const SchoolLegacyStats = () => {
       const easedProgress = 1 - Math.pow(1 - progress, 3);
 
       setCounters({
-        schools: Math.floor(targetValues.schools * easedProgress),
-        students: Math.floor(targetValues.students * easedProgress),
-        subjects: Math.floor(targetValues.subjects * easedProgress),
-        price: Math.floor(targetValues.price * easedProgress),
+        schools: Math.floor(targetValues.current.schools * easedProgress),
+        students: Math.floor(targetValues.current.students * easedProgress),
+        subjects: Math.floor(targetValues.current.subjects * easedProgress),
+        price: Math.floor(targetValues.current.price * easedProgress),
       });
 
       if (currentStep >= steps) {
         clearInterval(timer);
         // Ensure final values are exactly the targets
-        setCounters(targetValues);
+        setCounters(targetValues.current);
       }
     }, stepDuration);
 

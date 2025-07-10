@@ -1073,8 +1073,6 @@ a {
 }
 
 .carousel-image {
-  height: 600px;
-  width: 100%;
   object-fit: cover;
   object-position: top center; /* Focuses the top part of the image */
   border-radius: 20px;

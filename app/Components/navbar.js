@@ -109,17 +109,43 @@ export default function Navbar() {
 
           {/* Right: Desktop login/signup buttons */}
           <div className="d-none d-md-flex gap-2 align-items-center">
-            <Link
-              href="/login"
-              className="btn"
-              style={{
-                borderRadius: "10px",
-                color: "#333333",
-                border: "2px solid #f2f2f2",
-              }}
-            >
-              English <i className="fa-solid fa-angle-down"></i>
-            </Link>
+            <div className="dropdown">
+              <button
+                className="btn dropdown-toggle"
+                type="button"
+                id="languageDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{
+                  borderRadius: "10px",
+                  color: "#333333",
+                  border: "2px solid #f2f2f2",
+                  backgroundColor: "white",
+                }}
+              >
+                English
+              </button>
+
+              <ul className="dropdown-menu" aria-labelledby="languageDropdown">
+                <li>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => console.log("Switched to English")}
+                  >
+                    Igbo
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="dropdown-item"
+                    onClick={() => console.log("Switched to French")}
+                  >
+                    German
+                  </button>
+                </li>
+              </ul>
+            </div>
+
             <button
               onClick={openModal}
               className="btn btn-light navaa p-3"

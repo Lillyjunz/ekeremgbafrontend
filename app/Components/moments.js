@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const ExcitingMomentsCarousel = () => {
@@ -78,11 +79,13 @@ const ExcitingMomentsCarousel = () => {
                     index === currentSlide ? "active" : ""
                   }`}
                 >
-                  <img
+                  <Image
                     src={slide.image}
-                    className="d-block w-100 carousel-image"
+                    className="d-block carousel-image"
                     alt={slide.alt}
-                  />
+                    width={1200}
+                    height={600}
+                  ></Image>
                 </div>
               ))}
             </div>

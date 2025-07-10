@@ -57,8 +57,8 @@ const FaqSection = () => {
                   {openItems[index] && (
                     <div className="faq-answer">
                       <p>
-                        This is a sample answer for "{item}". Replace this
-                        content with the actual answer for each FAQ item.
+                        This is a sample answer for &quot;{item}&quot;. Replace
+                        this content with the actual answer for each FAQ item.
                       </p>
                     </div>
                   )}
