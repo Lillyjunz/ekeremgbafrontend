@@ -8,8 +8,19 @@ import { useState } from "react";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [selectedReps, setSelectedReps] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    participants: ["", "", "", ""],
+  });
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -25,17 +36,106 @@ export default function Navbar() {
 
   const closeModal = () => {
     setShowModal(false);
+    // Clear form when closing
+    clearForm();
   };
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleParticipantChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      participants: prev.participants.map((participant, i) =>
+        i === index ? value : participant
+      ),
+    }));
+  };
+
+  const clearForm = () => {
+    setFormData({
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      participants: ["", "", "", ""],
+    });
+    setTermsAccepted(false);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted");
-    closeModal();
+
+    if (!termsAccepted) {
+      alert("Please accept the terms and conditions");
+      return;
+    }
+
+    // Validate required fields
+    if (
+      !formData.name ||
+      !formData.address ||
+      !formData.phone ||
+      !formData.email
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Filter out empty participants
+      const filteredParticipants = formData.participants.filter(
+        (participant) => participant.trim() !== ""
+      );
+
+      const requestBody = {
+        name: formData.name,
+        email: formData.email,
+        phone: parseInt(formData.phone),
+        address: formData.address,
+        participants: filteredParticipants,
+      };
+
+      const response = await fetch(
+        "http://api.ekeremgbaakpauche.com/api/school/register-school",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (response.ok) {
+        // Show success popup
+        setShowSuccess(true);
+        setShowModal(false);
+        // Clear form
+        clearForm();
+      } else {
+        const errorData = await response.json();
+        alert(`Registration failed: ${errorData.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert(
+        "Registration failed. Please check your internet connection and try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRepsSelection = (value) => {
-    setSelectedReps(value);
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
   };
 
   return (
@@ -253,7 +353,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Modal Overlay */}
+      {/* Registration Modal */}
       {showModal && (
         <div
           className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
@@ -268,6 +368,7 @@ export default function Navbar() {
               onClick={closeModal}
               className="close-button-modal position-absolute"
               aria-label="Close"
+              disabled={isLoading}
             >
               ×
             </button>
@@ -292,7 +393,11 @@ export default function Navbar() {
                   type="text"
                   className="form-control form-input"
                   id="schoolName"
+                  name="name"
                   placeholder="Noah Academy"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -305,7 +410,11 @@ export default function Navbar() {
                   type="text"
                   className="form-control form-input"
                   id="address"
-                  placeholder="noa@gmail.com"
+                  name="address"
+                  placeholder="Enter school address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -318,7 +427,11 @@ export default function Navbar() {
                   type="tel"
                   className="form-control form-input"
                   id="phoneNumber"
-                  placeholder="noa@gmail.com"
+                  name="phone"
+                  placeholder="08012345678"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -331,7 +444,11 @@ export default function Navbar() {
                   type="email"
                   className="form-control form-input"
                   id="emailAddress"
-                  placeholder="noa@gmail.com"
+                  name="email"
+                  placeholder="school@email.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
                   required
                 />
               </div>
@@ -341,13 +458,18 @@ export default function Navbar() {
                   Number of Representatives
                 </label>
                 <div className="representatives-grid">
-                  {[1, 2, 3, 4].map((num) => (
+                  {[1, 2, 3, 4].map((num, index) => (
                     <div key={num} className="rep-input-wrapper">
                       <span className="rep-label">{num}.</span>
                       <input
                         type="text"
                         className="form-control rep-input"
-                        required
+                        placeholder="Full Name"
+                        value={formData.participants[index]}
+                        onChange={(e) =>
+                          handleParticipantChange(index, e.target.value)
+                        }
+                        disabled={isLoading}
                       />
                     </div>
                   ))}
@@ -359,6 +481,9 @@ export default function Navbar() {
                   className="form-check-input custom-checkbox"
                   type="checkbox"
                   id="termsConditions"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  disabled={isLoading}
                   required
                 />
                 <label
@@ -372,10 +497,43 @@ export default function Navbar() {
               <button
                 type="submit"
                 className="btn w-100 text-white fw-bold py-3 submit-button"
+                disabled={isLoading}
               >
-                Join the Tournament
+                {isLoading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Registering...
+                  </>
+                ) : (
+                  "Join the Tournament"
+                )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccess && (
+        <div className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+          <div className="modal-content bg-white rounded-4 p-4 text-center position-relative">
+            <div className="mb-3">
+              <div className="text-success" style={{ fontSize: "3rem" }}>
+                ✓
+              </div>
+            </div>
+            <h4 className="text-success mb-3">Registration Successful!</h4>
+            <p className="text-muted mb-4">
+              Your school has been registered successfully. A consultant will
+              reach out to you soon.
+            </p>
+            <button className="btn btn-success" onClick={handleSuccessClose}>
+              Close
+            </button>
           </div>
         </div>
       )}

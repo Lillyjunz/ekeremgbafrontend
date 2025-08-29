@@ -14,7 +14,6 @@ const page = () => {
     <div>
       <Navbar></Navbar>
       <HeroSection></HeroSection>
-
       <SchoolLegacyStats></SchoolLegacyStats>
       <HowItWorks></HowItWorks>
       <SubjectsEvents></SubjectsEvents>

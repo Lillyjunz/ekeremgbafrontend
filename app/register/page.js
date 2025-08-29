@@ -6,9 +6,11 @@ import RegisterModal from "../Components/registermodal";
 const RegisterPage = () => {
   const [showModal, setShowModal] = useState(true);
 
-  return (
-    <>{showModal && <RegisterModal onClose={() => setShowModal(false)} />}</>
-  );
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  return <div>{showModal && <RegisterModal onClose={handleCloseModal} />}</div>;
 };
 
 export default RegisterPage;
