@@ -15,10 +15,20 @@ function LoginPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // ✅ New state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // ✅ If already logged in, redirect to dashboard
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      router.push("/admin/dashboard");
+    }
+  }, [router]);
+
+  // ✅ Handle reset param
   useEffect(() => {
     const resetParam = searchParams.get("reset");
     if (resetParam === "success") {
@@ -39,28 +49,28 @@ function LoginPageContent() {
 
     try {
       const res = await fetch(
-        "http://api.ekeremgbaakpauche.com/api/admin/admin-login",
+        "https://api.ekeremgbaakpauche.com/api/admin/admin-login",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: email,
-            password: password,
+            email,
+            password,
           }),
         }
       );
 
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data.status) {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Save token
+      // ✅ Save token (consistent key with dashboard)
       if (data.token) {
-        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("authToken", data.token);
       }
 
       // ✅ Redirect
@@ -91,7 +101,6 @@ function LoginPageContent() {
     setShowForgotModal(true);
   };
 
-  // ✅ Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -159,7 +168,7 @@ function LoginPageContent() {
                 </label>
                 <div className="input-group">
                   <input
-                    type={showPassword ? "text" : "password"} // ✅ Dynamic input type
+                    type={showPassword ? "text" : "password"}
                     className="form-control"
                     id="password"
                     placeholder="********"
@@ -169,15 +178,14 @@ function LoginPageContent() {
                   />
                   <span
                     className="input-group-text bg-white"
-                    style={{ cursor: "pointer" }} // ✅ Add pointer cursor
-                    onClick={togglePasswordVisibility} // ✅ Add click handler
+                    style={{ cursor: "pointer" }}
+                    onClick={togglePasswordVisibility}
                   >
                     <i
                       className={`bi ${
                         showPassword ? "bi-eye" : "bi-eye-slash"
                       }`}
                     ></i>
-                    {/* ✅ Dynamic icon based on showPassword state */}
                   </span>
                 </div>
               </div>
@@ -246,7 +254,7 @@ function LoginPageContent() {
                 </h4>
 
                 <p className="text-muted mb-4" style={{ fontSize: "14px" }}>
-                  {"You don't need to worry, we will send a reset instruction."}
+                  You don't need to worry, we will send a reset instruction.
                 </p>
 
                 <form onSubmit={handleForgotPassword}>

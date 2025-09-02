@@ -9,16 +9,54 @@ const SchoolLegacyStats = () => {
     subjects: 0,
     price: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const sectionRef = useRef(null);
 
-  // Target values for animation - moved inside useEffect to avoid dependency issue
+  // Target values for animation
   const targetValues = useRef({
     schools: 10,
-    students: 500,
+    students: 500, // This will be updated from API
     subjects: 10,
     price: 9,
   });
+
+  // Fetch students data from API
+  useEffect(() => {
+    const fetchStudentsCount = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          "http://api.ekeremgbaakpauche.com/api/school/get-all-students"
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.status && data.schools && data.schools.number_of_students) {
+          // Update the target value for students with the API response
+          targetValues.current.students = data.schools.number_of_students;
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (err) {
+        console.error("Error fetching students count:", err);
+        setError(err.message);
+        // Keep the default value on error
+        targetValues.current.students = 500;
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentsCount();
+  }, []);
 
   // Intersection Observer to trigger animation when component is visible
   useEffect(() => {
@@ -38,9 +76,9 @@ const SchoolLegacyStats = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Animate counters when component becomes visible
+  // Animate counters when component becomes visible and data is loaded
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || loading) return;
 
     const duration = 2000; // 2 seconds
     const steps = 60; // 60 steps for smooth animation
@@ -69,7 +107,7 @@ const SchoolLegacyStats = () => {
     }, stepDuration);
 
     return () => clearInterval(timer);
-  }, [isVisible]);
+  }, [isVisible, loading]);
 
   return (
     <section ref={sectionRef} className="school-legacy-section py-5">
@@ -110,7 +148,14 @@ const SchoolLegacyStats = () => {
                 {/* Students */}
                 <div className="col-6">
                   <div className="stat-card">
-                    <div className="stat-number">{counters.students}+</div>
+                    <div className="stat-number">
+                      {loading ? "..." : `${counters.students}+`}
+                      {error && (
+                        <span className="text-danger" title={`Error: ${error}`}>
+                          ⚠️
+                        </span>
+                      )}
+                    </div>
                     <div className="stat-label">Students</div>
                   </div>
                 </div>

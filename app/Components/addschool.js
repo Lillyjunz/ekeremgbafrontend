@@ -82,7 +82,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
       };
 
       const response = await fetch(
-        "https://api.ekeremgbaakpauche.com/register-school",
+        "https://api.ekeremgbaakpauche.com/api/school/register-school",
         {
           method: "POST",
           headers: {

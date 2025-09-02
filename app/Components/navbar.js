@@ -10,6 +10,7 @@ export default function Navbar() {
   const [showModal, setShowModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const pathname = usePathname();
 
   // Form state
@@ -30,12 +31,14 @@ export default function Navbar() {
 
   const openModal = () => {
     setShowModal(true);
+    setError(""); // Clear any previous errors
     // Close mobile menu if open
     setIsOpen(false);
   };
 
   const closeModal = () => {
     setShowModal(false);
+    setError(""); // Clear errors when closing
     // Clear form when closing
     clearForm();
   };
@@ -66,24 +69,40 @@ export default function Navbar() {
       participants: ["", "", "", ""],
     });
     setTermsAccepted(false);
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
     if (!termsAccepted) {
-      alert("Please accept the terms and conditions");
+      setError("Please accept the terms and conditions");
       return;
     }
 
     // Validate required fields
     if (
-      !formData.name ||
-      !formData.address ||
-      !formData.phone ||
-      !formData.email
+      !formData.name.trim() ||
+      !formData.address.trim() ||
+      !formData.phone.trim() ||
+      !formData.email.trim()
     ) {
-      alert("Please fill in all required fields");
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    // Validate phone number (basic validation)
+    const phoneRegex = /^[0-9+\-\s()]+$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setError("Please enter a valid phone number");
       return;
     }
 
@@ -96,39 +115,54 @@ export default function Navbar() {
       );
 
       const requestBody = {
-        name: formData.name,
-        email: formData.email,
-        phone: parseInt(formData.phone),
-        address: formData.address,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(), // Keep as string, don't convert to int
+        address: formData.address.trim(),
         participants: filteredParticipants,
       };
 
+      console.log("Sending request:", requestBody); // Debug log
+
       const response = await fetch(
-        "http://api.ekeremgbaakpauche.com/api/school/register-school",
+        "https://api.ekeremgbaakpauche.com/api/school/register-school",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
         }
       );
 
-      if (response.ok) {
+      const responseData = await response.json();
+      console.log("Response:", responseData); // Debug log
+
+      if (response.ok && responseData.status === true) {
         // Show success popup
         setShowSuccess(true);
         setShowModal(false);
         // Clear form
         clearForm();
       } else {
-        const errorData = await response.json();
-        alert(`Registration failed: ${errorData.message || "Unknown error"}`);
+        // Handle API error response
+        const errorMessage =
+          responseData.message ||
+          responseData.error ||
+          `Registration failed with status ${response.status}`;
+        setError(errorMessage);
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert(
-        "Registration failed. Please check your internet connection and try again."
-      );
+
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        setError(
+          "Network error. Please check your internet connection and try again."
+        );
+      } else {
+        setError("Registration failed. Please try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -230,7 +264,7 @@ export default function Navbar() {
                 <li>
                   <button
                     className="dropdown-item"
-                    onClick={() => console.log("Switched to English")}
+                    onClick={() => console.log("Switched to Igbo")}
                   >
                     Igbo
                   </button>
@@ -238,7 +272,7 @@ export default function Navbar() {
                 <li>
                   <button
                     className="dropdown-item"
-                    onClick={() => console.log("Switched to French")}
+                    onClick={() => console.log("Switched to German")}
                   >
                     German
                   </button>
@@ -382,6 +416,13 @@ export default function Navbar() {
                 Kindly fill this form to reach out to a Consultant
               </p>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="alert alert-danger mb-3" role="alert">
+                {error}
+              </div>
+            )}
 
             {/* Registration Form */}
             <form onSubmit={handleSubmit}>
