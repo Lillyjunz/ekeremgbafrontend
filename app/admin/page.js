@@ -254,7 +254,8 @@ function LoginPageContent() {
                 </h4>
 
                 <p className="text-muted mb-4" style={{ fontSize: "14px" }}>
-                  You don't need to worry, we will send a reset instruction.
+                  You don&apos;t need to worry, we will send a reset
+                  instruction.
                 </p>
 
                 <form onSubmit={handleForgotPassword}>
@@ -366,7 +367,7 @@ function LoginPageContent() {
                   className="mb-0"
                   style={{ fontSize: "14px", color: "#606060" }}
                 >
-                  {" Didn't get a mail?"}
+                  {" Did not get a mail?"}
                   <button
                     type="button"
                     className="btn btn-link text-danger text-decoration-none p-0 ms-1"

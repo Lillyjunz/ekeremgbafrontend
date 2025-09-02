@@ -7,7 +7,7 @@ import styles from "./tournament2.module.css";
 
 export default function TournamentBracket() {
   const [selectedRound, setSelectedRound] = useState("Round of 16");
-  const [viewMode, setViewMode] = useState("list"); // 'list' or 'groups'
+  const [viewMode, setViewMode] = useState("list");
   const [activeMatch, setActiveMatch] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
