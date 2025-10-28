@@ -290,9 +290,7 @@ export default function TournamentSchools() {
                               Deleting...
                             </>
                           ) : (
-                            <>
-                              <i className="bi bi-trash me-1"></i> Delete
-                            </>
+                            <>Remove</>
                           )}
                         </button>
                       </td>

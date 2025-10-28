@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,9 +21,9 @@ function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ✅ If already logged in, redirect to dashboard
+  // ✅ Redirect to dashboard if already logged in
   useEffect(() => {
-    const token = localStorage.getItem("ekereAuthToken");
+    const token = Cookies.get("ekereAuthToken");
     if (token) {
       router.push("/admin/dashboard");
     }
@@ -55,10 +56,7 @@ function LoginPageContent() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         }
       );
 
@@ -68,12 +66,18 @@ function LoginPageContent() {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Save token (consistent key with dashboard)
+      // ✅ Save token both in localStorage & cookies
       if (data.token) {
         localStorage.setItem("ekereAuthToken", data.token);
+
+        // 👇 This cookie is what your middleware reads
+        Cookies.set("ekereAuthToken", data.token, {
+          expires: 1, // 1 day
+          path: "/", // available everywhere
+        });
       }
 
-      // ✅ Redirect
+      // ✅ Redirect to dashboard
       router.push("/admin/dashboard");
     } catch (error) {
       setErrorMessage(error.message);
@@ -101,9 +105,7 @@ function LoginPageContent() {
     setShowForgotModal(true);
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <>

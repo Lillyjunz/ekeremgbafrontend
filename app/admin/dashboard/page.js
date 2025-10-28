@@ -489,7 +489,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="mt-3 d-flex gap-2">
+                      <div className="mt-3 d-flex flex-wrap gap-2">
                         <button
                           className="btn btn-sm flex-grow-1"
                           style={{
@@ -503,11 +503,10 @@ export default function Dashboard() {
                           <i className="bi bi-plus-circle me-1"></i>
                           Add Schools
                         </button>
+
                         <button
                           className="btn btn-sm btn-outline-danger flex-grow-1"
-                          style={{
-                            borderRadius: "20px",
-                          }}
+                          style={{ borderRadius: "20px" }}
                           onClick={() =>
                             router.push(
                               `/admin/dashboard/tournament/${tournament.id}/schools`
@@ -516,6 +515,37 @@ export default function Dashboard() {
                         >
                           <i className="bi bi-eye me-1"></i>
                           View Schools
+                        </button>
+                        {/* 🧩 Groupings button */}
+                        <button
+                          className="btn btn-sm btn-outline-danger flex-grow-1"
+                          style={{
+                            borderRadius: "20px",
+                          }}
+                          onClick={() =>
+                            router.push(
+                              `/admin/dashboard/tournament/${tournament.id}/brackets`
+                            )
+                          }
+                        >
+                          <i className="bi bi-diagram-3-fill me-1"></i>
+                          Brackets
+                        </button>
+
+                        {/* 🏆 Leaderboard button */}
+                        <button
+                          className="btn btn-sm btn-outline-danger flex-grow-1"
+                          style={{
+                            borderRadius: "20px",
+                          }}
+                          onClick={() =>
+                            router.push(
+                              `/admin/dashboard/tournament/${tournament.id}/leaderboard`
+                            )
+                          }
+                        >
+                          <i className="bi bi-bar-chart-fill me-1"></i>
+                          Leaderboard
                         </button>
                       </div>
                     </div>

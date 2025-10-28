@@ -1,7 +1,7 @@
-// Layout.js
 "use client";
 
 import ChangePasswordModal from "@/app/Components/changepassword";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,6 +30,13 @@ export default function Layout({ children }) {
   const handleNavClick = (path) => {
     router.push(path);
     setIsMenuOpen(false);
+  };
+
+  // ✅ Logout handler
+  const handleLogout = () => {
+    Cookies.remove("ekereAuthToken"); // remove token cookie
+    localStorage.removeItem("ekereAuthToken"); // remove from localStorage (optional)
+    router.push("/admin"); // redirect to login
   };
 
   const hideNavbar = pathname.includes("/admin/dashboard/scoreboard");
@@ -62,6 +69,7 @@ export default function Layout({ children }) {
               <span className={styles.toggleIcon}></span>
             </button>
 
+            {/* Admin Dropdown */}
             <div className={`dropdown ${styles.adminDropdown}`}>
               <button
                 className={`btn ${styles.adminBtn}`}
@@ -81,6 +89,7 @@ export default function Layout({ children }) {
                   Admin <i className="bi bi-chevron-down ms-1 me-2"></i>
                 </span>
               </button>
+
               <ul className="dropdown-menu mt-2">
                 <li>
                   <button
@@ -94,13 +103,13 @@ export default function Layout({ children }) {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <Link
-                    href="/admin"
-                    className="dropdown-item"
-                    style={{ color: "rgba(255, 0, 0, 1)" }}
+                  {/* ✅ Logout integrated here */}
+                  <button
+                    className="dropdown-item text-danger"
+                    onClick={handleLogout}
                   >
                     Logout
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -133,7 +142,7 @@ export default function Layout({ children }) {
                   }`}
                   onClick={() => handleNavClick("/admin/dashboard/report")}
                 >
-                  Report
+                  Champions
                 </button>
               </div>
             </div>

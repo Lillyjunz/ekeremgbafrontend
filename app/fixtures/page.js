@@ -191,20 +191,75 @@ export default function FixturesPage() {
           <div className="alert alert-danger text-center">{error}</div>
         ) : (
           <div className="row mt-5 justify-content-center">
-            {tournaments.map((t) => (
-              <div
-                key={t.id}
-                className="col-md-6 col-lg-4 mb-4"
-                onClick={() => openModal(t)}
-              >
+            {tournaments.map((tournament) => (
+              <div key={tournament.id} className="col-md-6 col-lg-4 mb-4">
                 <div
-                  className="card shadow-sm h-100"
-                  style={{ borderRadius: "15px", cursor: "pointer" }}
+                  className="card h-100 shadow-sm"
+                  style={{ borderRadius: "15px" }}
                 >
                   <div className="card-body">
-                    <h5 className="fw-bold">{t.name}</h5>
-                    <p className="text-muted">{t.year}</p>
-                    <small className="text-muted">{t.location}</small>
+                    <div className="d-flex align-items-start mb-3">
+                      <div
+                        className="me-3"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          borderRadius: "50%",
+                          background:
+                            "linear-gradient(to right, #b30000, #660000)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#fff",
+                        }}
+                      >
+                        <i className="bi bi-trophy-fill fs-4"></i>
+                      </div>
+                      <div className="flex-grow-1">
+                        <h5 className="card-title mb-1 fw-bold">
+                          {tournament.name}
+                        </h5>
+                        <small className="text-muted">
+                          Year: {tournament.year}
+                        </small>
+                      </div>
+                    </div>
+                    <p className="card-text text-muted small">
+                      {tournament.description}
+                    </p>
+                    <div className="mt-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <i className="bi bi-geo-alt-fill text-danger me-2"></i>
+                        <small>{tournament.location}</small>
+                      </div>
+                      <div className="d-flex align-items-center mb-2">
+                        <i className="bi bi-clock-fill text-danger me-2"></i>
+                        <small>{tournament.event_time}</small>
+                      </div>
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-calendar-fill text-danger me-2"></i>
+                        <small>
+                          {new Date(tournament.created_at).toLocaleDateString()}
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Brackets Button */}
+                    <div className="mt-3">
+                      <button
+                        className="btn w-100"
+                        style={{
+                          background:
+                            "linear-gradient(to right, #b30000, #660000)",
+                          color: "#fff",
+                          borderRadius: "20px",
+                        }}
+                        onClick={() => openModal(tournament)}
+                      >
+                        <i className="bi bi-diagram-3-fill me-2"></i>
+                        View Brackets
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -120,12 +120,6 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
     } else {
       onClose(); // Fallback to just closing modal
     }
-
-    // Optional: Redirect to schools list if not already there
-    // Commenting this out since we want to stay on the same page and see the updated list
-    // setTimeout(() => {
-    //   router.push("/admin/dashboard/schools/schoollist");
-    // }, 500);
   };
 
   // Handle regular modal close (without success)
