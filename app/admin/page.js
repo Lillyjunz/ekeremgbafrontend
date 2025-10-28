@@ -22,7 +22,7 @@ function LoginPageContent() {
 
   // ✅ If already logged in, redirect to dashboard
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("ekereAuthToken");
     if (token) {
       router.push("/admin/dashboard");
     }
@@ -35,7 +35,7 @@ function LoginPageContent() {
       setShowSuccessMessage(true);
       const timer = setTimeout(() => {
         setShowSuccessMessage(false);
-        router.replace("/admin/login");
+        router.replace("/admin");
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -70,7 +70,7 @@ function LoginPageContent() {
 
       // ✅ Save token (consistent key with dashboard)
       if (data.token) {
-        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("ekereAuthToken", data.token);
       }
 
       // ✅ Redirect

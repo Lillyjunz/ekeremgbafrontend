@@ -25,7 +25,7 @@ export default function ScoreboardPage() {
     setError("");
     try {
       const res = await fetch(
-        `http://localhost:5100/api/admin/bracket/${tournamentId}`
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
       );
       if (!res.ok) throw new Error("Failed to fetch bracket data");
       const data = await res.json();
@@ -62,7 +62,7 @@ export default function ScoreboardPage() {
     setSubmitting(true);
     try {
       const res = await fetch(
-        `http://localhost:5100/api/admin/match/${activeMatch.match_id}/winner/tournament/${tournamentId}`,
+        `https://api.ekeremgbaakpauche.com/api/admin/match/${activeMatch.match_id}/winner/tournament/${tournamentId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

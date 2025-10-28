@@ -1,51 +1,83 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
 import styles from "./schools.module.css";
 
-// components/RankingTable.js
 export default function RankingTable() {
-  const rankings = [
-    { rank: 1, school: "The Pen College", score: 1589 },
-    { rank: 2, school: "The Pen College", score: 1049 },
-    { rank: 3, school: "The Pen College", score: 1049 },
-    { rank: 4, school: "The Pen College", score: 1049 },
-    { rank: 5, school: "The Pen College", score: 1049 },
-    { rank: 6, school: "The Pen College", score: 1049 },
-    { rank: 7, school: "The Pen College", score: 1049 },
-    { rank: 8, school: "The Pen College", score: 1049 },
-    { rank: 9, school: "The Pen College", score: 1049 },
-    { rank: 10, school: "The Pen College", score: 1049 },
-  ];
+  const [schools, setSchools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const response = await fetch(
+          "https://api.ekeremgbaakpauche.com/api/school/get-schools"
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        if (data?.schools?.allSchools) {
+          setSchools(data.schools.allSchools);
+        } else {
+          setError("No schools found");
+        }
+      } catch (err) {
+        console.error("Error fetching schools:", err);
+        setError("Failed to fetch schools");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchools();
+  }, []);
 
   return (
     <>
-      <Navbar></Navbar>
+      <Navbar />
       <div style={{ backgroundColor: "#fafafa" }}>
         <div className="container py-5">
           <div className={styles.rankingWrapper}>
-            <table className="table mb-0">
-              <thead>
-                <tr className="text-muted">
-                  <th>Ranking</th>
-                  <th>School</th>
-                  <th>Scores</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rankings.map((item) => (
-                  <tr key={item.rank}>
-                    <td>{item.rank}</td>
-                    <td>{item.school}</td>
-                    <td>{item.score}</td>
+            <h3 className="mb-4 fw-bold">School Rankings</h3>
+
+            {loading ? (
+              <p>Loading schools...</p>
+            ) : error ? (
+              <p className="text-danger">{error}</p>
+            ) : (
+              <table className="table mb-0">
+                <thead>
+                  <tr className="text-muted">
+                    <th>Ranking</th>
+                    <th>School Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>No. of Students</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {schools.map((school, index) => (
+                    <tr key={school.school_id}>
+                      <td>{index + 1}</td>
+                      <td>{school.name}</td>
+                      <td>{school.phone}</td>
+                      <td>{school.email}</td>
+                      <td>{school.students?.length || 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
 
-      <Footer></Footer>
+      <Footer />
     </>
   );
 }

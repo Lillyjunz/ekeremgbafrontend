@@ -1,125 +1,46 @@
-/* GroupsTable.module.css */
-.tableWrapper {
+.container {
+  padding: 2rem;
+  background-color: #fafafa;
+  min-height: 100vh;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.modalContent {
   background: #fff;
-  border-radius: 12px;
-  border: 1px solid #dee2e6;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  padding: 0;
-  margin-bottom: 2rem;
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 900px;
+  width: 95%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease;
 }
 
-.groupsTable {
-  background: #fff;
-
-  overflow: hidden;
-}
-
-/* Fix border radius for table corners */
-.groupsTable thead tr:first-child th:first-child {
-  border-top-left-radius: 8px !important;
-}
-
-.groupsTable thead tr:first-child th:last-child {
-  border-top-right-radius: 8px !important;
-}
-
-.groupsTable tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 8px !important;
-}
-
-.groupsTable tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 8px !important;
-}
-
-.filterButton {
-  border: 1px solid #dee2e6 !important;
-  color: #6c757d !important;
-  background-color: #fff !important;
-  font-size: 0.875rem !important;
-  padding: 6px 12px !important;
-  border-radius: 6px !important;
-  transition: all 0.2s ease-in-out;
-}
-
-.filterButton:hover {
-  border-color: #adb5bd !important;
-  color: #495057 !important;
-  background-color: #f8f9fa !important;
-}
-
-.filterButton:focus {
-  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
-}
-
-.tableHeader {
-  background-color: #f8f9fa !important;
-  border: none !important;
-  padding: 12px 16px !important;
-  font-size: 0.875rem !important;
-  color: #6c757d !important;
-  font-weight: 400 !important;
-}
-
-.tableCell {
-  border: none !important;
-  padding: 16px !important;
-  vertical-align: top !important;
-}
-
-.teamRow {
-  border-bottom: 1px solid #e9ecef;
-}
-
-.teamRow:last-child {
-  border-bottom: none;
-}
-
-.teamRow:hover {
-  background-color: #f8f9fa;
-}
-
-.representatives {
-  line-height: 1.4;
-}
-
-.repName {
-  font-size: 0.875rem !important;
-  color: #6c757d !important;
-  margin-bottom: 4px !important;
-}
-
-.repName:last-child {
-  margin-bottom: 0 !important;
-}
-
-.group-title h5 {
-  font-size: 1.125rem;
-  margin-bottom: 0;
-  color: #c71d12 !important;
-}
-
-.groupsHeader span {
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-.groupSection:last-child {
-  margin-bottom: 0 !important;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .groupsTable {
-    font-size: 0.875rem;
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
   }
-
-  .tableHeader,
-  .tableCell {
-    padding: 12px 8px !important;
-  }
-
-  .repName {
-    font-size: 0.8125rem !important;
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
