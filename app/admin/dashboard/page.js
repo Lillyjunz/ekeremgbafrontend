@@ -25,12 +25,13 @@ export default function Dashboard() {
     description: "",
   });
 
+  // ✅ Updated: Initialize with 3 empty participants
   const [schoolFormData, setSchoolFormData] = useState({
     name: "",
     address: "",
     phoneNumber: "",
     emailAddress: "",
-    participants: [""],
+    participants: ["", "", ""],
   });
 
   const router = useRouter();
@@ -68,7 +69,6 @@ export default function Dashboard() {
   };
 
   // Fetch all tournaments
-
   useEffect(() => {
     async function fetchTournaments() {
       setLoadingTournaments(true);
@@ -102,31 +102,34 @@ export default function Dashboard() {
     fetchTournaments();
   }, [selectedYear]);
 
-  // Fetch schools
-  useEffect(() => {
-    async function fetchSchools() {
-      try {
-        const res = await fetch(
-          "https://api.ekeremgbaakpauche.com/api/school/get-schools"
-        );
-        const data = await res.json();
-        if (res.ok && data.status) {
-          const schools = data.schools.allSchools.map((s) => ({
-            school_id: s.school_id,
-            name: s.name,
-            address: s.address,
-            phoneNumber: s.phone,
-            emailAddress: s.email,
-            participants: s.participants || [],
-          }));
-          setAvailableSchools(schools);
-        } else {
-          console.error("Failed to fetch schools", data);
-        }
-      } catch (err) {
-        console.error(err);
+  // ✅ Updated: Changed to HTTP to match working Schools page
+  const fetchSchools = async () => {
+    try {
+      const res = await fetch(
+        "http://api.ekeremgbaakpauche.com/api/school/get-schools"
+      );
+      const data = await res.json();
+
+      if (res.ok && data.status) {
+        const schools = data.schools.allSchools.map((s) => ({
+          school_id: s.school_id,
+          name: s.name,
+          address: s.address,
+          phoneNumber: s.phone,
+          emailAddress: s.email,
+          students: s.students || [],
+        }));
+        setAvailableSchools(schools);
+      } else {
+        console.error("Failed to fetch schools", data);
       }
+    } catch (err) {
+      console.error(err);
     }
+  };
+
+  // Run fetchSchools automatically once
+  useEffect(() => {
     fetchSchools();
   }, []);
 
@@ -140,10 +143,13 @@ export default function Dashboard() {
     setError("");
   };
 
-  const toggleSchoolSelection = (id) =>
+  const toggleSchoolSelection = (school_id) => {
     setSelectedSchools((prev) =>
-      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+      prev.includes(school_id)
+        ? prev.filter((id) => id !== school_id)
+        : [...prev, school_id]
     );
+  };
 
   const addAll = () =>
     setSelectedSchools(availableSchools.map((s) => s.school_id));
@@ -167,14 +173,45 @@ export default function Dashboard() {
     }));
   };
 
+  // ✅ Updated: Prevent removing below 3 participants
   const removeParticipantField = (index) => {
+    if (schoolFormData.participants.length <= 3) {
+      setError("Minimum 3 participants required");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
     const updated = schoolFormData.participants.filter((_, i) => i !== index);
     setSchoolFormData((prev) => ({ ...prev, participants: updated }));
   };
 
+  // ✅ Updated: Added validation for participants
   const handleSchoolFormSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Validate minimum 3 participants
+    if (schoolFormData.participants.length < 3) {
+      setError("Please add at least 3 participants");
+      return;
+    }
+
+    // Validate all participants have names (trim whitespace)
+    const validParticipants = schoolFormData.participants.filter(
+      (p) => p.trim() !== ""
+    );
+    if (validParticipants.length < 3) {
+      setError("Please fill in at least 3 participant names");
+      return;
+    }
+
+    // Check for duplicate names
+    const uniqueNames = new Set(
+      validParticipants.map((p) => p.trim().toLowerCase())
+    );
+    if (uniqueNames.size < validParticipants.length) {
+      setError("Participant names must be unique");
+      return;
+    }
 
     try {
       const token = getAuthToken();
@@ -184,7 +221,7 @@ export default function Dashboard() {
         address: schoolFormData.address,
         phone: schoolFormData.phoneNumber,
         email: schoolFormData.emailAddress,
-        participants: schoolFormData.participants,
+        participants: validParticipants.map((p) => p.trim()), // Trim whitespace
       };
 
       const res = await fetch(
@@ -200,6 +237,7 @@ export default function Dashboard() {
       );
 
       const data = await res.json();
+
       if (res.ok && data.status && data.new_school) {
         const newSchool = {
           school_id: data.new_school.school_id || Date.now().toString(),
@@ -207,18 +245,31 @@ export default function Dashboard() {
           address: data.new_school.address,
           phoneNumber: data.new_school.phone,
           emailAddress: data.new_school.email,
-          participants: data.new_school.participants || [],
+          students:
+            data.new_school.participants?.map((p, i) => ({
+              id: Date.now() + i,
+              fullname: p,
+              class: null,
+            })) || [],
         };
+
         setAvailableSchools((prev) => [...prev, newSchool]);
         setSelectedSchools((prev) => [...prev, newSchool.school_id]);
+
         setSuccess("School added successfully!");
+
+        // Re-fetch to ensure data consistency
+        await fetchSchools();
+
         setShowSchoolForm(false);
+
+        // ✅ Reset form with 3 empty participants
         setSchoolFormData({
           name: "",
           address: "",
           phoneNumber: "",
           emailAddress: "",
-          participants: [""],
+          participants: ["", "", ""],
         });
       } else {
         throw new Error(data.message || "Add school failed");
@@ -262,11 +313,10 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Updated to use new response format
         setSuccess(data.message || "Tournament created successfully!");
         console.log("Tournament ID:", data.tournamentId);
 
-        // ✅ Auto-close modal after success
+        // Auto-close modal after success
         setTimeout(() => {
           resetAll();
           window.location.reload();
@@ -291,46 +341,6 @@ export default function Dashboard() {
   const handleAddSchools = (tournamentId) => {
     setSelectedTournamentId(tournamentId);
     setShowSchoolModal(true);
-  };
-
-  // Handle adding schools to tournament
-
-  const handleAddSchoolsToTournament = async (schoolId) => {
-    try {
-      const token = getAuthToken();
-      if (!token) {
-        alert("No admin token found. Please log in again.");
-        return;
-      }
-
-      if (!selectedTournamentId) {
-        alert("Please select a tournament first.");
-        return;
-      }
-
-      const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedTournamentId}/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ schoolId }), // ✅ correct payload
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to add school to tournament");
-      }
-
-      alert(data.message); // ✅ shows “ABC Int’l school Aba successfully registered for testing”
-    } catch (error) {
-      console.error("Error adding school:", error);
-      alert(error.message);
-    }
   };
 
   return (
@@ -516,7 +526,7 @@ export default function Dashboard() {
                           <i className="bi bi-eye me-1"></i>
                           View Schools
                         </button>
-                        {/* 🧩 Groupings button */}
+
                         <button
                           className="btn btn-sm btn-outline-danger flex-grow-1"
                           style={{
@@ -532,7 +542,6 @@ export default function Dashboard() {
                           Brackets
                         </button>
 
-                        {/* 🏆 Leaderboard button */}
                         <button
                           className="btn btn-sm btn-outline-danger flex-grow-1"
                           style={{
@@ -722,6 +731,7 @@ export default function Dashboard() {
                         </button>
                       </div>
                     ))}
+
                     <button
                       className={styles.addNewSchoolBtn}
                       onClick={() => setShowSchoolForm(true)}
@@ -731,29 +741,6 @@ export default function Dashboard() {
                   </div>
 
                   <div className="mt-4">
-                    {/* <button
-                      onClick={async () => {
-                        if (selectedSchools.length === 0)
-                          return alert("No schools selected");
-                        for (const id of selectedSchools) {
-                          await handleAddSchoolsToTournament(id);
-                        }
-                        alert("All selected schools added successfully!");
-                        setSelectedSchools([]); // optional reset
-                      }}
-                      className="btn w-100"
-                      style={{
-                        background:
-                          "linear-gradient(to right, #b30000, #660000)",
-                        color: "#fff",
-                        borderRadius: "30px",
-                      }}
-                      disabled={selectedSchools.length === 0}
-                    >
-                      Add Schools to Tournament ({selectedSchools.length}{" "}
-                      selected)
-                    </button> */}
-
                     <button
                       onClick={async () => {
                         if (selectedSchools.length === 0) return;
@@ -761,9 +748,15 @@ export default function Dashboard() {
                         let successCount = 0;
                         let failedSchools = [];
 
+                        console.log("Tournament ID:", selectedTournamentId);
+                        console.log("Selected School IDs:", selectedSchools);
+
                         for (const id of selectedSchools) {
                           try {
                             const token = getAuthToken();
+
+                            console.log(`Registering school ${id}...`);
+
                             const res = await fetch(
                               `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedTournamentId}/register`,
                               {
@@ -777,31 +770,43 @@ export default function Dashboard() {
                             );
 
                             const data = await res.json();
+                            console.log(`Response for school ${id}:`, data);
 
-                            if (!res.ok)
+                            if (!res.ok) {
                               throw new Error(data.message || "Failed");
+                            }
 
                             successCount++;
                           } catch (err) {
                             failedSchools.push(id);
-                            console.error("Failed to add school:", err.message);
+                            console.error(
+                              `Failed to add school ${id}:`,
+                              err.message
+                            );
                           }
                         }
 
-                        // Show results using SweetAlert2
+                        // Show results
                         let htmlMsg = `<p><strong>${successCount}</strong> school(s) added successfully.</p>`;
                         if (failedSchools.length > 0) {
                           htmlMsg += `<p><strong>${failedSchools.length}</strong> school(s) failed to add.</p>`;
                         }
 
-                        Swal.fire({
-                          icon:
-                            failedSchools.length === 0 ? "success" : "warning",
-                          title: "Add Schools Result",
-                          html: htmlMsg,
-                        });
+                        if (typeof Swal !== "undefined") {
+                          Swal.fire({
+                            icon:
+                              failedSchools.length === 0
+                                ? "success"
+                                : "warning",
+                            title: "Add Schools Result",
+                            html: htmlMsg,
+                          });
+                        } else {
+                          alert(htmlMsg.replace(/<[^>]*>/g, ""));
+                        }
 
-                        setSelectedSchools([]); // reset selection
+                        setSelectedSchools([]);
+                        resetSchoolModal();
                       }}
                       className="btn w-100"
                       style={{
@@ -840,10 +845,14 @@ export default function Dashboard() {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h5 className="fw-bold">Add a School</h5>
                 <button
-                  onClick={() => setShowSchoolForm(false)}
+                  onClick={() => {
+                    setShowSchoolForm(false);
+                    setError("");
+                  }}
                   className="btn-close"
                 />
               </div>
+              {error && <div className="alert alert-danger">{error}</div>}
               <form onSubmit={handleSchoolFormSubmit}>
                 <div className="mb-3">
                   <label className="form-label">
@@ -902,38 +911,63 @@ export default function Dashboard() {
                   />
                 </div>
 
+                {/* ✅ Updated Participants Section */}
                 <div className="mb-3">
-                  <label className="form-label">Participants</label>
+                  <label className="form-label fw-bold">
+                    Participants{" "}
+                    <span className="text-muted small">
+                      (Minimum 3 required)
+                    </span>
+                    <span className="text-danger">*</span>
+                  </label>
+                  <div className="alert alert-info py-2 small mb-3">
+                    <i className="bi bi-info-circle me-2"></i>
+                    Please enter the full names of at least 3 participants
+                  </div>
+
                   {schoolFormData.participants.map((p, i) => (
-                    <div key={i} className="input-group mb-2">
-                      <span className="input-group-text">{i + 1}</span>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={`Fullname - ${i + 1}`}
-                        value={p}
-                        onChange={(e) =>
-                          handleParticipantChange(i, e.target.value)
-                        }
-                        required
-                      />
-                      {schoolFormData.participants.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger"
-                          onClick={() => removeParticipantField(i)}
+                    <div key={i} className="mb-3">
+                      <div className="input-group">
+                        <span
+                          className="input-group-text"
+                          style={{
+                            minWidth: "45px",
+                            justifyContent: "center",
+                          }}
                         >
-                          <i className="bi bi-dash"></i>
-                        </button>
-                      )}
+                          {i + 1}
+                        </span>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder={`Participant ${i + 1} - Full Name`}
+                          value={p}
+                          onChange={(e) =>
+                            handleParticipantChange(i, e.target.value)
+                          }
+                          required
+                        />
+                        {schoolFormData.participants.length > 3 && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger"
+                            onClick={() => removeParticipantField(i)}
+                            title="Remove participant"
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
+
                   <button
                     type="button"
-                    className="btn btn-outline-primary btn-sm mt-2"
+                    className="btn btn-outline-primary btn-sm w-100"
                     onClick={addParticipantField}
                   >
-                    <i className="bi bi-plus"></i> Add Participant
+                    <i className="bi bi-plus-circle me-2"></i>
+                    Add Another Participant
                   </button>
                 </div>
 

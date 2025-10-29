@@ -111,7 +111,7 @@ export default function Schools() {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://api.ekeremgbaakpauche.com/api/school/get-schools"
+        "https://api.ekeremgbaakpauche.com/api/school/get-schools"
       );
 
       if (!response.ok) {
