@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import styles from "./scoreboard.module.css";
 
 export default function ScoreboardPage() {
+  const [token, setToken] = useState(null);
   const [bracket, setBracket] = useState(null);
+  const [schoolsMap, setSchoolsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showInstructions, setShowInstructions] = useState(false);
-  const [activeMatch, setActiveMatch] = useState(null); // match currently recording scores
+  const [activeMatch, setActiveMatch] = useState(null);
   const [scores, setScores] = useState({
     school1_score: "",
     school2_score: "",
@@ -18,31 +20,65 @@ export default function ScoreboardPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const tournamentId = 2; // static for now, can make dynamic
+  const tournamentId = 2; // static for now
 
-  const fetchBracket = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch bracket data");
-      const data = await res.json();
-      setBracket(data.bracket);
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // ✅ Get token from localStorage safely
   useEffect(() => {
-    fetchBracket();
-    const interval = setInterval(fetchBracket, 5000);
-    return () => clearInterval(interval);
+    const storedToken = localStorage.getItem("ekereAuthToken");
+    setToken(storedToken);
   }, []);
+
+  // ✅ Combined fetching for bracket + active match
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchData = async () => {
+      try {
+        const [bracketRes, activeRes] = await Promise.all([
+          fetch(
+            `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `https://api.ekeremgbaakpauche.com/api/admin/get-active-match`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+        ]);
+
+        const bracketData = await bracketRes.json();
+        const activeData = await activeRes.json();
+
+        if (!bracketRes.ok)
+          throw new Error(bracketData.message || "Failed to fetch bracket");
+
+        setBracket(bracketData.bracket || {});
+        setActiveMatch(activeData?.activeMatch || null);
+
+        // Build school map
+        const map = {};
+        Object.values(bracketData.bracket || {})
+          .flat()
+          .forEach((m) => {
+            map[m.school1Id] = m.school1;
+            map[m.school2Id] = m.school2;
+          });
+        setSchoolsMap(map);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, [token]);
 
   const handleOpenScoreForm = (match) => {
     setActiveMatch(match);
@@ -59,13 +95,23 @@ export default function ScoreboardPage() {
       return;
     }
 
+    if (!token) {
+      alert("Token not found. Please log in again.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/match/${activeMatch.match_id}/winner/tournament/${tournamentId}`,
+        `https://api.ekeremgbaakpauche.com/api/admin/match/${
+          activeMatch.match_id || activeMatch.id
+        }/winner/tournament/${tournamentId}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             winnerId: Number(scores.winnerId),
             school1_score: Number(scores.school1_score),
@@ -73,12 +119,12 @@ export default function ScoreboardPage() {
           }),
         }
       );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to record scores");
 
       alert(data.message);
       setActiveMatch(null);
-      fetchBracket(); // refresh bracket
     } catch (err) {
       alert(err.message);
     } finally {
@@ -94,16 +140,37 @@ export default function ScoreboardPage() {
   const currentRoundName = Object.keys(bracket).find((round) =>
     bracket[round].some((match) => match.winner === null)
   );
-  const currentMatches = currentRoundName ? bracket[currentRoundName] : [];
+  let currentMatches = currentRoundName ? [...bracket[currentRoundName]] : [];
+
+  // Merge activeMatch if not already in currentMatches
+  if (activeMatch) {
+    const exists = currentMatches.some((m) => m.match_id === activeMatch.id);
+    if (!exists) {
+      currentMatches.unshift({
+        match_id: activeMatch.id,
+        school1:
+          schoolsMap[activeMatch.school1_id] ||
+          `School ${activeMatch.school1_id}`,
+        school2:
+          schoolsMap[activeMatch.school2_id] ||
+          `School ${activeMatch.school2_id}`,
+        school1_score: activeMatch.school1_score,
+        school2_score: activeMatch.school2_score,
+        winner: activeMatch.winner_id
+          ? schoolsMap[activeMatch.winner_id]
+          : null,
+        isActive: true,
+      });
+    }
+  }
 
   return (
     <div className={styles.container}>
-      <button className={styles.backButton}>
-        <Link href="/admin/dashboard">
-          <ArrowLeft size={16} />
-          &nbsp;Go back to home
-        </Link>
-      </button>
+      {/* ✅ Fixed: No refresh */}
+      <Link href="/admin/dashboard" className={styles.backButton}>
+        <ArrowLeft size={16} />
+        &nbsp;Go back to home
+      </Link>
 
       <div className={styles.topicWrapper}>
         <p className={styles.topicLabel}>CURRENT ROUND</p>
@@ -114,75 +181,48 @@ export default function ScoreboardPage() {
 
       {currentMatches.length === 0 && <p>No ongoing matches currently.</p>}
 
-      {currentMatches.map((match) => (
-        <div key={match.match_id} className={styles.scoreboardBox}>
-          <div className={styles.matchup}>
-            <span className={styles.teamLeft}>{match.school1}</span>
-            <span className={styles.vs}>VS</span>
-            <span className={styles.teamRight}>{match.school2}</span>
-          </div>
+      {currentMatches.map((match) => {
+        const isActive = activeMatch?.id === match.match_id || match.isActive;
 
-          <div className={styles.scoreSection}>
-            <div className={styles.teamScores}>
-              <div className={styles.teamColumn}>
-                <h5>Students</h5>
-                <ul>
-                  {match.school1_students?.map((s) => (
-                    <li key={s.id}>{s.name}</li>
-                  )) || <li>Student list not available</li>}
-                </ul>
-              </div>
-              <div className={styles.teamColumn}>
-                <h5>Score</h5>
-                <ul>
-                  {match.school1_students?.map((s) => (
-                    <li key={s.id}>{s.score || 0}</li>
-                  )) || <li>0</li>}
-                </ul>
-              </div>
+        return (
+          <div
+            key={match.match_id}
+            className={`${styles.scoreboardBox} ${
+              isActive ? styles.activeMatch : ""
+            }`}
+          >
+            <div className={styles.matchup}>
+              <span className={styles.teamLeft}>{match.school1}</span>
+              <span className={styles.vs}>VS</span>
+              <span className={styles.teamRight}>{match.school2}</span>
+            </div>
 
+            <div className={styles.scoreSection}>
               <div className={styles.centerScore}>
-                {match.school1_total || 0} : {match.school2_total || 0}
-              </div>
-
-              <div className={styles.teamColumn}>
-                <h5>Students</h5>
-                <ul>
-                  {match.school2_students?.map((s) => (
-                    <li key={s.id}>{s.name}</li>
-                  )) || <li>Student list not available</li>}
-                </ul>
-              </div>
-              <div className={styles.teamColumn}>
-                <h5>Score</h5>
-                <ul>
-                  {match.school2_students?.map((s) => (
-                    <li key={s.id}>{s.score || 0}</li>
-                  )) || <li>0</li>}
-                </ul>
+                {match.school1_score || 0} : {match.school2_score || 0}
               </div>
             </div>
 
-            <div className={styles.timer}>Time : {match.timer || "00:00"}</div>
+            {match.winner === null && (
+              <button
+                className="btn btn-primary mt-3"
+                onClick={() => handleOpenScoreForm(match)}
+              >
+                Record Scores
+              </button>
+            )}
           </div>
-
-          {match.winner === null && (
-            <button
-              className="btn btn-primary mt-3"
-              onClick={() => handleOpenScoreForm(match)}
-            >
-              Record Scores
-            </button>
-          )}
-        </div>
-      ))}
+        );
+      })}
 
       {/* Score Recording Modal */}
       {activeMatch && (
         <div className={styles.popup}>
           <div className={styles.popupHeader}>
             <h4>
-              Record Scores for {activeMatch.school1} vs {activeMatch.school2}
+              Record Scores for{" "}
+              {schoolsMap[activeMatch.school1_id] || activeMatch.school1} vs{" "}
+              {schoolsMap[activeMatch.school2_id] || activeMatch.school2}
             </h4>
             <button
               className={styles.closeBtn}
@@ -201,12 +241,19 @@ export default function ScoreboardPage() {
                 }
               >
                 <option value="">Select Winner</option>
-                <option value={1}>{activeMatch.school1}</option>
-                <option value={2}>{activeMatch.school2}</option>
+                <option value={activeMatch.school1_id}>
+                  {schoolsMap[activeMatch.school1_id] || activeMatch.school1}
+                </option>
+                <option value={activeMatch.school2_id}>
+                  {schoolsMap[activeMatch.school2_id] || activeMatch.school2}
+                </option>
               </select>
             </div>
             <div style={{ marginBottom: "1rem" }}>
-              <label>{activeMatch.school1} Score:</label>
+              <label>
+                {schoolsMap[activeMatch.school1_id] || activeMatch.school1}{" "}
+                Score:
+              </label>
               <input
                 type="number"
                 value={scores.school1_score}
@@ -216,7 +263,10 @@ export default function ScoreboardPage() {
               />
             </div>
             <div style={{ marginBottom: "1rem" }}>
-              <label>{activeMatch.school2} Score:</label>
+              <label>
+                {schoolsMap[activeMatch.school2_id] || activeMatch.school2}{" "}
+                Score:
+              </label>
               <input
                 type="number"
                 value={scores.school2_score}
@@ -236,6 +286,7 @@ export default function ScoreboardPage() {
         </div>
       )}
 
+      {/* Instructions */}
       <div className={styles.instructionsWrapper}>
         <button
           className={styles.instructionsBtn}

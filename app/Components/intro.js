@@ -23,6 +23,7 @@ const SchoolLegacyStats = () => {
   });
 
   // Fetch students data from API
+
   useEffect(() => {
     const fetchStudentsCount = async () => {
       try {
@@ -30,7 +31,7 @@ const SchoolLegacyStats = () => {
         setError(null);
 
         const response = await fetch(
-          "http://api.ekeremgbaakpauche.com/api/school/get-all-students"
+          "https://api.ekeremgbaakpauche.com/api/school/get-all-students"
         );
 
         if (!response.ok) {
@@ -39,8 +40,13 @@ const SchoolLegacyStats = () => {
 
         const data = await response.json();
 
-        if (data.status && data.schools && data.schools.number_of_students) {
-          // Update the target value for students with the API response
+        if (
+          data &&
+          typeof data.status === "boolean" &&
+          data.schools &&
+          "number_of_students" in data.schools
+        ) {
+          // ✅ Update with API data
           targetValues.current.students = data.schools.number_of_students;
         } else {
           throw new Error("Invalid response format");
@@ -48,7 +54,7 @@ const SchoolLegacyStats = () => {
       } catch (err) {
         console.error("Error fetching students count:", err);
         setError(err.message);
-        // Keep the default value on error
+        // Keep default value
         targetValues.current.students = 500;
       } finally {
         setLoading(false);

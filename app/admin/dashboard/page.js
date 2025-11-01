@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import styles from "./dashboard.module.css";
 
 export default function Dashboard() {
@@ -103,16 +104,18 @@ export default function Dashboard() {
   }, [selectedYear]);
 
   // ✅ Updated: Changed to HTTP to match working Schools page
+
   const fetchSchools = async () => {
     try {
       const res = await fetch(
-        "http://api.ekeremgbaakpauche.com/api/school/get-schools"
+        "https://api.ekeremgbaakpauche.com/api/school/get-schools"
       );
       const data = await res.json();
 
       if (res.ok && data.status) {
         const schools = data.schools.allSchools.map((s) => ({
-          school_id: s.school_id,
+          id: s.id, // ✅ Changed from school_id to id
+          school_id: s.school_id, // Keep school_id for reference if needed
           name: s.name,
           address: s.address,
           phoneNumber: s.phone,
@@ -143,17 +146,15 @@ export default function Dashboard() {
     setError("");
   };
 
-  const toggleSchoolSelection = (school_id) => {
+  const toggleSchoolSelection = (schoolId) => {
     setSelectedSchools((prev) =>
-      prev.includes(school_id)
-        ? prev.filter((id) => id !== school_id)
-        : [...prev, school_id]
+      prev.includes(schoolId)
+        ? prev.filter((id) => id !== schoolId)
+        : [...prev, schoolId]
     );
   };
 
-  const addAll = () =>
-    setSelectedSchools(availableSchools.map((s) => s.school_id));
-
+  const addAll = () => setSelectedSchools(availableSchools.map((s) => s.id));
   const removeAll = () => setSelectedSchools([]);
 
   const handleSchoolFormChange = (field, value) => {
@@ -184,7 +185,6 @@ export default function Dashboard() {
     setSchoolFormData((prev) => ({ ...prev, participants: updated }));
   };
 
-  // ✅ Updated: Added validation for participants
   const handleSchoolFormSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -221,7 +221,7 @@ export default function Dashboard() {
         address: schoolFormData.address,
         phone: schoolFormData.phoneNumber,
         email: schoolFormData.emailAddress,
-        participants: validParticipants.map((p) => p.trim()), // Trim whitespace
+        participants: validParticipants.map((p) => p.trim()),
       };
 
       const res = await fetch(
@@ -240,7 +240,8 @@ export default function Dashboard() {
 
       if (res.ok && data.status && data.new_school) {
         const newSchool = {
-          school_id: data.new_school.school_id || Date.now().toString(),
+          id: data.new_school.id || Date.now(), // ✅ Changed to use 'id'
+          school_id: data.new_school.school_id, // Keep school_id for reference
           name: data.new_school.name,
           address: data.new_school.address,
           phoneNumber: data.new_school.phone,
@@ -254,7 +255,7 @@ export default function Dashboard() {
         };
 
         setAvailableSchools((prev) => [...prev, newSchool]);
-        setSelectedSchools((prev) => [...prev, newSchool.school_id]);
+        setSelectedSchools((prev) => [...prev, newSchool.id]); // ✅ Changed from school_id to id
 
         setSuccess("School added successfully!");
 
@@ -263,7 +264,7 @@ export default function Dashboard() {
 
         setShowSchoolForm(false);
 
-        // ✅ Reset form with 3 empty participants
+        // Reset form with 3 empty participants
         setSchoolFormData({
           name: "",
           address: "",
@@ -715,19 +716,17 @@ export default function Dashboard() {
 
                   <div className={styles.schoolsList}>
                     {availableSchools.map((s) => (
-                      <div key={s.school_id} className={styles.schoolItem}>
+                      <div key={s.id} className={styles.schoolItem}>
                         <span className={styles.schoolName}>{s.name}</span>
                         <button
                           className={`${styles.addBtn} ${
-                            selectedSchools.includes(s.school_id)
+                            selectedSchools.includes(s.id)
                               ? styles.addBtnActive
                               : ""
                           }`}
-                          onClick={() => toggleSchoolSelection(s.school_id)}
+                          onClick={() => toggleSchoolSelection(s.id)} // <-- numeric ID
                         >
-                          {selectedSchools.includes(s.school_id)
-                            ? "Added"
-                            : "Add"}
+                          {selectedSchools.includes(s.id) ? "Added" : "Add"}
                         </button>
                       </div>
                     ))}
@@ -745,18 +744,16 @@ export default function Dashboard() {
                       onClick={async () => {
                         if (selectedSchools.length === 0) return;
 
+                        const uniqueSelectedSchools = [
+                          ...new Set(selectedSchools),
+                        ]; // Remove duplicates
                         let successCount = 0;
                         let failedSchools = [];
 
-                        console.log("Tournament ID:", selectedTournamentId);
-                        console.log("Selected School IDs:", selectedSchools);
+                        const token = getAuthToken();
 
-                        for (const id of selectedSchools) {
+                        for (const id of uniqueSelectedSchools) {
                           try {
-                            const token = getAuthToken();
-
-                            console.log(`Registering school ${id}...`);
-
                             const res = await fetch(
                               `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedTournamentId}/register`,
                               {
@@ -765,17 +762,13 @@ export default function Dashboard() {
                                   "Content-Type": "application/json",
                                   Authorization: `Bearer ${token}`,
                                 },
-                                body: JSON.stringify({ schoolId: id }),
+                                body: JSON.stringify({ schoolId: id }), // numeric ID
                               }
                             );
 
                             const data = await res.json();
-                            console.log(`Response for school ${id}:`, data);
-
-                            if (!res.ok) {
+                            if (!res.ok)
                               throw new Error(data.message || "Failed");
-                            }
-
                             successCount++;
                           } catch (err) {
                             failedSchools.push(id);
@@ -786,24 +779,17 @@ export default function Dashboard() {
                           }
                         }
 
-                        // Show results
-                        let htmlMsg = `<p><strong>${successCount}</strong> school(s) added successfully.</p>`;
-                        if (failedSchools.length > 0) {
-                          htmlMsg += `<p><strong>${failedSchools.length}</strong> school(s) failed to add.</p>`;
-                        }
-
-                        if (typeof Swal !== "undefined") {
-                          Swal.fire({
-                            icon:
-                              failedSchools.length === 0
-                                ? "success"
-                                : "warning",
-                            title: "Add Schools Result",
-                            html: htmlMsg,
-                          });
-                        } else {
-                          alert(htmlMsg.replace(/<[^>]*>/g, ""));
-                        }
+                        Swal.fire({
+                          icon:
+                            failedSchools.length === 0 ? "success" : "warning",
+                          title: "Add Schools Result",
+                          html: `<p><strong>${successCount}</strong> school(s) added successfully.</p>
+         ${
+           failedSchools.length > 0
+             ? `<p><strong>${failedSchools.length}</strong> school(s) failed to add.</p>`
+             : ""
+         }`,
+                        });
 
                         setSelectedSchools([]);
                         resetSchoolModal();

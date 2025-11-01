@@ -15,12 +15,7 @@ export default function FixturesPage() {
   const [bracketData, setBracketData] = useState(null);
   const [bracketLoading, setBracketLoading] = useState(false);
   const [bracketError, setBracketError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const [generatingNext, setGeneratingNext] = useState(false);
-  const [updatingMatch, setUpdatingMatch] = useState(null);
-  const [matchInputs, setMatchInputs] = useState({});
   const [champion, setChampion] = useState(null);
-  const [recordingChampion, setRecordingChampion] = useState(false);
 
   const getAuthToken = () =>
     typeof window !== "undefined"
@@ -61,17 +56,6 @@ export default function FixturesPage() {
       const data = await res.json();
       if (data?.bracket) {
         setBracketData(data.bracket);
-        const initialInputs = {};
-        Object.values(data.bracket)
-          .flat()
-          .forEach((match) => {
-            initialInputs[match.match_id] = {
-              selectedWinner: "",
-              school1Score: "",
-              school2Score: "",
-            };
-          });
-        setMatchInputs(initialInputs);
       } else setBracketError("No bracket data found.");
       const champRes = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${tournamentId}`
@@ -95,85 +79,6 @@ export default function FixturesPage() {
     setSelectedTournament(null);
     setBracketData(null);
     setChampion(null);
-  };
-
-  // ✅ Input change
-  const handleInputChange = (id, field, val) =>
-    setMatchInputs((p) => ({ ...p, [id]: { ...p[id], [field]: val } }));
-
-  // ✅ Record winner
-  const handleRecordWinner = async (matchId) => {
-    const { selectedWinner, school1Score, school2Score } =
-      matchInputs[matchId] || {};
-    if (!selectedWinner || !school1Score || !school2Score) {
-      alert("Please fill all fields and select a winner.");
-      return;
-    }
-    setUpdatingMatch(matchId);
-    try {
-      const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/match/${matchId}/winner/tournament/${selectedTournament.id}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            winnerId: selectedWinner,
-            school1_score: Number(school1Score),
-            school2_score: Number(school2Score),
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      setSuccessMsg(data.message);
-      fetchBracket(selectedTournament.id);
-    } catch (err) {
-      setBracketError(err.message);
-    } finally {
-      setUpdatingMatch(null);
-    }
-  };
-
-  // ✅ Generate next round
-  const handleGenerateNextRound = async () => {
-    setGeneratingNext(true);
-    try {
-      const token = getAuthToken();
-      const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/generate-next-round?tournamentId=${selectedTournament.id}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      setSuccessMsg(data.message);
-      fetchBracket(selectedTournament.id);
-    } catch (err) {
-      setBracketError(err.message);
-    } finally {
-      setGeneratingNext(false);
-    }
-  };
-
-  // ✅ Record Champion
-  const handleRecordChampion = async () => {
-    setRecordingChampion(true);
-    try {
-      const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${selectedTournament.id}`,
-        { method: "POST" }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      setChampion(data.champion);
-      setSuccessMsg("Champion recorded successfully!");
-    } catch (err) {
-      setBracketError(err.message);
-    } finally {
-      setRecordingChampion(false);
-    }
   };
 
   return (
@@ -295,128 +200,191 @@ export default function FixturesPage() {
                 <div className="alert alert-warning text-center">
                   {bracketError}
                 </div>
+              ) : !bracketData || Object.keys(bracketData).length === 0 ? (
+                <div className="text-center py-5">
+                  <div
+                    className="mx-auto mb-4"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "50%",
+                      background:
+                        "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i
+                      className="bi bi-diagram-3 text-muted"
+                      style={{ fontSize: "4rem" }}
+                    ></i>
+                  </div>
+                  <h4 className="text-muted fw-bold mb-2">
+                    No Bracket Available
+                  </h4>
+                  <p className="text-muted">
+                    The tournament bracket hasn't been created yet.
+                    <br />
+                    Please check back later for updates.
+                  </p>
+                </div>
               ) : (
                 bracketData && (
-                  <div style={{ padding: "1rem" }}>
-                    <h4>Tournament Bracket</h4>
-
+                  <div
+                    style={{
+                      padding: "1rem",
+                      maxHeight: "70vh",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {/* Champion Banner */}
                     {champion && (
-                      <div className="alert alert-success text-center">
-                        🏆 Champion: {champion}
+                      <div
+                        className="text-center p-4 rounded-4 mb-4 shadow mx-auto"
+                        style={{
+                          maxWidth: "700px",
+                          background:
+                            "linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)",
+                          border: "3px solid #f0c000",
+                        }}
+                      >
+                        <i
+                          className="bi bi-trophy-fill text-warning mb-2"
+                          style={{ fontSize: "3rem" }}
+                        ></i>
+                        <h2 className="fw-bold text-dark mb-1">🏆 Champion</h2>
+                        <h3 className="text-dark fw-bold">{champion}</h3>
                       </div>
                     )}
 
-                    <button
-                      className="btn btn-primary mb-3"
-                      disabled={generatingNext}
-                      onClick={handleGenerateNextRound}
-                    >
-                      {generatingNext
-                        ? "Generating Next Round..."
-                        : "Generate Next Round"}
-                    </button>
-
-                    {Object.keys(bracketData).map((round) => (
-                      <div key={round} className="mb-4 border p-3 rounded">
-                        <h5>{round}</h5>
-                        {bracketData[round].map((match) => {
-                          const isUpcoming = !match.winner;
-                          const m = matchInputs[match.match_id] || {};
-                          return (
+                    {/* Bracket Rounds */}
+                    <div className="row g-4">
+                      {Object.keys(bracketData).map((round, roundIndex) => (
+                        <div key={round} className="col-12">
+                          {/* Round Header */}
+                          <div className="d-flex align-items-center gap-2 mb-3">
                             <div
-                              key={match.match_id}
-                              className="mb-3 p-2 rounded"
+                              className="px-3 py-2 rounded-3 shadow d-inline-flex align-items-center gap-2"
                               style={{
-                                background: isUpcoming ? "#fff3cd" : "#e2e3e5",
+                                background:
+                                  "linear-gradient(#c71d12 0%, #680b05 100%)",
+                                color: "white",
                               }}
                             >
-                              <div className="d-flex justify-content-between">
-                                <span>{match.school1}</span>
-                                <span>vs</span>
-                                <span>{match.school2}</span>
-                                <strong>
-                                  {match.winner
-                                    ? `Winner: ${match.winner}`
-                                    : "Winner: TBD"}
-                                </strong>
-                              </div>
-
-                              {isUpcoming && (
-                                <div className="mt-2 d-flex flex-wrap gap-2">
-                                  <select
-                                    className="form-select"
-                                    style={{ width: "180px" }}
-                                    value={m.selectedWinner}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        match.match_id,
-                                        "selectedWinner",
-                                        e.target.value
-                                      )
-                                    }
-                                  >
-                                    <option value="">Select Winner</option>
-                                    <option value={1}>{match.school1}</option>
-                                    <option value={2}>{match.school2}</option>
-                                  </select>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    style={{ width: "120px" }}
-                                    placeholder={`${match.school1} Score`}
-                                    value={m.school1Score}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        match.match_id,
-                                        "school1Score",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    style={{ width: "120px" }}
-                                    placeholder={`${match.school2} Score`}
-                                    value={m.school2Score}
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        match.match_id,
-                                        "school2Score",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                  <button
-                                    className="btn btn-success"
-                                    disabled={updatingMatch === match.match_id}
-                                    onClick={() =>
-                                      handleRecordWinner(match.match_id)
-                                    }
-                                  >
-                                    {updatingMatch === match.match_id
-                                      ? "Recording..."
-                                      : "Record Winner"}
-                                  </button>
-                                </div>
-                              )}
+                              <span className="fw-bold">{round}</span>
                             </div>
-                          );
-                        })}
-                      </div>
-                    ))}
+                            {roundIndex <
+                              Object.keys(bracketData).length - 1 && (
+                              <i
+                                className="bi bi-chevron-right text-muted"
+                                style={{ fontSize: "1.5rem" }}
+                              ></i>
+                            )}
+                          </div>
 
-                    {!champion && (
-                      <button
-                        className="btn btn-success"
-                        disabled={recordingChampion}
-                        onClick={handleRecordChampion}
-                      >
-                        {recordingChampion
-                          ? "Recording Champion..."
-                          : "Record Champion 🏆"}
-                      </button>
-                    )}
+                          {/* Matches Grid */}
+                          <div className="row g-3">
+                            {bracketData[round].map((match) => {
+                              const isUpcoming = !match.winner;
+
+                              return (
+                                <div
+                                  key={match.match_id}
+                                  className="col-12 col-md-6 col-lg-4"
+                                >
+                                  <div
+                                    className="card h-100 shadow-sm border-0"
+                                    style={{
+                                      borderLeft: isUpcoming
+                                        ? "4px solid #ffc107"
+                                        : "4px solid #6c757d",
+                                      transition: "transform 0.2s",
+                                    }}
+                                  >
+                                    <div className="card-body">
+                                      {/* Match Header */}
+                                      <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <small className="text-muted fw-semibold">
+                                          Match {match.match_id}
+                                        </small>
+                                        {match.match_time && (
+                                          <div className="d-flex align-items-center gap-1 text-danger small">
+                                            <i
+                                              className="bi bi-clock-fill"
+                                              style={{ fontSize: "0.875rem" }}
+                                            ></i>
+                                            <span>{match.match_time}</span>
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Team 1 */}
+                                      <div
+                                        className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded"
+                                        style={{ background: "#f8f9fa" }}
+                                      >
+                                        <span className="fw-semibold text-dark">
+                                          {match.school1}
+                                        </span>
+                                        <span
+                                          className="fw-bold"
+                                          style={{
+                                            minWidth: "20px",
+                                            textAlign: "center",
+                                          }}
+                                        >
+                                          {match.school1_score !== undefined
+                                            ? match.school1_score
+                                            : "-"}
+                                        </span>
+                                      </div>
+
+                                      {/* VS Divider */}
+                                      <div className="text-center text-muted small fw-semibold my-2">
+                                        VS
+                                      </div>
+
+                                      {/* Team 2 */}
+                                      <div
+                                        className="d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded"
+                                        style={{ background: "#f8f9fa" }}
+                                      >
+                                        <span className="fw-semibold text-dark">
+                                          {match.school2}
+                                        </span>
+                                        <span
+                                          className="fw-bold"
+                                          style={{
+                                            minWidth: "20px",
+                                            textAlign: "center",
+                                          }}
+                                        >
+                                          {match.school2_score !== undefined
+                                            ? match.school2_score
+                                            : "-"}
+                                        </span>
+                                      </div>
+
+                                      {/* Winner Display */}
+                                      {match.winner && (
+                                        <div
+                                          className="alert alert-success mb-0 py-2"
+                                          role="alert"
+                                        >
+                                          <strong>Winner:</strong>{" "}
+                                          {match.winner}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )
               )}

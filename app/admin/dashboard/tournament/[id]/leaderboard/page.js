@@ -4,14 +4,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LeaderboardPage() {
-  const { tournamentId } = useParams();
+  const { id } = useParams(); // ✅ 'id' from route: /tournament/[id]/leaderboard
   const router = useRouter();
 
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Get auth token from localStorage
+  // ✅ Get auth token safely
   const getAuthToken = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("ekereAuthToken");
@@ -19,38 +19,48 @@ export default function LeaderboardPage() {
     return null;
   };
 
-  // Fetch leaderboard
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      setLoading(true);
+  // ✅ Fetch leaderboard data
+  const fetchLeaderboard = async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) throw new Error("Missing authentication token");
+
+      const res = await fetch(
+        `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.message || "Failed to load leaderboard");
+
+      setLeaderboard(data.leaderboard || []);
       setError("");
-      try {
-        const token = getAuthToken();
-        if (!token) throw new Error("Missing authentication token");
+    } catch (err) {
+      console.error("Leaderboard fetch error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const res = await fetch(
-          `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${tournamentId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  // ✅ Run on mount + auto-refresh every 10 seconds
+  useEffect(() => {
+    if (!id) return;
 
-        const data = await res.json();
-        if (!res.ok)
-          throw new Error(data.message || "Failed to load leaderboard");
+    setLoading(true);
+    fetchLeaderboard();
 
-        setLeaderboard(data.leaderboard || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const interval = setInterval(() => {
+      fetchLeaderboard();
+    }, 10000); // ⏱ refresh every 10 seconds
 
-    if (tournamentId) fetchLeaderboard();
-  }, [tournamentId]);
+    return () => clearInterval(interval); // cleanup on unmount
+  }, [id]);
 
   return (
     <div className="container py-4">
@@ -95,9 +105,13 @@ export default function LeaderboardPage() {
               ))}
             </tbody>
           </table>
+          <p className="text-muted small text-end mb-0 mt-2">
+            Auto-refreshing every 10 seconds 🔄
+          </p>
         </div>
       )}
 
+      {/* No Data */}
       {!loading && leaderboard.length === 0 && !error && (
         <p className="text-muted mt-3">No leaderboard data found.</p>
       )}

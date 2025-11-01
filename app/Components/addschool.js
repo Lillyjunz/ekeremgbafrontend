@@ -54,7 +54,6 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
       return;
     }
 
-    // Validate required fields
     if (
       !formData.name ||
       !formData.address ||
@@ -65,47 +64,50 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
       return;
     }
 
+    const filteredParticipants = formData.participants.filter(
+      (p) => p.trim() !== ""
+    );
+    if (filteredParticipants.length === 0) {
+      alert("Please enter at least one participant");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Filter out empty participants
-      const filteredParticipants = formData.participants.filter(
-        (participant) => participant.trim() !== ""
-      );
-
       const requestBody = {
         name: formData.name,
         email: formData.email,
-        phone: parseInt(formData.phone), // Convert to number as required by API
+        phone: Number(formData.phone), // ✅ match backend type
         address: formData.address,
         participants: filteredParticipants,
       };
+
+      console.log("Request body:", requestBody);
 
       const response = await fetch(
         "https://api.ekeremgbaakpauche.com/api/school/register-school",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
         }
       );
 
-      if (response.ok) {
-        // Show success popup
+      const data = await response.json();
+      console.log("API response:", data);
+
+      if (response.ok && data.status === true) {
         setShowSuccess(true);
-        // Clear form
         clearForm();
       } else {
-        const errorData = await response.json();
-        alert(`Registration failed: ${errorData.message || "Unknown error"}`);
+        alert(
+          `Registration failed: ${data.message || "Could not create a school"}`
+        );
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert(
-        "Registration failed. Please check your internet connection and try again."
-      );
+      alert("Network error. Please check your internet connection.");
     } finally {
       setIsLoading(false);
     }
