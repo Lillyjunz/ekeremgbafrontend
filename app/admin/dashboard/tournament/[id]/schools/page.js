@@ -212,7 +212,8 @@ export default function TournamentSchools() {
   };
 
   // ✅ Fetch all schools for modal
-  const fetchAllSchools = async () => {
+
+  const fetchAllSchools = useCallback(async () => {
     if (!token) return;
     setModalLoading(true);
     try {
@@ -225,7 +226,6 @@ export default function TournamentSchools() {
 
       const schools = data.schools.allSchools.map((s) => ({
         id: s.id,
-        school_id: s.school_id,
         name: s.name,
         address: s.address,
         phoneNumber: s.phone,
@@ -239,14 +239,14 @@ export default function TournamentSchools() {
     } finally {
       setModalLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (showSchoolModal && token) {
       fetchAllSchools();
       setSelectedSchools([]);
     }
-  }, [showSchoolModal, token]);
+  }, [showSchoolModal, token, fetchAllSchools]);
 
   // ✅ Modal helpers
 
@@ -399,6 +399,7 @@ export default function TournamentSchools() {
   };
 
   // ✅ Add selected schools to tournament
+
   const handleAddSchools = async () => {
     if (selectedSchools.length === 0) return;
 
@@ -416,9 +417,11 @@ export default function TournamentSchools() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ schoolId: schoolId }),
+            // ✅ Send only numeric id
+            body: JSON.stringify({ schoolId }),
           }
         );
+
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed");
         successCount++;

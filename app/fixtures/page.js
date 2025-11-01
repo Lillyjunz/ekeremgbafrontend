@@ -224,7 +224,7 @@ export default function FixturesPage() {
                     No Bracket Available
                   </h4>
                   <p className="text-muted">
-                    The tournament bracket hasn't been created yet.
+                    The tournament bracket hasn&apos;t been created yet.
                     <br />
                     Please check back later for updates.
                   </p>

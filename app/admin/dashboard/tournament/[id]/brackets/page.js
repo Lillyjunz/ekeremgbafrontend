@@ -44,7 +44,7 @@ export default function TournamentBracketPage() {
           });
         setMatchInputs(initialInputs);
       } else {
-        setError("No bracket data found.");
+        setBracketData(null);
       }
 
       const champResponse = await fetch(
@@ -70,7 +70,6 @@ export default function TournamentBracketPage() {
           }
         }
       } catch (activeErr) {
-        // Active match endpoint not available, skip silently
         console.log("Active match fetch not available");
       }
     } catch (err) {
@@ -247,6 +246,36 @@ export default function TournamentBracketPage() {
         </div>
       </div>
     );
+
+  // Empty state for no bracket data
+  if (!bracketData || Object.keys(bracketData).length === 0) {
+    return (
+      <div className="min-vh-100 bg-light d-flex align-items-center justify-content-center">
+        <div className="text-center py-5 px-4">
+          <div
+            className="mx-auto mb-4"
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Trophy size={64} className="text-muted" />
+          </div>
+          <h4 className="text-muted fw-bold mb-2">No Bracket Available</h4>
+          <p className="text-muted">
+            The tournament bracket hasn&apos;t been created yet.
+            <br />
+            Please check back later for updates.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const rounds = bracketData ? Object.keys(bracketData) : [];
   const lastRoundMatches =

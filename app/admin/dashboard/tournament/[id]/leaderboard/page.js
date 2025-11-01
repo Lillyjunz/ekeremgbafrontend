@@ -1,17 +1,16 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function LeaderboardPage() {
-  const { id } = useParams(); // ✅ 'id' from route: /tournament/[id]/leaderboard
+  const { id } = useParams();
   const router = useRouter();
 
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ✅ Get auth token safely
   const getAuthToken = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("ekereAuthToken");
@@ -19,8 +18,8 @@ export default function LeaderboardPage() {
     return null;
   };
 
-  // ✅ Fetch leaderboard data
-  const fetchLeaderboard = async () => {
+  // ✅ useCallback to memoize the fetch function
+  const fetchLeaderboard = useCallback(async () => {
     try {
       const token = getAuthToken();
       if (!token) throw new Error("Missing authentication token");
@@ -28,9 +27,7 @@ export default function LeaderboardPage() {
       const res = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${id}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -46,25 +43,20 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]); // ✅ dependency: id
 
-  // ✅ Run on mount + auto-refresh every 10 seconds
   useEffect(() => {
     if (!id) return;
 
     setLoading(true);
     fetchLeaderboard();
 
-    const interval = setInterval(() => {
-      fetchLeaderboard();
-    }, 10000); // ⏱ refresh every 10 seconds
-
-    return () => clearInterval(interval); // cleanup on unmount
-  }, [id]);
+    const interval = setInterval(fetchLeaderboard, 10000);
+    return () => clearInterval(interval);
+  }, [id, fetchLeaderboard]); // ✅ now dependencies are complete
 
   return (
     <div className="container py-4">
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4 className="fw-bold mb-0">Tournament Leaderboard</h4>
         <button
@@ -75,7 +67,6 @@ export default function LeaderboardPage() {
         </button>
       </div>
 
-      {/* Loading / Error */}
       {loading && (
         <div className="text-center py-5">
           <div className="spinner-border text-primary"></div>
@@ -84,7 +75,6 @@ export default function LeaderboardPage() {
       )}
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Leaderboard Table */}
       {!loading && !error && leaderboard.length > 0 && (
         <div className="card shadow-sm border-0 p-4">
           <table className="table table-bordered align-middle text-center">
@@ -111,7 +101,6 @@ export default function LeaderboardPage() {
         </div>
       )}
 
-      {/* No Data */}
       {!loading && leaderboard.length === 0 && !error && (
         <p className="text-muted mt-3">No leaderboard data found.</p>
       )}
