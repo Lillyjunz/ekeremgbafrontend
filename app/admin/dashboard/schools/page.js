@@ -96,16 +96,6 @@ export default function Schools() {
     setCurrentPage(1); // Reset to first page
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "2-digit",
-    });
-  };
-
   // Fetch schools function (extracted so it can be reused)
   const fetchSchools = async () => {
     try {
@@ -248,7 +238,6 @@ export default function Schools() {
                     <th>Phone number</th>
                     <th>Email</th>
                     <th>Students</th>
-                    <th>Date added</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -275,7 +264,6 @@ export default function Schools() {
                           <span className="text-muted">No students</span>
                         )}
                       </td>
-                      <td>{formatDate(school.time_stamp)}</td>
                       <td className="position-relative">
                         <button
                           className="btn btn-light rounded-circle"

@@ -540,7 +540,7 @@ export default function Dashboard() {
                           }
                         >
                           <i className="bi bi-diagram-3-fill me-1"></i>
-                          Brackets
+                          Groups
                         </button>
 
                         <button

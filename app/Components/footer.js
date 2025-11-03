@@ -75,41 +75,34 @@ const Footer = () => {
 
             <div className="col-lg-2 col-md-6">
               <div className="d-flex hightech-link">
-                <Image
-                  className="me-2"
-                  src="/images/Facebook.png"
-                  width={30}
-                  height={30}
-                  alt="footer"
-                ></Image>
-                <Image
-                  className="me-2"
-                  src="/images/Linkedin.png"
-                  width={30}
-                  height={30}
-                  alt="footer"
-                ></Image>
-                <Image
-                  className="me-2"
-                  src="/images/Twitter.png"
-                  width={30}
-                  height={30}
-                  alt="footer"
-                ></Image>
-                <Image
-                  className="me-2"
-                  src="/images/Youtube.png"
-                  width={30}
-                  height={30}
-                  alt="footer"
-                ></Image>
-                <Image
-                  className="me-2"
-                  src="/images/Instagram.png"
-                  width={30}
-                  height={30}
-                  alt="footer"
-                ></Image>
+                <Link href="https://www.facebook.com/share/17SitWbqNz/">
+                  <Image
+                    className="me-2"
+                    src="/images/Facebook.png"
+                    width={30}
+                    height={30}
+                    alt="footer"
+                  ></Image>
+                </Link>
+
+                <Link href="https://www.tiktok.com/@ekeremgbaakpauche?_t=ZN-90akK2wuO02&_r=1">
+                  <Image
+                    className="me-2"
+                    src="/images/Twitter.png"
+                    width={30}
+                    height={30}
+                    alt="footer"
+                  ></Image>
+                </Link>
+                <Link href="https://youtube.com/@ekeremgbaakpauche?si=Gn2pg-5vSO3exhmF">
+                  <Image
+                    className="me-2"
+                    src="/images/Youtube.png"
+                    width={30}
+                    height={30}
+                    alt="footer"
+                  ></Image>
+                </Link>
               </div>
             </div>
           </div>

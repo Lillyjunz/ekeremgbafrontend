@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
@@ -10,6 +11,7 @@ export default function FixturesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedTournament, setSelectedTournament] = useState(null);
+  const [selectedYear, setSelectedYear] = useState("2025");
 
   // Bracket states
   const [bracketData, setBracketData] = useState(null);
@@ -17,23 +19,53 @@ export default function FixturesPage() {
   const [bracketError, setBracketError] = useState("");
   const [champion, setChampion] = useState(null);
 
+  // View Schools Modal states
+  const [showSchoolsModal, setShowSchoolsModal] = useState(false);
+  const [selectedTournamentForSchools, setSelectedTournamentForSchools] =
+    useState(null);
+  const [schoolsData, setSchoolsData] = useState(null);
+  const [schoolsLoading, setSchoolsLoading] = useState(false);
+  const [schoolsError, setSchoolsError] = useState("");
+
+  // Leaderboard Modal states
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [
+    selectedTournamentForLeaderboard,
+    setSelectedTournamentForLeaderboard,
+  ] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+  const [leaderboardError, setLeaderboardError] = useState("");
+
+  const router = useRouter();
+
   const getAuthToken = () =>
     typeof window !== "undefined"
       ? localStorage.getItem("ekereAuthToken")
       : null;
 
-  // ✅ Fetch tournaments
+  // ✅ Fetch tournaments with year filter
   useEffect(() => {
     async function fetchTournaments() {
+      setLoading(true);
       try {
         const token = getAuthToken();
-        const res = await fetch(
-          "https://api.ekeremgbaakpauche.com/api/admin/tournaments",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+
+        // Determine URL based on selectedYear
+        const url = selectedYear
+          ? `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedYear}`
+          : "https://api.ekeremgbaakpauche.com/api/admin/tournaments";
+
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
-        if (res.ok && Array.isArray(data)) setTournaments(data);
-        else setError("Failed to fetch tournaments");
+        if (res.ok && Array.isArray(data)) {
+          setTournaments(data);
+        } else {
+          setTournaments([]);
+          setError("Failed to fetch tournaments");
+        }
       } catch {
         setError("Network error");
       } finally {
@@ -41,7 +73,7 @@ export default function FixturesPage() {
       }
     }
     fetchTournaments();
-  }, []);
+  }, [selectedYear]);
 
   // ✅ Fetch bracket for selected tournament
   const fetchBracket = useCallback(async (tournamentId) => {
@@ -70,6 +102,74 @@ export default function FixturesPage() {
     }
   }, []);
 
+  // ✅ Fetch schools for selected tournament
+  const fetchSchoolsForTournament = useCallback(async (tournamentId) => {
+    setSchoolsLoading(true);
+    setSchoolsError("");
+    try {
+      const token = getAuthToken();
+      const res = await fetch(
+        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${tournamentId}/registrations`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to load schools");
+
+      setSchoolsData({
+        tournamentId: data.tournamentId || tournamentId,
+        totalRegistered: data.totalRegistered || data.schools?.length || 0,
+        schools: data.schools || [],
+      });
+    } catch (err) {
+      setSchoolsError(err.message);
+    } finally {
+      setSchoolsLoading(false);
+    }
+  }, []);
+
+  // ✅ Fetch leaderboard for selected tournament
+  const fetchLeaderboard = useCallback(async (tournamentId) => {
+    setLeaderboardLoading(true);
+    setLeaderboardError("");
+    try {
+      const token = getAuthToken();
+      if (!token) throw new Error("Missing authentication token");
+
+      const res = await fetch(
+        `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${tournamentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.message || "Failed to load leaderboard");
+
+      setLeaderboard(data.leaderboard || []);
+    } catch (err) {
+      console.error("Leaderboard fetch error:", err);
+      setLeaderboardError(err.message);
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  }, []);
+
+  // ✅ Auto-refresh leaderboard when modal is open
+  useEffect(() => {
+    if (!showLeaderboardModal || !selectedTournamentForLeaderboard) return;
+
+    const interval = setInterval(() => {
+      fetchLeaderboard(selectedTournamentForLeaderboard.id);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [
+    showLeaderboardModal,
+    selectedTournamentForLeaderboard,
+    fetchLeaderboard,
+  ]);
+
   const openModal = (t) => {
     setSelectedTournament(t);
     fetchBracket(t.id);
@@ -81,11 +181,119 @@ export default function FixturesPage() {
     setChampion(null);
   };
 
+  const openSchoolsModal = (tournament) => {
+    setSelectedTournamentForSchools(tournament);
+    setShowSchoolsModal(true);
+    fetchSchoolsForTournament(tournament.id);
+  };
+
+  const closeSchoolsModal = () => {
+    setShowSchoolsModal(false);
+    setSelectedTournamentForSchools(null);
+    setSchoolsData(null);
+    setSchoolsError("");
+  };
+
+  const openLeaderboardModal = (tournament) => {
+    setSelectedTournamentForLeaderboard(tournament);
+    setShowLeaderboardModal(true);
+    fetchLeaderboard(tournament.id);
+  };
+
+  const closeLeaderboardModal = () => {
+    setShowLeaderboardModal(false);
+    setSelectedTournamentForLeaderboard(null);
+    setLeaderboard([]);
+    setLeaderboardError("");
+  };
+
+  // ✅ Get display text for dropdown
+  const getDropdownText = () => {
+    if (!selectedYear) return "All Tournaments";
+    return `Ekeremgba − Akpauche ${selectedYear}`;
+  };
+
   return (
     <>
       <Navbar />
       <div className={styles.container}>
-        <h2 className="text-center fw-bold mt-4">Tournament Fixtures</h2>
+        {/* ✅ Added Tournament Selector Dropdown */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="fw-bold mb-0">Tournament Fixtures</h2>
+
+          <div
+            className="dropdown p-2"
+            style={{
+              border: "2px solid #f2f2f2",
+              borderRadius: "15px",
+              backgroundColor: "#fff",
+            }}
+          >
+            <button
+              className="btn d-flex align-items-center gap-2"
+              type="button"
+              data-bs-toggle="dropdown"
+              style={{
+                border: "none",
+                background: "transparent",
+                fontWeight: "500",
+              }}
+            >
+              {getDropdownText()}
+              <i className="bi bi-chevron-down"></i>
+            </button>
+            <ul className="dropdown-menu">
+              <li>
+                <a
+                  className="dropdown-item"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedYear("");
+                  }}
+                >
+                  All Tournaments
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedYear("2025");
+                  }}
+                >
+                  2025
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedYear("2024");
+                  }}
+                >
+                  2024
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedYear("2023");
+                  }}
+                >
+                  2023
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
         {loading ? (
           <div className="text-center py-5">
@@ -94,6 +302,32 @@ export default function FixturesPage() {
           </div>
         ) : error ? (
           <div className="alert alert-danger text-center">{error}</div>
+        ) : tournaments.length === 0 ? (
+          <div className="text-center py-5">
+            <div
+              className="mx-auto mb-4"
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <i
+                className="bi bi-trophy text-muted"
+                style={{ fontSize: "4rem" }}
+              ></i>
+            </div>
+            <h4 className="text-muted fw-bold mb-2">No Tournaments Found</h4>
+            <p className="text-muted">
+              {selectedYear
+                ? `No tournaments found for ${selectedYear}`
+                : "No tournaments available at the moment"}
+            </p>
+          </div>
         ) : (
           <div className="row mt-5 justify-content-center">
             {tournaments.map((tournament) => (
@@ -149,20 +383,42 @@ export default function FixturesPage() {
                       </div>
                     </div>
 
-                    {/* Brackets Button */}
-                    <div className="mt-3">
+                    {/* Action Buttons */}
+                    <div className="mt-3 d-flex flex-wrap gap-2">
                       <button
-                        className="btn w-100"
+                        className="btn btn-sm flex-grow-1"
                         style={{
                           background:
                             "linear-gradient(to right, #b30000, #660000)",
                           color: "#fff",
                           borderRadius: "20px",
                         }}
+                        onClick={() => openSchoolsModal(tournament)}
+                      >
+                        <i className="bi bi-eye me-1"></i>
+                        View Schools
+                      </button>
+
+                      <button
+                        className="btn btn-sm btn-outline-danger flex-grow-1"
+                        style={{
+                          borderRadius: "20px",
+                        }}
                         onClick={() => openModal(tournament)}
                       >
-                        <i className="bi bi-diagram-3-fill me-2"></i>
-                        View Brackets
+                        <i className="bi bi-diagram-3-fill me-1"></i>
+                        Groups
+                      </button>
+
+                      <button
+                        className="btn btn-sm btn-outline-danger flex-grow-1"
+                        style={{
+                          borderRadius: "20px",
+                        }}
+                        onClick={() => openLeaderboardModal(tournament)}
+                      >
+                        <i className="bi bi-bar-chart-fill me-1"></i>
+                        Leaderboard
                       </button>
                     </div>
                   </div>
@@ -172,7 +428,184 @@ export default function FixturesPage() {
           </div>
         )}
 
-        {/* 🏆 Modal */}
+        {/* 🏫 View Schools Modal */}
+        {showSchoolsModal && (
+          <div className={styles.modalBackdrop} onClick={closeSchoolsModal}>
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h5 className="fw-bold text-danger mb-0">
+                  Schools - {selectedTournamentForSchools?.name} (
+                  {selectedTournamentForSchools?.year})
+                </h5>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={closeSchoolsModal}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {schoolsLoading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-danger"></div>
+                  <p className="mt-3">Loading schools...</p>
+                </div>
+              ) : schoolsError ? (
+                <div className="alert alert-danger text-center">
+                  {schoolsError}
+                </div>
+              ) : schoolsData?.schools?.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-hover align-middle">
+                    <thead className="table-light">
+                      <tr>
+                        <th style={{ width: "60px" }}>#</th>
+                        <th>School Name</th>
+                        <th>Registered At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {schoolsData.schools.map((school, index) => (
+                        <tr key={school.id}>
+                          <td className="text-center fw-semibold">
+                            {index + 1}
+                          </td>
+                          <td className="fw-semibold">{school.name}</td>
+                          <td className="text-muted">
+                            {new Date(school.registered_at).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="mt-3 text-center text-muted">
+                    <strong>Total Registered:</strong>{" "}
+                    {schoolsData.totalRegistered} school(s)
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-5">
+                  <div
+                    className="mx-auto mb-4"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "50%",
+                      background:
+                        "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i
+                      className="bi bi-building text-muted"
+                      style={{ fontSize: "4rem" }}
+                    ></i>
+                  </div>
+                  <h4 className="text-muted fw-bold mb-2">
+                    No Schools Registered
+                  </h4>
+                  <p className="text-muted">
+                    No schools have registered for this tournament yet.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 📊 Leaderboard Modal */}
+        {showLeaderboardModal && (
+          <div className={styles.modalBackdrop} onClick={closeLeaderboardModal}>
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h5 className="fw-bold text-danger mb-0">
+                  Leaderboard - {selectedTournamentForLeaderboard?.name} (
+                  {selectedTournamentForLeaderboard?.year})
+                </h5>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={closeLeaderboardModal}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {leaderboardLoading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-danger"></div>
+                  <p className="mt-3">Loading leaderboard...</p>
+                </div>
+              ) : leaderboardError ? (
+                <div className="alert alert-danger text-center">
+                  {leaderboardError}
+                </div>
+              ) : leaderboard.length > 0 ? (
+                <>
+                  <div className="table-responsive">
+                    <table className="table table-bordered align-middle text-center">
+                      <thead className="table-primary">
+                        <tr>
+                          <th>#</th>
+                          <th>School</th>
+                          <th>Progress</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboard.map((item, index) => (
+                          <tr key={index}>
+                            <td className="fw-semibold">{index + 1}</td>
+                            <td className="fw-semibold">{item.school}</td>
+                            <td>{item.progress}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-muted small text-end mb-0 mt-2">
+                    Auto-refreshing every 10 seconds 🔄
+                  </p>
+                </>
+              ) : (
+                <div className="text-center py-5">
+                  <div
+                    className="mx-auto mb-4"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      borderRadius: "50%",
+                      background:
+                        "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i
+                      className="bi bi-bar-chart text-muted"
+                      style={{ fontSize: "4rem" }}
+                    ></i>
+                  </div>
+                  <h4 className="text-muted fw-bold mb-2">
+                    No Leaderboard Data
+                  </h4>
+                  <p className="text-muted">
+                    No leaderboard data found for this tournament.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 🏆 Brackets Modal */}
         {selectedTournament && (
           <div className={styles.modalBackdrop} onClick={closeModal}>
             <div
@@ -194,7 +627,7 @@ export default function FixturesPage() {
               {bracketLoading ? (
                 <div className="text-center py-4">
                   <div className="spinner-border text-danger"></div>
-                  <p>Loading bracket...</p>
+                  <p>Loading groups...</p>
                 </div>
               ) : bracketError ? (
                 <div className="alert alert-warning text-center">
@@ -221,10 +654,10 @@ export default function FixturesPage() {
                     ></i>
                   </div>
                   <h4 className="text-muted fw-bold mb-2">
-                    No Bracket Available
+                    No School Groups Available
                   </h4>
                   <p className="text-muted">
-                    The tournament bracket hasn&apos;t been created yet.
+                    The tournament groups hasn&apos;t been created yet.
                     <br />
                     Please check back later for updates.
                   </p>

@@ -289,7 +289,7 @@ export default function TournamentBracketPage() {
         <div className="text-center mb-4">
           <div className="d-inline-flex align-items-center gap-2 mb-2">
             <Trophy className="text-warning" size={32} />
-            <h1 className="fw-bold text-dark mb-0">Tournament Bracket</h1>
+            <h1 className="fw-bold text-dark mb-0">Tournament Groups</h1>
           </div>
 
           {/* Action Button */}
