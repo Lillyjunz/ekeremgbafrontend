@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const SchoolLegacyStats = () => {
@@ -7,7 +8,6 @@ const SchoolLegacyStats = () => {
     schools: 0,
     students: 0,
     subjects: 0,
-    price: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +33,6 @@ const SchoolLegacyStats = () => {
     schools: 0,
     students: 0,
     subjects: 0,
-    price: 300000,
   });
 
   useEffect(() => {
@@ -58,10 +57,6 @@ const SchoolLegacyStats = () => {
         const schoolsData = await schoolsRes.json();
         const tournamentsData = await tournamentsRes.json();
 
-        console.log("🧠 Students API:", studentsData);
-        console.log("🏫 Schools API:", schoolsData);
-        console.log("📘 Tournaments API:", tournamentsData);
-
         targetValues.current.students =
           typeof studentsData?.schools?.number_of_students === "number"
             ? studentsData.schools.number_of_students
@@ -76,8 +71,6 @@ const SchoolLegacyStats = () => {
         targetValues.current.subjects = Array.isArray(tournamentsData)
           ? tournamentsData.length
           : 0;
-
-        targetValues.current.price = 300;
       } catch (err) {
         console.error("Error fetching stats:", err);
         setError(err.message);
@@ -120,7 +113,6 @@ const SchoolLegacyStats = () => {
         schools: Math.floor(targetValues.current.schools * easedProgress),
         students: Math.floor(targetValues.current.students * easedProgress),
         subjects: Math.floor(targetValues.current.subjects * easedProgress),
-        price: Math.floor(targetValues.current.price * easedProgress),
       });
 
       if (currentStep >= steps) {
@@ -219,8 +211,6 @@ const SchoolLegacyStats = () => {
         participants: filteredParticipants,
       };
 
-      console.log("Sending request:", requestBody);
-
       const response = await fetch(
         "https://api.ekeremgbaakpauche.com/api/school/register-school",
         {
@@ -234,7 +224,6 @@ const SchoolLegacyStats = () => {
       );
 
       const responseData = await response.json();
-      console.log("Response:", responseData);
 
       if (response.ok && responseData.status === true) {
         setShowSuccess(true);
@@ -341,8 +330,14 @@ const SchoolLegacyStats = () => {
                   {/* Prize */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className="stat-number">
-                        ₦{loading ? "..." : counters.price.toLocaleString()}
+                      <div className=" d-flex justify-content-center align-items-center">
+                        <Image
+                          className="stat-numberr "
+                          src="/images/cash.png"
+                          alt="Cash"
+                          width={84}
+                          height={84}
+                        />
                       </div>
                       <div className="stat-label">Prize Won</div>
                     </div>

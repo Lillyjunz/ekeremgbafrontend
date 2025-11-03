@@ -365,7 +365,9 @@ export default function Dashboard() {
                   type="button"
                   data-bs-toggle="dropdown"
                 >
-                  Ekeremgba − Akpauche 2025
+                  {selectedYear === ""
+                    ? "All Tournaments"
+                    : `Ekeremgba − Akpauche ${selectedYear}`}
                   <i className="bi bi-chevron-down ms-2"></i>
                 </button>
                 <ul className="dropdown-menu">
@@ -373,7 +375,10 @@ export default function Dashboard() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setSelectedYear("")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedYear("");
+                      }}
                     >
                       All Tournaments
                     </a>
@@ -382,7 +387,10 @@ export default function Dashboard() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setSelectedYear("2025")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedYear("2025");
+                      }}
                     >
                       2025
                     </a>
@@ -391,7 +399,10 @@ export default function Dashboard() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setSelectedYear("2024")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedYear("2024");
+                      }}
                     >
                       2024
                     </a>
@@ -400,7 +411,10 @@ export default function Dashboard() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setSelectedYear("2023")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedYear("2023");
+                      }}
                     >
                       2023
                     </a>
@@ -556,6 +570,19 @@ export default function Dashboard() {
                         >
                           <i className="bi bi-bar-chart-fill me-1"></i>
                           Leaderboard
+                        </button>
+
+                        <button
+                          className="btn btn-sm btn-outline-danger flex-grow-1"
+                          style={{ borderRadius: "20px" }}
+                          onClick={() =>
+                            router.push(
+                              `/admin/dashboard/tournament/${tournament.id}/scoreboard`
+                            )
+                          }
+                        >
+                          <i className="bi bi-trophy me-1"></i>
+                          Scoreboard
                         </button>
                       </div>
                     </div>

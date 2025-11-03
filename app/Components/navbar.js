@@ -239,6 +239,14 @@ export default function Navbar() {
                 About
               </Link>
             </li>
+            <li className="nav-item">
+              <Link
+                href="/events"
+                className={`nav-link ${isActive("/events") ? "active" : ""}`}
+              >
+                Live Event
+              </Link>
+            </li>
           </ul>
 
           {/* Right: Desktop login/signup buttons */}

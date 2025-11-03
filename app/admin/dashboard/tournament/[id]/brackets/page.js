@@ -17,6 +17,17 @@ export default function TournamentBracketPage() {
   const [recordingChampion, setRecordingChampion] = useState(false);
   const [settingActive, setSettingActive] = useState(null);
   const [activeMatchId, setActiveMatchId] = useState(null);
+  const [selectedNextRound, setSelectedNextRound] = useState("");
+
+  const roundOptions = [
+    "First Round",
+    "Second Round",
+    "Third Round",
+    "Fourth Round",
+    "Fifth Round",
+    "Sixth Round",
+    "Final",
+  ];
 
   const fetchBracket = useCallback(async () => {
     setLoading(true);
@@ -57,7 +68,6 @@ export default function TournamentBracketPage() {
         setChampion(null);
       }
 
-      // Fetch active match (if endpoint exists)
       try {
         const activeResponse = await fetch(
           `https://api.ekeremgbaakpauche.com/api/admin/active-match?tournamentId=${id}`,
@@ -85,6 +95,11 @@ export default function TournamentBracketPage() {
   }, [id, fetchBracket]);
 
   const handleGenerateNextRound = async () => {
+    if (!selectedNextRound) {
+      alert("Please select a round name before generating the next round.");
+      return;
+    }
+
     setGeneratingNext(true);
     setError("");
     setSuccessMsg("");
@@ -98,6 +113,9 @@ export default function TournamentBracketPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            nextRound: selectedNextRound,
+          }),
         }
       );
 
@@ -106,6 +124,7 @@ export default function TournamentBracketPage() {
         throw new Error(data.message || "Failed to generate next round");
 
       setSuccessMsg(data.message);
+      setSelectedNextRound("");
       fetchBracket();
     } catch (err) {
       setError(err.message);
@@ -247,7 +266,6 @@ export default function TournamentBracketPage() {
       </div>
     );
 
-  // Empty state for no bracket data
   if (!bracketData || Object.keys(bracketData).length === 0) {
     return (
       <div className="min-vh-100 bg-light d-flex align-items-center justify-content-center">
@@ -285,30 +303,51 @@ export default function TournamentBracketPage() {
   return (
     <div className="min-vh-100 bg-light py-4">
       <div className="container-fluid px-4">
-        {/* Header Section */}
         <div className="text-center mb-4">
           <div className="d-inline-flex align-items-center gap-2 mb-2">
             <Trophy className="text-warning" size={32} />
             <h1 className="fw-bold text-dark mb-0">Tournament Groups</h1>
           </div>
 
-          {/* Action Button */}
-          <div className="mt-3">
-            <button
-              onClick={handleGenerateNextRound}
-              disabled={generatingNext || isLastRound}
-              className="bracket-btn px-4 py-2 fw-semibold rounded-pill"
-            >
-              {generatingNext
-                ? "Generating Next Round..."
-                : isLastRound
-                ? "No More Rounds"
-                : "Generate Next Round"}
-            </button>
-          </div>
+          {/* Round Selection and Generate Button */}
+          {!isLastRound && (
+            <div className="mt-3 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
+              <select
+                className="form-select"
+                style={{ maxWidth: "250px" }}
+                value={selectedNextRound}
+                onChange={(e) => setSelectedNextRound(e.target.value)}
+                disabled={generatingNext}
+              >
+                <option value="">Select Next Round</option>
+                {roundOptions.map((round) => (
+                  <option key={round} value={round}>
+                    {round}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleGenerateNextRound}
+                disabled={generatingNext || !selectedNextRound}
+                className="btn btn-primary px-4 py-2 fw-semibold rounded-pill"
+              >
+                {generatingNext ? "Generating..." : "Generate Next Round"}
+              </button>
+            </div>
+          )}
+
+          {isLastRound && (
+            <div className="mt-3">
+              <button
+                disabled
+                className="btn btn-secondary px-4 py-2 fw-semibold rounded-pill"
+              >
+                No More Rounds
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Success Message */}
         {successMsg && (
           <div
             className="alert alert-success text-center fw-semibold shadow-sm mx-auto"
@@ -318,7 +357,6 @@ export default function TournamentBracketPage() {
           </div>
         )}
 
-        {/* Champion Banner */}
         {champion && (
           <div
             className="text-center p-4 rounded-4 mb-4 shadow mx-auto"
@@ -334,7 +372,6 @@ export default function TournamentBracketPage() {
           </div>
         )}
 
-        {/* Record Champion Button */}
         {isLastRound && !champion && (
           <div className="text-center mb-4">
             <button
@@ -348,11 +385,9 @@ export default function TournamentBracketPage() {
           </div>
         )}
 
-        {/* Bracket Rounds */}
         <div className="row g-4">
           {rounds.map((round, roundIndex) => (
             <div key={round} className="col-12">
-              {/* Round Header */}
               <div className="d-flex align-items-center gap-2 mb-3">
                 <div
                   className="px-3 py-2 rounded-3 shadow d-inline-flex align-items-center gap-2"
@@ -368,7 +403,6 @@ export default function TournamentBracketPage() {
                 )}
               </div>
 
-              {/* Matches Grid */}
               <div className="row g-3">
                 {bracketData[round].map((match) => {
                   const isUpcoming = !match.winner;
@@ -395,7 +429,6 @@ export default function TournamentBracketPage() {
                         }}
                       >
                         <div className="card-body">
-                          {/* Match Header */}
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <small className="text-muted fw-semibold">
                               Match {match.match_id}
@@ -413,7 +446,6 @@ export default function TournamentBracketPage() {
                             )}
                           </div>
 
-                          {/* Team 1 */}
                           <div
                             className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded"
                             style={{ background: "#f8f9fa" }}
@@ -431,12 +463,10 @@ export default function TournamentBracketPage() {
                             </span>
                           </div>
 
-                          {/* VS Divider */}
                           <div className="text-center text-muted small fw-semibold my-2">
                             VS
                           </div>
 
-                          {/* Team 2 */}
                           <div
                             className="d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded"
                             style={{ background: "#f8f9fa" }}
@@ -454,7 +484,6 @@ export default function TournamentBracketPage() {
                             </span>
                           </div>
 
-                          {/* Winner Display */}
                           {match.winner && (
                             <div
                               className="alert alert-success mb-0 py-2"
@@ -464,7 +493,6 @@ export default function TournamentBracketPage() {
                             </div>
                           )}
 
-                          {/* Input Controls for Upcoming Matches */}
                           {isUpcoming && (
                             <div className="mt-3 pt-3 border-top">
                               <select

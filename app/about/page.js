@@ -16,104 +16,147 @@ const About = () => {
     subjects: 0,
     price: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const sectionRef = useRef(null);
+  const targetValues = useRef({
+    schools: 0,
+    students: 0,
+    subjects: 0,
+    price: 0,
+  });
 
-  // Subjects data
+  // ✅ Fetch real stats from your API
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [studentsRes, schoolsRes, tournamentsRes] = await Promise.all([
+          fetch(
+            "https://api.ekeremgbaakpauche.com/api/school/get-all-students"
+          ),
+          fetch("https://api.ekeremgbaakpauche.com/api/school/get-schools"),
+          fetch("https://api.ekeremgbaakpauche.com/api/admin/tournaments"),
+        ]);
+
+        if (!studentsRes.ok || !schoolsRes.ok || !tournamentsRes.ok) {
+          throw new Error("One or more API requests failed");
+        }
+
+        const studentsData = await studentsRes.json();
+        const schoolsData = await schoolsRes.json();
+        const tournamentsData = await tournamentsRes.json();
+
+        targetValues.current.students =
+          typeof studentsData?.schools?.number_of_students === "number"
+            ? studentsData.schools.number_of_students
+            : 0;
+
+        targetValues.current.schools = Array.isArray(
+          schoolsData?.schools?.allSchools
+        )
+          ? schoolsData.schools.allSchools.length
+          : 0;
+
+        targetValues.current.subjects = Array.isArray(tournamentsData)
+          ? tournamentsData.length
+          : 0;
+
+        targetValues.current.price = 300000; // Example value
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // ✅ Observe section visibility for counter animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // ✅ Animate counters when visible
+  useEffect(() => {
+    if (!isVisible || loading) return;
+
+    const duration = 2000;
+    const steps = 60;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+      setCounters({
+        schools: Math.floor(targetValues.current.schools * easedProgress),
+        students: Math.floor(targetValues.current.students * easedProgress),
+        subjects: Math.floor(targetValues.current.subjects * easedProgress),
+        price: Math.floor(targetValues.current.price * easedProgress),
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setCounters(targetValues.current);
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [isVisible, loading]);
+
   const subjects = [
     {
-      icon: "bi-mortarboard", // Math
+      icon: "bi-mortarboard",
       title: "Transparent Judging",
       description: "Every score follows a clear rubric—no bias, no guesswork.",
     },
     {
-      icon: "bi-trophy", // Science
-      title: "Flexible comprtition format",
+      icon: "bi-trophy",
+      title: "Flexible competition format",
       description:
         "From knockout to round-robin, we adapt structures to fit subject and scale.",
     },
     {
-      icon: "bi-clipboard-data", // Debate
+      icon: "bi-clipboard-data",
       title: "Real-time Leaderboard",
       description:
         "Rankings update live so schools and students can follow progress instantly.",
     },
     {
-      icon: "bi-globe", // English
+      icon: "bi-globe",
       title: "National-level Recognition",
       description:
-        "Top performers earn digital certificates, trophies, and spotlight features across platforms",
+        "Top performers earn digital certificates, trophies, and spotlight features across platforms.",
     },
     {
-      icon: "bi-laptop", // Geography
-      title: "School Dashboard access",
+      icon: "bi-laptop",
+      title: "School Dashboard Access",
       description:
         "Each school gets a personalized portal to manage teams, track scores, and view schedules.",
     },
   ];
 
-  // Intersection Observer to trigger animation when component is visible
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Animate counters when component becomes visible
-  useEffect(() => {
-    if (!isVisible) return;
-
-    // Target values for animation - moved inside useEffect
-    const targetValues = {
-      schools: 10,
-      students: 500,
-      subjects: 10,
-      price: 9,
-    };
-
-    const duration = 2000; // 2 seconds
-    const steps = 60; // 60 steps for smooth animation
-    const stepDuration = duration / steps;
-
-    let currentStep = 0;
-    const timer = setInterval(() => {
-      currentStep++;
-      const progress = currentStep / steps;
-
-      // Easing function for smooth animation
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-
-      setCounters({
-        schools: Math.floor(targetValues.schools * easedProgress),
-        students: Math.floor(targetValues.students * easedProgress),
-        subjects: Math.floor(targetValues.subjects * easedProgress),
-        price: Math.floor(targetValues.price * easedProgress),
-      });
-
-      if (currentStep >= steps) {
-        clearInterval(timer);
-        // Ensure final values are exactly the targets
-        setCounters(targetValues);
-      }
-    }, stepDuration);
-
-    return () => clearInterval(timer);
-  }, [isVisible]);
-
   return (
     <div>
-      <Navbar></Navbar>
+      <Navbar />
+
+      {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.textContainer}>
           <h2 className={styles.title}>ABOUT EKEREMGBA TOURNAMENT</h2>
@@ -123,9 +166,10 @@ const About = () => {
             and started in 2021 featuring top schools in the Igbo community.
           </p>
         </div>
-        <AboutMomentsCarousel></AboutMomentsCarousel>
+        <AboutMomentsCarousel />
       </section>
 
+      {/* ✅ Stats section using real API data */}
       <section
         ref={sectionRef}
         className="school-legacy-section py-5"
@@ -141,8 +185,8 @@ const About = () => {
                   width={35}
                   height={35}
                   src="/images/target.svg"
-                ></Image>
-                <h5 className=" mb-4 mt-2">Our Mission</h5>
+                />
+                <h5 className="mb-4 mt-2">Our Mission</h5>
 
                 <p className="description mb-4">
                   Ekeremgba is a school-based academic competition focused on
@@ -161,7 +205,9 @@ const About = () => {
                   {/* Schools Participated */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className="stat-number">{counters.schools}+</div>
+                      <div className="stat-number">
+                        {loading ? "..." : `${counters.schools}+`}
+                      </div>
                       <div className="stat-label">Schools Participated</div>
                     </div>
                   </div>
@@ -169,7 +215,17 @@ const About = () => {
                   {/* Students */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className="stat-number">{counters.students}+</div>
+                      <div className="stat-number">
+                        {loading ? "..." : `${counters.students}+`}
+                        {error && (
+                          <span
+                            className="text-danger"
+                            title={`Error: ${error}`}
+                          >
+                            ⚠️
+                          </span>
+                        )}
+                      </div>
                       <div className="stat-label">Students</div>
                     </div>
                   </div>
@@ -177,16 +233,26 @@ const About = () => {
                   {/* Core Subjects */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className="stat-number">{counters.subjects}+</div>
-                      <div className="stat-label">Core Subjects Covered</div>
+                      <div className="stat-number">
+                        {loading ? "..." : `${counters.subjects}+`}
+                      </div>
+                      <div className="stat-label">Tournaments</div>
                     </div>
                   </div>
 
-                  {/* Price Won */}
+                  {/* Cash */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className="stat-number">0{counters.price}+</div>
-                      <div className="stat-label">Price Won</div>
+                      <div className=" d-flex justify-content-center align-items-center">
+                        <Image
+                          className="stat-numberr "
+                          src="/images/cash.png"
+                          alt="Cash"
+                          width={84}
+                          height={84}
+                        />
+                      </div>
+                      <div className="stat-label">Prize Won</div>
                     </div>
                   </div>
                 </div>
@@ -196,6 +262,7 @@ const About = () => {
         </div>
       </section>
 
+      {/* Features Section */}
       <section
         className="subjects-sectionn py-5"
         style={{ backgroundColor: "black" }}
@@ -229,7 +296,7 @@ const About = () => {
         </div>
       </section>
 
-      <MeetOurTeam></MeetOurTeam>
+      <MeetOurTeam />
 
       <section className="py-5" style={{ backgroundColor: "#fafafa" }}>
         <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-white text-center">
@@ -240,7 +307,7 @@ const About = () => {
         </div>
       </section>
 
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 };

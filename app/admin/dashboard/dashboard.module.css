@@ -421,8 +421,6 @@
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Add these styles to your existing dashboard.module.css */
-
 /* Modal Panel Wide for Add Schools */
 .modalPanelWide {
   max-width: 500px !important;
