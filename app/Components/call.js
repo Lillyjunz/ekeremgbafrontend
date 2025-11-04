@@ -158,7 +158,7 @@ export default function CallToAction() {
         <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-white text-center">
           <h2 className="fw-bold mb-3">Ready to Join the Game?</h2>
           <button onClick={openModal} className="btn registerBtn">
-            Register your School
+            Register School (2026)
           </button>
         </div>
       </div>

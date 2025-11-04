@@ -280,7 +280,7 @@ const SchoolLegacyStats = () => {
                 </p>
 
                 <button onClick={openModal} className="register-btn">
-                  Register your School
+                  Register School (2026)
                 </button>
               </div>
             </div>

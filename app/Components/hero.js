@@ -200,7 +200,7 @@ const HeroSection = () => {
 
           <div className="hero-buttons">
             <button onClick={openModal} className="btn btn-primary-custom">
-              Register your School
+              Register School (2026)
             </button>
             <Link href="/fixtures" className="btn btn-secondary-custom">
               View Fixtures

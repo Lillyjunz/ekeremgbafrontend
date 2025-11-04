@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import AboutMomentsCarousel from "../Components/aboutmomemt";
 import Footer from "../Components/footer";
@@ -18,8 +17,24 @@ const About = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const sectionRef = useRef(null);
+
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [modalError, setModalError] = useState("");
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    participants: ["", "", "", ""],
+  });
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   const targetValues = useRef({
     schools: 0,
     students: 0,
@@ -27,7 +42,7 @@ const About = () => {
     price: 0,
   });
 
-  // ✅ Fetch real stats from your API
+  // Fetch stats from API
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -77,7 +92,7 @@ const About = () => {
     fetchStats();
   }, []);
 
-  // ✅ Observe section visibility for counter animation
+  // Intersection Observer for counters
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -90,7 +105,7 @@ const About = () => {
     return () => observer.disconnect();
   }, []);
 
-  // ✅ Animate counters when visible
+  // Animate counters
   useEffect(() => {
     if (!isVisible || loading) return;
 
@@ -152,6 +167,122 @@ const About = () => {
     },
   ];
 
+  // Modal functions
+  const openModal = () => {
+    setShowModal(true);
+    setModalError("");
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalError("");
+    clearForm();
+  };
+
+  const clearForm = () => {
+    setFormData({
+      name: "",
+      address: "",
+      phone: "",
+      email: "",
+      participants: ["", "", "", ""],
+    });
+    setTermsAccepted(false);
+    setModalError("");
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleParticipantChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      participants: prev.participants.map((p, i) => (i === index ? value : p)),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setModalError("");
+
+    if (!termsAccepted) {
+      setModalError("Please accept the terms and conditions");
+      return;
+    }
+
+    if (
+      !formData.name.trim() ||
+      !formData.address.trim() ||
+      !formData.phone.trim() ||
+      !formData.email.trim()
+    ) {
+      setModalError("Please fill in all required fields");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setModalError("Please enter a valid email address");
+      return;
+    }
+
+    const phoneRegex = /^[0-9+\-\s()]+$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setModalError("Please enter a valid phone number");
+      return;
+    }
+
+    setIsLoadingModal(true);
+
+    try {
+      const filteredParticipants = formData.participants.filter(
+        (p) => p.trim() !== ""
+      );
+      const requestBody = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
+        participants: filteredParticipants,
+      };
+
+      const response = await fetch(
+        "https://api.ekeremgbaakpauche.com/api/school/register-school",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok && data.status === true) {
+        setShowSuccess(true);
+        setShowModal(false);
+        clearForm();
+      } else {
+        setModalError(data.message || "Registration failed. Try again.");
+      }
+    } catch (err) {
+      setModalError("Network error. Please try again later.");
+      console.error(err);
+    } finally {
+      setIsLoadingModal(false);
+    }
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
+  };
+
   return (
     <div>
       <Navbar />
@@ -162,14 +293,13 @@ const About = () => {
           <h2 className={styles.title}>ABOUT EKEREMGBA TOURNAMENT</h2>
           <p className={styles.description}>
             Fostering academic brilliance and healthy school rivalry through
-            structured contests. This competition is organized by Rev. Emmanuel
-            and started in 2021 featuring top schools in the Igbo community.
+            structured contests.
           </p>
         </div>
         <AboutMomentsCarousel />
       </section>
 
-      {/* ✅ Stats section using real API data */}
+      {/* Stats Section */}
       <section
         ref={sectionRef}
         className="school-legacy-section py-5"
@@ -177,7 +307,6 @@ const About = () => {
       >
         <div className="container">
           <div className="row align-items-center">
-            {/* Left Content */}
             <div className="col-lg-7 col-xl-6 mb-5 mb-lg-0">
               <div className="content-wrapper">
                 <Image
@@ -187,22 +316,16 @@ const About = () => {
                   src="/images/target.svg"
                 />
                 <h5 className="mb-4 mt-2">Our Mission</h5>
-
                 <p className="description mb-4">
                   Ekeremgba is a school-based academic competition focused on
-                  Debate, Mathematics, Science, and more. We bring students
-                  together to compete, learn, and grow—sharpening minds,
-                  building confidence, and rewarding excellence across every
-                  subject.
+                  Debate, Mathematics, Science, and more.
                 </p>
               </div>
             </div>
 
-            {/* Right Stats */}
             <div className="col-lg-5 col-xl-6">
               <div className="stats-wrapper">
                 <div className="row g-4">
-                  {/* Schools Participated */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -212,7 +335,6 @@ const About = () => {
                     </div>
                   </div>
 
-                  {/* Students */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -230,7 +352,6 @@ const About = () => {
                     </div>
                   </div>
 
-                  {/* Core Subjects */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -240,16 +361,15 @@ const About = () => {
                     </div>
                   </div>
 
-                  {/* Cash */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className=" d-flex justify-content-center align-items-center">
+                      <div className="d-flex justify-content-center align-items-center">
                         <Image
-                          className="stat-numberr "
-                          src="/images/cash.png"
+                          className="cash-image"
+                          src="/images/naira.png"
                           alt="Cash"
-                          width={84}
-                          height={84}
+                          width={124}
+                          height={124}
                         />
                       </div>
                       <div className="stat-label">Price Won</div>
@@ -271,7 +391,6 @@ const About = () => {
           <h2 className="fw-bold mb-2 text-light pb-4">
             What makes us different
           </h2>
-
           <div className="row gy-4">
             {subjects.map((item, idx) => (
               <div key={idx} className="col-md-4">
@@ -298,16 +417,190 @@ const About = () => {
 
       <MeetOurTeam />
 
+      {/* Banner + Register Button */}
       <section className="py-5" style={{ backgroundColor: "#fafafa" }}>
-        <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-white text-center">
-          <h2 className="fw-bold mb-3">Want to join the next edition?</h2>
-          <Link href="/register" className="btn registerBtn">
-            Register your School
-          </Link>
+        <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-center">
+          <h2 className="fw-bold mb-3 text-light">
+            Want to join the next edition?
+          </h2>
+          <button onClick={openModal} className="btn registerBtn">
+            Register School (2026)
+          </button>
         </div>
       </section>
 
       <Footer />
+
+      {/* Registration Modal */}
+      {showModal && (
+        <div
+          className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          onClick={closeModal}
+        >
+          <div
+            className="modal-content bg-white rounded-4 p-4 position-relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeModal}
+              className="close-button-modal position-absolute"
+              aria-label="Close"
+              disabled={isLoadingModal}
+            >
+              ×
+            </button>
+
+            <div className="text-center mb-4">
+              <h2 className="fw-bold mb-2" style={{ color: "#333" }}>
+                Register your School
+              </h2>
+              <p className="text-muted mb-0">
+                Kindly fill this form to reach out to a Consultant
+              </p>
+            </div>
+
+            {modalError && (
+              <div className="alert alert-danger mb-3">{modalError}</div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="schoolName" className="form-label text-muted">
+                  School name*
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="schoolName"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  disabled={isLoadingModal}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="address" className="form-label text-muted">
+                  Address*
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  disabled={isLoadingModal}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="phoneNumber" className="form-label text-muted">
+                  Phone number*
+                </label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  id="phoneNumber"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  disabled={isLoadingModal}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="emailAddress" className="form-label text-muted">
+                  Email address*
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="emailAddress"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  disabled={isLoadingModal}
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3">
+                  Number of Representatives
+                </label>
+                <div className="representatives-grid">
+                  {[1, 2, 3, 4].map((num, index) => (
+                    <div key={num} className="rep-input-wrapper">
+                      <span className="rep-label">{num}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        placeholder="Full Name"
+                        value={formData.participants[index]}
+                        onChange={(e) =>
+                          handleParticipantChange(index, e.target.value)
+                        }
+                        disabled={isLoadingModal}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-check mb-4">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="termsConditions"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  disabled={isLoadingModal}
+                  required
+                />
+                <label
+                  className="form-check-label text-muted"
+                  htmlFor="termsConditions"
+                >
+                  Accept our Terms and Conditions
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="btn w-100 text-white fw-bold py-3"
+                disabled={isLoadingModal}
+              >
+                {isLoadingModal ? "Registering..." : "Join the Tournament"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccess && (
+        <div className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+          <div className="modal-content bg-white rounded-4 p-4 text-center position-relative">
+            <div className="mb-3">
+              <div className="text-success" style={{ fontSize: "3rem" }}>
+                ✓
+              </div>
+            </div>
+            <h4 className="text-success mb-3">Registration Successful!</h4>
+            <p className="text-muted mb-4">
+              Your school has been registered successfully. A consultant will
+              reach out to you soon.
+            </p>
+            <button className="btn btn-success" onClick={handleSuccessClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
