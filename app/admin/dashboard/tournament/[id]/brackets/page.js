@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, ChevronRight, Clock, Trophy } from "lucide-react";
+import { Award, ChevronRight, Clock, Plus, Trophy } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -18,6 +18,14 @@ export default function TournamentBracketPage() {
   const [settingActive, setSettingActive] = useState(null);
   const [activeMatchId, setActiveMatchId] = useState(null);
   const [selectedNextRound, setSelectedNextRound] = useState("");
+
+  // Add Schools Modal States
+  const [showAddSchoolsModal, setShowAddSchoolsModal] = useState(false);
+  const [allSchools, setAllSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+  const [selectedSchool1, setSelectedSchool1] = useState("");
+  const [selectedSchool2, setSelectedSchool2] = useState("");
+  const [addingSchools, setAddingSchools] = useState(false);
 
   const roundOptions = [
     "First Round",
@@ -93,6 +101,94 @@ export default function TournamentBracketPage() {
   useEffect(() => {
     if (id) fetchBracket();
   }, [id, fetchBracket]);
+
+  const fetchSchools = async () => {
+    setLoadingSchools(true);
+    try {
+      const token = localStorage.getItem("ekereAuthToken");
+      const response = await fetch(
+        "https://api.ekeremgbaakpauche.com/api/school/get-schools",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      if (data?.status && data?.schools?.allSchools) {
+        setAllSchools(data.schools.allSchools);
+      } else {
+        throw new Error("Failed to fetch schools");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load schools list.");
+    } finally {
+      setLoadingSchools(false);
+    }
+  };
+
+  const handleOpenAddSchoolsModal = () => {
+    setShowAddSchoolsModal(true);
+    fetchSchools();
+    setSelectedSchool1("");
+    setSelectedSchool2("");
+  };
+
+  const handleCloseAddSchoolsModal = () => {
+    setShowAddSchoolsModal(false);
+    setSelectedSchool1("");
+    setSelectedSchool2("");
+  };
+
+  const handleAddSchools = async () => {
+    if (!selectedSchool1 || !selectedSchool2) {
+      alert("Please select both schools");
+      return;
+    }
+
+    if (selectedSchool1 === selectedSchool2) {
+      alert("Please select two different schools");
+      return;
+    }
+
+    setAddingSchools(true);
+    setError("");
+    setSuccessMsg("");
+
+    try {
+      const token = localStorage.getItem("ekereAuthToken");
+
+      const response = await fetch(
+        "https://api.ekeremgbaakpauche.com/api/admin/add-schools-for-next-round",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            tournamentId: Number(id),
+            school1_id: Number(selectedSchool1),
+            school2_id: Number(selectedSchool2),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add schools");
+      }
+
+      setSuccessMsg(data.message || "Schools added successfully!");
+      handleCloseAddSchoolsModal();
+      fetchBracket();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setAddingSchools(false);
+    }
+  };
 
   const handleGenerateNextRound = async () => {
     if (!selectedNextRound) {
@@ -309,43 +405,53 @@ export default function TournamentBracketPage() {
             <h1 className="fw-bold text-dark mb-0">Tournament Groups</h1>
           </div>
 
-          {/* Round Selection and Generate Button */}
-          {!isLastRound && (
-            <div className="mt-3 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
-              <select
-                className="form-select"
-                style={{ maxWidth: "250px" }}
-                value={selectedNextRound}
-                onChange={(e) => setSelectedNextRound(e.target.value)}
-                disabled={generatingNext}
-              >
-                <option value="">Select Next Round</option>
-                {roundOptions.map((round) => (
-                  <option key={round} value={round}>
-                    {round}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={handleGenerateNextRound}
-                disabled={generatingNext || !selectedNextRound}
-                className="btn btn-primary px-4 py-2 fw-semibold rounded-pill"
-              >
-                {generatingNext ? "Generating..." : "Generate Next Round"}
-              </button>
-            </div>
-          )}
+          {/* Action Buttons Row */}
+          <div className="mt-3 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
+            {/* Add Schools Button */}
+            <button
+              onClick={handleOpenAddSchoolsModal}
+              className="btn btn-success px-4 py-2 fw-semibold rounded-pill"
+            >
+              <Plus size={18} className="me-2" />
+              Add Schools to Next Round
+            </button>
 
-          {isLastRound && (
-            <div className="mt-3">
+            {/* Round Selection and Generate Button */}
+            {!isLastRound && (
+              <>
+                <select
+                  className="form-select"
+                  style={{ maxWidth: "250px" }}
+                  value={selectedNextRound}
+                  onChange={(e) => setSelectedNextRound(e.target.value)}
+                  disabled={generatingNext}
+                >
+                  <option value="">Select Next Round</option>
+                  {roundOptions.map((round) => (
+                    <option key={round} value={round}>
+                      {round}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleGenerateNextRound}
+                  disabled={generatingNext || !selectedNextRound}
+                  className="btn btn-primary px-4 py-2 fw-semibold rounded-pill"
+                >
+                  {generatingNext ? "Generating..." : "Generate Next Round"}
+                </button>
+              </>
+            )}
+
+            {isLastRound && (
               <button
                 disabled
                 className="btn btn-secondary px-4 py-2 fw-semibold rounded-pill"
               >
                 No More Rounds
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {successMsg && (
@@ -590,6 +696,126 @@ export default function TournamentBracketPage() {
           ))}
         </div>
       </div>
+
+      {/* Add Schools Modal */}
+      {showAddSchoolsModal && (
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={handleCloseAddSchoolsModal}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header border-0 pb-0">
+                <h5 className="modal-title fw-bold">
+                  Add Schools to Tournament
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleCloseAddSchoolsModal}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {loadingSchools ? (
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">
+                        Loading schools...
+                      </span>
+                    </div>
+                    <p className="text-muted mt-2">Loading schools...</p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="mb-3">
+                      <label className="form-label fw-semibold">
+                        School 1{" "}
+                        <span className="text-secondary">(Main school)</span>
+                      </label>
+                      <select
+                        className="form-select"
+                        value={selectedSchool1}
+                        onChange={(e) => setSelectedSchool1(e.target.value)}
+                      >
+                        <option value="">Select first school</option>
+                        {allSchools.map((school) => (
+                          <option key={school.id} value={school.id}>
+                            {school.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label fw-semibold">
+                        School 2{" "}
+                        <span className="text-secondary">
+                          (School they competed with)
+                        </span>
+                      </label>
+                      <select
+                        className="form-select"
+                        value={selectedSchool2}
+                        onChange={(e) => setSelectedSchool2(e.target.value)}
+                      >
+                        <option value="">Select second school</option>
+                        {allSchools.map((school) => (
+                          <option key={school.id} value={school.id}>
+                            {school.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {selectedSchool1 &&
+                      selectedSchool2 &&
+                      selectedSchool1 === selectedSchool2 && (
+                        <div className="alert alert-warning py-2">
+                          Please select two different schools
+                        </div>
+                      )}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer border-0">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleCloseAddSchoolsModal}
+                  disabled={addingSchools}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleAddSchools}
+                  disabled={
+                    addingSchools ||
+                    loadingSchools ||
+                    !selectedSchool1 ||
+                    !selectedSchool2 ||
+                    selectedSchool1 === selectedSchool2
+                  }
+                >
+                  {addingSchools ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      Adding...
+                    </>
+                  ) : (
+                    "Add Schools"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

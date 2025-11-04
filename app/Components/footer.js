@@ -88,7 +88,7 @@ const Footer = () => {
                 <Link href="https://www.tiktok.com/@ekeremgbaakpauche?_t=ZN-90akK2wuO02&_r=1">
                   <Image
                     className="me-2"
-                    src="/images/Twitter.png"
+                    src="/images/tik.png"
                     width={30}
                     height={30}
                     alt="footer"

@@ -293,7 +293,7 @@ export default function Navbar() {
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
             >
-              Register your School
+              Register School <br></br> for 2026
             </button>
           </div>
         </div>
@@ -360,14 +360,26 @@ export default function Navbar() {
           </li>
           <li className="mb-3">
             <Link
-              href="/contact"
+              href="/about"
               className={`text-decoration-none side-text ${
-                isActive("/contact") ? "active" : ""
+                isActive("/about") ? "active" : ""
               }`}
               onClick={toggleNavbar}
             >
               <i className="fa-solid fa-circle-info me-2"></i>
               About Us
+            </Link>
+          </li>
+          <li className="mb-3">
+            <Link
+              href="/events"
+              className={`text-decoration-none side-text ${
+                isActive("/events") ? "active" : ""
+              }`}
+              onClick={toggleNavbar}
+            >
+              <i className="fa-solid fa-circle-info me-2"></i>
+              Live Events
             </Link>
           </li>
         </ul>

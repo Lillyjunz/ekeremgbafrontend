@@ -236,7 +236,7 @@ const About = () => {
                       <div className="stat-number">
                         {loading ? "..." : `${counters.subjects}+`}
                       </div>
-                      <div className="stat-label">Tournaments</div>
+                      <div className="stat-label">Tournaments Hosted</div>
                     </div>
                   </div>
 
@@ -252,7 +252,7 @@ const About = () => {
                           height={84}
                         />
                       </div>
-                      <div className="stat-label">Prize Won</div>
+                      <div className="stat-label">Price Won</div>
                     </div>
                   </div>
                 </div>

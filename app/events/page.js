@@ -4,7 +4,7 @@ import { Clock, Trophy, Users, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
-import styles from "./events.module.css";
+import pageStyles from "./events.module.css";
 
 export default function EventsPage() {
   const [token, setToken] = useState(null);
@@ -14,8 +14,19 @@ export default function EventsPage() {
   const [error, setError] = useState("");
   const [activeMatch, setActiveMatch] = useState(null);
 
+  // Get token from localStorage
+  const getAuthToken = () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ekereAuthToken");
+    }
+    return null;
+  };
+
   useEffect(() => {
-    setToken("demo-token");
+    const authToken = getAuthToken();
+    if (authToken) {
+      setToken(authToken);
+    }
   }, []);
 
   useEffect(() => {
@@ -24,69 +35,97 @@ export default function EventsPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const demoData = {
-          activeMatch: {
-            id: 1,
-            tournament_id: 100,
-            school1_id: 20,
-            school2_id: 11,
-            school1_score: 45,
-            school2_score: 38,
-            winner_id: null,
-            round: "Semi Finals",
-            isOngoing: "true",
-          },
-        };
+
+        const response = await fetch(
+          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch active match");
+        }
+
+        const matchData = data.activeMatch;
+
+        if (!matchData) {
+          setBracket(null);
+          setActiveMatch(null);
+          setLoading(false);
+          return;
+        }
+
+        // Build schools map
         const map = {
-          20: "Victory High School",
-          11: "Excellence Academy",
+          [matchData.school1_id]: matchData.school1_name,
+          [matchData.school2_id]: matchData.school2_name,
         };
         setSchoolsMap(map);
 
-        const roundName = demoData.activeMatch.round || "Round of 32";
+        // Build bracket structure
+        const roundName = matchData.round || "Round of 32";
         setBracket({
           [roundName]: [
             {
-              match_id: demoData.activeMatch.id,
-              tournament_id: demoData.activeMatch.tournament_id,
-              school1: map[demoData.activeMatch.school1_id],
-              school2: map[demoData.activeMatch.school2_id],
-              school1_score: demoData.activeMatch.school1_score,
-              school2_score: demoData.activeMatch.school2_score,
-              school1Id: demoData.activeMatch.school1_id,
-              school2Id: demoData.activeMatch.school2_id,
-              winner: demoData.activeMatch.winner_id
-                ? map[demoData.activeMatch.winner_id]
-                : null,
-              isActive: demoData.activeMatch.isOngoing === "true",
+              match_id: matchData.match_id,
+              tournament_id: matchData.tournament_id,
+              school1: matchData.school1_name,
+              school2: matchData.school2_name,
+              school1_score: matchData.school1_score ?? 0,
+              school2_score: matchData.school2_score ?? 0,
+              school1Id: matchData.school1_id,
+              school2Id: matchData.school2_id,
+              school1Students: matchData.school1Students || [],
+              school2Students: matchData.school2Students || [],
+              winner: matchData.winner_id ? map[matchData.winner_id] : null,
+              isActive: matchData.isOngoing === "true",
+              tournament_name: matchData.tournament_name,
+              tournament_year: matchData.tournament_year,
+              tournament_location: matchData.tournament_location,
+              tournament_time: matchData.tournament_time,
             },
           ],
         });
-        setActiveMatch(demoData.activeMatch);
+
+        setActiveMatch(matchData);
         setError("");
       } catch (err) {
         console.error(err);
-        setError("Failed to load match data");
+        setError(err.message || "Failed to load match data");
       } finally {
         setLoading(false);
       }
     };
 
+    // Initial fetch
     fetchData();
+
+    // Auto refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchData();
+    }, 180000); //
+
+    // Cleanup interval when component unmounts
+    return () => clearInterval(interval);
   }, [token]);
 
   if (loading)
     return (
       <div
-        className={styles.pageContainer}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
       >
-        <div style={{ textAlign: "center", color: "#cbd5e1" }}>
-          Loading scoreboard...
+        <div className="text-center">
+          <div
+            className="spinner-border text-warning mb-3"
+            style={{ width: "3rem", height: "3rem" }}
+          ></div>
+          <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
+            Loading scoreboard...
+          </div>
         </div>
       </div>
     );
@@ -94,30 +133,24 @@ export default function EventsPage() {
   if (error)
     return (
       <div
-        className={styles.pageContainer}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#ef4444",
-        }}
+        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
       >
-        {error}
+        <div
+          style={{ color: "#ef4444", fontSize: "1.25rem", fontWeight: "600" }}
+        >
+          {error}
+        </div>
       </div>
     );
 
   if (!bracket)
     return (
       <div
-        className={styles.pageContainer}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#cbd5e1",
-        }}
+        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
       >
-        No active match found.
+        <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
+          No active match found.
+        </div>
       </div>
     );
 
@@ -126,19 +159,36 @@ export default function EventsPage() {
 
   return (
     <>
-      <Navbar></Navbar>
-      <div className={styles.pageContainer}>
-        <div className={styles.pageOverlay}></div>
+      <Navbar />
+      <div className={pageStyles.pageContainer}>
+        <div className={pageStyles.pageOverlay}></div>
 
         <div
           className="container py-5"
           style={{ position: "relative", zIndex: 1 }}
         >
           <div className="text-center mb-5">
-            <div className={styles.roundBadge}>
-              <Trophy size={20} /> Current Round
+            <div className={pageStyles.roundBadge}>
+              <Trophy size={20} />
+              <span>Current Round</span>
             </div>
-            <h1 className={styles.roundTitle}>{currentRoundName}</h1>
+            <h1 className={pageStyles.roundTitle}>{currentRoundName}</h1>
+
+            {currentMatches[0] && (
+              <div
+                className="mt-3"
+                style={{ color: "#cbd5e1", fontSize: "0.95rem" }}
+              >
+                <div>
+                  {currentMatches[0].tournament_name}{" "}
+                  {currentMatches[0].tournament_year}
+                </div>
+                <div>
+                  {currentMatches[0].tournament_location} •{" "}
+                  {currentMatches[0].tournament_time}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="row g-4 justify-content-center">
@@ -150,23 +200,26 @@ export default function EventsPage() {
               return (
                 <div key={match.match_id} className="col-12 col-xl-10">
                   <div
-                    className={`${styles.matchCard} ${
-                      isLive ? styles.matchCardLive : ""
+                    className={`${pageStyles.matchCard} ${
+                      isLive ? pageStyles.matchCardLive : ""
                     }`}
                   >
                     {isLive && (
-                      <div className={styles.liveBadge}>
-                        <div className={styles.pulse}></div> LIVE
+                      <div className={pageStyles.liveBadge}>
+                        <div className={pageStyles.pulse}></div>
+                        <span>LIVE</span>
                       </div>
                     )}
 
                     <div className="text-center mb-4">
-                      <span className={styles.matchBadge}>
-                        <Users size={16} /> Match {match.match_id}
+                      <span className={pageStyles.matchBadge}>
+                        <Users size={16} className="me-2" />
+                        Match {match.match_id}
                       </span>
                       {isLive && (
-                        <span className={styles.inProgressBadge}>
-                          <Zap size={16} /> In Progress
+                        <span className={pageStyles.inProgressBadge}>
+                          <Zap size={16} className="me-2" />
+                          In Progress
                         </span>
                       )}
                     </div>
@@ -174,67 +227,107 @@ export default function EventsPage() {
                     <div className="row align-items-center text-center g-4">
                       <div className="col-12 col-md-5">
                         <h3
-                          className={`${styles.schoolName} ${
+                          className={`${pageStyles.schoolName} ${
                             school1Score > school2Score
-                              ? styles.schoolNameWinning
+                              ? pageStyles.schoolNameWinning
                               : ""
                           }`}
                         >
                           {match.school1}
                         </h3>
                         <div
-                          className={`${styles.scoreDisplay} ${
+                          className={`${pageStyles.scoreDisplay} ${
                             school1Score > school2Score
-                              ? styles.scoreDisplayWinning
+                              ? pageStyles.scoreDisplayWinning
                               : ""
                           }`}
                         >
                           {school1Score}
                         </div>
+
+                        {match.school1Students?.length > 0 && (
+                          <div
+                            className="mt-3"
+                            style={{ fontSize: "0.85rem", color: "#94a3b8" }}
+                          >
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              Team Members:
+                            </div>
+                            {match.school1Students.map((student) => (
+                              <div key={student.id}>{student.fullname}</div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <div className="col-12 col-md-2">
-                        <div className={styles.vsCircle}>VS</div>
+                        <div className={pageStyles.vsCircle}>VS</div>
                         {isLive && (
                           <div
                             className="mt-3"
                             style={{
                               color: "#4ade80",
                               fontSize: "0.875rem",
-                              fontWeight: "600",
+                              fontWeight: 600,
                             }}
                           >
-                            <Clock size={14} /> Ongoing
+                            <Clock size={14} className="me-1" />
+                            Ongoing
                           </div>
                         )}
                       </div>
 
                       <div className="col-12 col-md-5">
                         <h3
-                          className={`${styles.schoolName} ${
+                          className={`${pageStyles.schoolName} ${
                             school2Score > school1Score
-                              ? styles.schoolNameWinning
+                              ? pageStyles.schoolNameWinning
                               : ""
                           }`}
                         >
                           {match.school2}
                         </h3>
                         <div
-                          className={`${styles.scoreDisplay} ${
+                          className={`${pageStyles.scoreDisplay} ${
                             school2Score > school1Score
-                              ? styles.scoreDisplayWinning
+                              ? pageStyles.scoreDisplayWinning
                               : ""
                           }`}
                         >
                           {school2Score}
                         </div>
+
+                        {match.school2Students?.length > 0 && (
+                          <div
+                            className="mt-3"
+                            style={{ fontSize: "0.85rem", color: "#94a3b8" }}
+                          >
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              Team Members:
+                            </div>
+                            {match.school2Students.map((student) => (
+                              <div key={student.id}>{student.fullname}</div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {match.winner && (
                       <div className="text-center mt-4">
-                        <span className={styles.winnerBadge}>
-                          <Trophy size={20} /> Winner: {match.winner}
+                        <span className={pageStyles.winnerBadge}>
+                          <Trophy size={20} />
+                          <span>Winner: {match.winner}</span>
                         </span>
                       </div>
                     )}
@@ -245,7 +338,7 @@ export default function EventsPage() {
           </div>
         </div>
       </div>
-      <Footer></Footer>
+      <Footer />
     </>
   );
 }

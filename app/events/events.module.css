@@ -1,3 +1,5 @@
+/* ScoreboardPage.module.css */
+
 .pageContainer {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
@@ -39,6 +41,14 @@
   border: 1px solid rgba(59, 130, 246, 0.3);
   color: #60a5fa;
   transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
 
 .infoButton {
@@ -128,6 +138,16 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .matchBadge {
   background: rgba(59, 130, 246, 0.15);
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -200,6 +220,100 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* ScoreboardModal.module.css */
+.modal {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modalBackdrop {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.modalContent {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1.5rem 2rem;
+  color: #f1f5f9;
+  font-weight: 700;
+  font-size: 1.5rem;
+
+  display: flex;
+  justify-content: space-between; /* pushes title left, button right */
+  align-items: center;
+}
+
+.modalBody {
+  padding: 2rem;
+}
+
+.scoreMatchInfo {
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 0.75rem;
+}
+
+.scoreMatchInfo strong {
+  color: #60a5fa;
+  font-size: 1.125rem;
+}
+
+.formLabel {
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.formControl {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.formControl:focus,
+.formSelect:focus {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+  color: #e2e8f0 !important;
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  color: white;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+  width: 100%;
+}
+
+.submitButton:active {
+  transform: scale(0.98) !important;
 }
 
 @keyframes pulse {

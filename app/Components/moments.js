@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 const ExcitingMomentsCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Sample data - replace with your actual images and content
   const slides = [
     {
       id: 1,
@@ -30,15 +29,14 @@ const ExcitingMomentsCarousel = () => {
     {
       id: 5,
       image: "/images/day5.jpg",
-      alt: "Exciting moment 4",
+      alt: "Exciting moment 5",
     },
   ];
 
-  // Auto-slide functionality
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 1000); // Change slide every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [slides.length]);
@@ -79,13 +77,16 @@ const ExcitingMomentsCarousel = () => {
                     index === currentSlide ? "active" : ""
                   }`}
                 >
-                  <Image
-                    src={slide.image}
-                    className="d-block carousel-image"
-                    alt={slide.alt}
-                    width={1200}
-                    height={600}
-                  ></Image>
+                  <div className="carousel-image-wrapper">
+                    <Image
+                      src={slide.image}
+                      className="d-block carousel-image"
+                      alt={slide.alt}
+                      width={1200}
+                      height={600}
+                      priority={index === 0}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -114,7 +115,7 @@ const ExcitingMomentsCarousel = () => {
               ></span>
             </button>
 
-            {/* Custom pagination dots overlaid on image */}
+            {/* Custom pagination dots */}
             <div className="custom-indicators">
               {slides.map((_, index) => (
                 <button

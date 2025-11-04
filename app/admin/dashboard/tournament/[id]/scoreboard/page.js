@@ -24,8 +24,19 @@ export default function ScoreboardPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // Get token from localStorage
+  const getAuthToken = () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("ekereAuthToken");
+    }
+    return null;
+  };
+
   useEffect(() => {
-    setToken("demo-token");
+    const authToken = getAuthToken();
+    if (authToken) {
+      setToken(authToken);
+    }
   }, []);
 
   useEffect(() => {
@@ -34,52 +45,68 @@ export default function ScoreboardPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const demoData = {
-          activeMatch: {
-            id: 1,
-            tournament_id: 100,
-            school1_id: 20,
-            school2_id: 11,
-            school1_score: 45,
-            school2_score: 38,
-            winner_id: null,
-            round: "Semi Finals",
-            isOngoing: "true",
-          },
-        };
 
+        // Fetch active match from API
+        const response = await fetch(
+          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch active match");
+        }
+
+        const matchData = data.activeMatch;
+
+        if (!matchData) {
+          setBracket(null);
+          setActiveMatch(null);
+          setLoading(false);
+          return;
+        }
+
+        // Build schools map
         const map = {
-          20: "Victory High School",
-          11: "Excellence Academy",
-          21: "Summit College",
-          12: "Pioneer Institute",
+          [matchData.school1_id]: matchData.school1_name,
+          [matchData.school2_id]: matchData.school2_name,
         };
         setSchoolsMap(map);
 
-        const roundName = demoData.activeMatch.round || "Round of 32";
+        // Build bracket structure
+        const roundName = matchData.round || "Round of 32";
         setBracket({
           [roundName]: [
             {
-              match_id: demoData.activeMatch.id,
-              tournament_id: demoData.activeMatch.tournament_id,
-              school1: map[demoData.activeMatch.school1_id],
-              school2: map[demoData.activeMatch.school2_id],
-              school1_score: demoData.activeMatch.school1_score ?? 0,
-              school2_score: demoData.activeMatch.school2_score ?? 0,
-              school1Id: demoData.activeMatch.school1_id,
-              school2Id: demoData.activeMatch.school2_id,
-              winner: demoData.activeMatch.winner_id
-                ? map[demoData.activeMatch.winner_id]
-                : null,
-              isActive: demoData.activeMatch.isOngoing === "true",
+              match_id: matchData.match_id,
+              tournament_id: matchData.tournament_id,
+              school1: matchData.school1_name,
+              school2: matchData.school2_name,
+              school1_score: matchData.school1_score ?? 0,
+              school2_score: matchData.school2_score ?? 0,
+              school1Id: matchData.school1_id,
+              school2Id: matchData.school2_id,
+              school1Students: matchData.school1Students || [],
+              school2Students: matchData.school2Students || [],
+              winner: matchData.winner_id ? map[matchData.winner_id] : null,
+              isActive: matchData.isOngoing === "true",
+              tournament_name: matchData.tournament_name,
+              tournament_year: matchData.tournament_year,
+              tournament_location: matchData.tournament_location,
+              tournament_time: matchData.tournament_time,
             },
           ],
         });
-        setActiveMatch(demoData.activeMatch);
+
+        setActiveMatch(matchData);
         setError("");
       } catch (err) {
         console.error(err);
-        setError("Failed to load match data");
+        setError(err.message || "Failed to load match data");
       } finally {
         setLoading(false);
       }
@@ -105,18 +132,65 @@ export default function ScoreboardPage() {
 
     setSubmitting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const authToken = getAuthToken();
+      if (!authToken) {
+        alert("Missing auth token. Please log in again.");
+        return;
+      }
+
+      // Call the winner API
+      const response = await fetch(
+        `https://api.ekeremgbaakpauche.com/api/admin/match/${activeMatch.match_id}/winner/tournament/${activeMatch.tournament_id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            winnerId: parseInt(scores.winnerId),
+            school1_score: parseInt(scores.school1_score),
+            school2_score: parseInt(scores.school2_score),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to record winner");
+      }
+
       alert("✅ Scores recorded successfully!");
       setShowScoreModal(false);
+
+      // Update local state
       setActiveMatch((prev) => ({
         ...prev,
-        winner_id: scores.winnerId,
-        school1_score: scores.school1_score,
-        school2_score: scores.school2_score,
+        winner_id: parseInt(scores.winnerId),
+        school1_score: parseInt(scores.school1_score),
+        school2_score: parseInt(scores.school2_score),
+      }));
+
+      // Update bracket
+      const roundName = Object.keys(bracket)[0];
+      setBracket((prev) => ({
+        ...prev,
+        [roundName]: prev[roundName].map((match) => {
+          if (match.match_id === activeMatch.match_id) {
+            return {
+              ...match,
+              school1_score: parseInt(scores.school1_score),
+              school2_score: parseInt(scores.school2_score),
+              winner: schoolsMap[scores.winnerId],
+            };
+          }
+          return match;
+        }),
       }));
     } catch (err) {
       console.error("Error submitting scores:", err);
-      alert("Network error. Please try again.");
+      alert("Error: " + err.message);
     } finally {
       setSubmitting(false);
     }
@@ -196,6 +270,23 @@ export default function ScoreboardPage() {
           </div>
           <h1 className={pageStyles.roundTitle}>{currentRoundName}</h1>
 
+          {/* Tournament Info */}
+          {currentMatches[0] && (
+            <div
+              className="mt-3"
+              style={{ color: "#cbd5e1", fontSize: "0.95rem" }}
+            >
+              <div>
+                {currentMatches[0].tournament_name}{" "}
+                {currentMatches[0].tournament_year}
+              </div>
+              <div>
+                {currentMatches[0].tournament_location} •{" "}
+                {currentMatches[0].tournament_time}
+              </div>
+            </div>
+          )}
+
           {activeMatch && (
             <div className="mt-4">
               <button
@@ -244,6 +335,7 @@ export default function ScoreboardPage() {
                   </div>
 
                   <div className="row align-items-center text-center g-4">
+                    {/* School 1 */}
                     <div className="col-12 col-md-5">
                       <h3
                         className={`${pageStyles.schoolName} ${
@@ -263,8 +355,30 @@ export default function ScoreboardPage() {
                       >
                         {school1Score}
                       </div>
+
+                      {/* School 1 Students */}
+                      {match.school1Students &&
+                        match.school1Students.length > 0 && (
+                          <div
+                            className="mt-3"
+                            style={{ fontSize: "0.85rem", color: "#94a3b8" }}
+                          >
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              Team Members:
+                            </div>
+                            {match.school1Students.map((student) => (
+                              <div key={student.id}>{student.fullname}</div>
+                            ))}
+                          </div>
+                        )}
                     </div>
 
+                    {/* VS */}
                     <div className="col-12 col-md-2">
                       <div className={pageStyles.vsCircle}>VS</div>
                       {isLive && (
@@ -282,6 +396,7 @@ export default function ScoreboardPage() {
                       )}
                     </div>
 
+                    {/* School 2 */}
                     <div className="col-12 col-md-5">
                       <h3
                         className={`${pageStyles.schoolName} ${
@@ -301,6 +416,27 @@ export default function ScoreboardPage() {
                       >
                         {school2Score}
                       </div>
+
+                      {/* School 2 Students */}
+                      {match.school2Students &&
+                        match.school2Students.length > 0 && (
+                          <div
+                            className="mt-3"
+                            style={{ fontSize: "0.85rem", color: "#94a3b8" }}
+                          >
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                marginBottom: "0.5rem",
+                              }}
+                            >
+                              Team Members:
+                            </div>
+                            {match.school2Students.map((student) => (
+                              <div key={student.id}>{student.fullname}</div>
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
 

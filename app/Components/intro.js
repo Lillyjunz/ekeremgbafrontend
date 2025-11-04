@@ -272,7 +272,7 @@ const SchoolLegacyStats = () => {
                 </h2>
 
                 <p className="description mb-4">
-                  Keremgba is a school-based academic competition focused on
+                  Ekeremgba is a school-based academic competition focused on
                   Debate, Mathematics, Science, and more. We bring students
                   together to compete, learn, and grow—sharpening minds,
                   building confidence, and rewarding excellence across every
@@ -323,7 +323,7 @@ const SchoolLegacyStats = () => {
                       <div className="stat-number">
                         {loading ? "..." : `${counters.subjects}+`}
                       </div>
-                      <div className="stat-label">Core Subjects Covered</div>
+                      <div className="stat-label">Tournaments Hosted</div>
                     </div>
                   </div>
 
@@ -339,7 +339,7 @@ const SchoolLegacyStats = () => {
                           height={84}
                         />
                       </div>
-                      <div className="stat-label">Prize Won</div>
+                      <div className="stat-label">Price Won</div>
                     </div>
                   </div>
                 </div>
