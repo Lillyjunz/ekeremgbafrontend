@@ -293,7 +293,7 @@ export default function Navbar() {
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
             >
-              Register School for 2026
+              Register School (2026)
             </button>
           </div>
         </div>
