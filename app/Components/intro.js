@@ -272,11 +272,12 @@ const SchoolLegacyStats = () => {
                 </h2>
 
                 <p className="description mb-4">
-                  Ekeremgba is a school-based academic competition focused on
-                  Debate, Mathematics, Science, and more. We bring students
-                  together to compete, learn, and grow—sharpening minds,
-                  building confidence, and rewarding excellence across every
-                  subject.
+                  Ekeremgba Akpauche is more than a competition — it is a
+                  movement to revive the Igbo spirit of wisdom (Amamihe),
+                  eloquence (Nkwuwa Okwu), and unity (ịdịnotu). We bring
+                  together schools, students, and communities to celebrate the
+                  richness of Igbo language and culture in joyful, profound and
+                  meaningful ways.
                 </p>
 
                 <button onClick={openModal} className="register-btn">

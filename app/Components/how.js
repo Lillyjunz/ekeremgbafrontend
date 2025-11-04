@@ -13,8 +13,9 @@ const HowItWorks = () => {
               </div>
               <h5 className="fw-bold">Register Your School</h5>
               <p className="mb-0">
-                Sign up your school and select which competitions to join—Math,
-                Debate, Science, or more.
+                Schools can register directly through our online form or by
+                contacting the organisers. You&apos;ll receive full
+                participation guidelines, category lists, and rehearsal tips.
               </p>
             </div>
           </div>
@@ -25,8 +26,8 @@ const HowItWorks = () => {
               </div>
               <h5 className="fw-bold">Compete</h5>
               <p className="mb-0">
-                Students represent their schools in scheduled rounds, judged
-                live or scored in real-time with full transparency.
+                Dozens of schools have joined the Ekeremgba Akpauche journey,
+                each contributing to the colourful showcase of Igbo excellence.
               </p>
             </div>
           </div>
@@ -35,10 +36,11 @@ const HowItWorks = () => {
               <div className="icon-wrapper mb-3">
                 <i className="bi bi-award"></i>
               </div>
-              <h5 className="fw-bold">Earn Points & Get Recognized</h5>
+              <h5 className="fw-bold">Rules and Guidelines</h5>
               <p className="mb-0">
-                Top performers move up the leaderboard. Winners receive awards,
-                certificates, and national recognition.
+                Participation is open to registered schools. Each team is guided
+                by clear rules promoting fairness, teamwork, and cultural
+                accuracy.
               </p>
             </div>
           </div>

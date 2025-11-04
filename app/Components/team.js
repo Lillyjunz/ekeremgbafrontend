@@ -114,7 +114,9 @@ const MeetOurTeam = () => {
         <div className="team-header mb-5">
           <h2 className="team-title">Meet Our Team</h2>
           <p className="team-subtitle">
-            Ekeremgba competitor organizers, they make the tournament possible
+            A network of passionate educators, linguists, and cultural promoters
+            committed to building pride in Igbo identity through practical
+            education and joyful events.
           </p>
         </div>
 

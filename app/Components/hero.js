@@ -184,20 +184,20 @@ const HeroSection = () => {
           <div className="hero-badge mb-3">Ekeremgba 2.0 is coming soon</div>
 
           <h1 className="hero-title">
-            Championing Academic Excellence
+            Celebrating Igbo Language
             <br />
-            Through Competition
+            Culture and Excellence
           </h1>
 
           <p className="hero-description">
-            Ekeremgba Academic Competition brings schools together in a test of
-            <br />
-            knowledge, skill, and critical thinking in subjects like Math,
-            English,
-            <br />
-            Science, and Debate
+            Promoting pride in our heritage through education, creativity, and
+            friendly competition among secondary schools in Nigeria.
           </p>
 
+          <p>
+            Next Competition:
+            <span className="fw-bold">January 20th till February 4th 2026</span>
+          </p>
           <div className="hero-buttons">
             <button onClick={openModal} className="btn btn-primary-custom">
               Register School (2026)

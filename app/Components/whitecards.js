@@ -4,31 +4,24 @@ import Image from "next/image";
 
 const subjects = [
   {
-    icon: "/images/math.svg",
-    title: "Math Bowl",
-    description:
-      "Rapid-fire problem solving under pressure. Mental speed meets accuracy.",
+    icon: "/images/essay.svg",
+    title: "Ọlanchọ (Debate)",
+    description: "Sharp minds, sharp words.",
   },
   {
-    icon: "/images/mic.svg", // Replace with your debate image path
-    title: "Debate",
-    description:
-      "Students battle ideas and logic on current issues in structured rounds",
+    icon: "/images/spell.svg",
+    title: "Ịgọ Ọjị (Kolanut Presentation)",
+    description: "Culture meets respect.",
   },
   {
-    icon: "/images/science.svg", // Replace with your science image path
-    title: "Science Showdown",
-    description: "A STEM-focused quiz testing concepts and critical thinking",
+    icon: "/images/science.svg",
+    title: "Ịkpọ Ụga (Proverbs & Wisdom)",
+    description: "The heartbeat of Igbo philosophy.",
   },
   {
-    icon: "/images/spell.svg", // Replace with your spelling image path
-    title: "Spelling Bee",
-    description: "Spell your way to the top. Vocabulary, memory, and poise.",
-  },
-  {
-    icon: "/images/essay.svg", // Replace with your essay image path
-    title: "Essay Slam",
-    description: "Express creativity and structure ideas under pressure.",
+    icon: "/images/mic.svg",
+    title: "Storytelling & Song",
+    description: "Creativity through oral tradition.",
   },
 ];
 
@@ -36,7 +29,7 @@ export default function SubjectsEvents() {
   return (
     <section className="subjects-section container py-5">
       <h2 className="fw-bold mb-2" style={{ color: "#4f4f4f" }}>
-        Subjects & Events
+        Categories
       </h2>
       <p className="text-muted mb-4">
         The competition will feature the following

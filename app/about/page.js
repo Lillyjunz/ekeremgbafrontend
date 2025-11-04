@@ -138,32 +138,27 @@ const About = () => {
   const subjects = [
     {
       icon: "bi-mortarboard",
-      title: "Transparent Judging",
-      description: "Every score follows a clear rubric—no bias, no guesswork.",
+      title: "A battle of the mind",
+      description:
+        "This programme celebrates an intellectual wrestling that sharpens reasoning and strengthens the intellect. Participants are challenged to think reason and express themselves in the Igbo language, using it as a tool for creativity problem-solving and deep reflection on human values and community life.",
     },
     {
       icon: "bi-trophy",
-      title: "Flexible competition format",
+      title: "The Power of Language",
       description:
-        "From knockout to round-robin, we adapt structures to fit subject and scale.",
+        "Language is not only a means of communication.It is also a medium for thinking, research, governance, art, and craftsmanship.A people who use their language in science, creativity, and technology build stronger societies and better education systems.Thus, Ekeremgba Akpauche encourages our youth to dream, research, and create — in their own tongue.",
     },
     {
       icon: "bi-clipboard-data",
-      title: "Real-time Leaderboard",
+      title: "Purpose and Vision",
       description:
-        "Rankings update live so schools and students can follow progress instantly.",
+        "The goal of Ekeremgba Akpauche is to rebuild and revitalize the Igbo language and culture, restoring pride and fluency among young people. But it does not stop there — it seeks to prove that the Igbo language has direction, purpose, and a future.",
     },
     {
       icon: "bi-globe",
-      title: "National-level Recognition",
+      title: "A call to ndi-igbo",
       description:
-        "Top performers earn digital certificates, trophies, and spotlight features across platforms.",
-    },
-    {
-      icon: "bi-laptop",
-      title: "School Dashboard Access",
-      description:
-        "Each school gets a personalized portal to manage teams, track scores, and view schedules.",
+        "Fellow Igbo sons and daughters, it is time to wake up from slumber.This movement reminds us — especially our children — of the importance of speaking, studying, and thinking in Igbo, particularly in education and research.Using our language to explore deep ideas gives us the power to build and renew our communities.",
     },
   ];
 
@@ -292,8 +287,8 @@ const About = () => {
         <div className={styles.textContainer}>
           <h2 className={styles.title}>ABOUT EKEREMGBA TOURNAMENT</h2>
           <p className={styles.description}>
-            Fostering academic brilliance and healthy school rivalry through
-            structured contests.
+            Promoting pride in our heritage through education, creativity, and
+            friendly competition among secondary schools in Nigeria.
           </p>
         </div>
         <AboutMomentsCarousel />
@@ -315,10 +310,18 @@ const About = () => {
                   height={35}
                   src="/images/target.svg"
                 />
-                <h5 className="mb-4 mt-2">Our Mission</h5>
+                <h5 className="mb-3 mt-2">Our Mission</h5>
                 <p className="description mb-4">
-                  Ekeremgba is a school-based academic competition focused on
-                  Debate, Mathematics, Science, and more.
+                  We create intellectual, educational, cultural, and linguistic
+                  experiences that connect young people to their heritage,
+                  promote excellence, and inspire social-cultural development.
+                </p>
+
+                <h5 className="mb-3 mt-2">Our Vision</h5>
+                <p className="description mb-4">
+                  To nurture a new generation of proud, confident, and
+                  culturally grounded Igbo youth — fluent in their language,
+                  expressive in their identity, and respectful of their roots.
                 </p>
               </div>
             </div>
@@ -377,6 +380,47 @@ const About = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={sectionRef}
+        className="school-legacy-section py-5"
+        style={{ backgroundColor: "#FFF" }}
+      >
+        <div className="container">
+          <div className="row align-items-center">
+            <div>
+              <div className="content-wrapper">
+                <h3 className="mb-2 mt-2 fw-semi-bold">
+                  The Story of Ekeremgba Akpauche
+                </h3>
+                <p className="description mb-4">
+                  Born out of a desire to encourage the use of Igbo language in
+                  learning and research, Ekeremgba Akpauche began as a
+                  school-based cultural and language competition. It quickly
+                  grew into a regional platform that inspires creativity,
+                  teamwork, and a deep sense of belonging among young Igbo
+                  learners.
+                </p>
+              </div>
+            </div>
+
+            <div className="content-wrapper">
+              <h3 className="mb-3 mt-2 fw-semi-bold">Meaning of the name </h3>
+              <p className="description mb-4">
+                Ekeremgba Akpauche is a creative initiative designed to promote
+                the Igbo language, wisdom, culture, and identity — the essential
+                treasures that define who we are as a people. The name itself
+                carries deep meaning. In ancient Igbo expression, “Ekeremgba”
+                referred to a contest of strength and endurance, while
+                “Akpauche” signifies deep thought, reflection, and valuable
+                wisdom.Together, Ekeremgba Akpauche represents a contest not of
+                muscles, but of the mind — a wrestling of intellect,
+                understanding, and wisdom.
+              </p>
             </div>
           </div>
         </div>
