@@ -332,11 +332,11 @@ const SchoolLegacyStats = () => {
                     <div className="stat-card">
                       <div className=" d-flex justify-content-center align-items-center">
                         <Image
-                          className="stat-numberr "
-                          src="/images/cash.png"
+                          className="cash-image"
+                          src="/images/naira.png"
                           alt="Cash"
-                          width={84}
-                          height={84}
+                          width={124}
+                          height={124}
                         />
                       </div>
                       <div className="stat-label">Price Won</div>

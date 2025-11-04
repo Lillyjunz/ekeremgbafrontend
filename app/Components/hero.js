@@ -181,7 +181,7 @@ const HeroSection = () => {
 
         {/* Content */}
         <div className="hero-content">
-          <div className="hero-badge">Ekeremgba 2.0 is coming soon</div>
+          <div className="hero-badge mb-3">Ekeremgba 2.0 is coming soon</div>
 
           <h1 className="hero-title">
             Championing Academic Excellence
