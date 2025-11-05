@@ -184,9 +184,9 @@ const HeroSection = () => {
           <div className="hero-badge mb-3">Ekeremgba 2.0 is coming soon</div>
 
           <h1 className="hero-title">
-            Celebrating Igbo Language
+            Developing Igbo language and Culture through
             <br />
-            Culture and Excellence
+            intellectual Competitions
           </h1>
 
           <p className="hero-description">

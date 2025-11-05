@@ -266,9 +266,7 @@ const SchoolLegacyStats = () => {
                 <h2 className="main-title mb-4">
                   More Than Just Competitions
                   <br />
-                  <span className="highlight-text">
-                    We Build School Legacies
-                  </span>
+                  <span className="highlight-text">We Build Legacies</span>
                 </h2>
 
                 <p className="description mb-4">
