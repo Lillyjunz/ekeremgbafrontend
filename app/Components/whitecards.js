@@ -5,23 +5,28 @@ import Image from "next/image";
 const subjects = [
   {
     icon: "/images/essay.svg",
-    title: "Ọlanchọ (Debate)",
+    title: "Ọlanchọ (Traditional Game)",
     description: "Sharp minds, sharp words.",
   },
   {
     icon: "/images/spell.svg",
-    title: "Ịgọ Ọjị (Kolanut Presentation)",
-    description: "Culture meets respect.",
+    title: "Arụmụka (Debate)",
+    description: "Where culture meets respect.",
   },
   {
-    icon: "/images/science.svg",
-    title: "Ịkpọ Ụga (Proverbs & Wisdom)",
+    icon: "/images/mic.svg",
+    title: "Ịkpọ Ụga (Traditional Game)",
     description: "The heartbeat of Igbo philosophy.",
   },
   {
     icon: "/images/mic.svg",
-    title: "Storytelling & Song",
+    title: "Akụkọ ifo na Egwu (Storytelling and Song)",
     description: "Creativity through oral tradition.",
+  },
+  {
+    icon: "/images/science.svg",
+    title: "Sayensị na NkanaỤzụ (Science and Technology)",
+    description: "A battle of the minds.",
   },
 ];
 
