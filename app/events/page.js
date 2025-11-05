@@ -7,42 +7,19 @@ import Navbar from "../Components/navbar";
 import pageStyles from "./events.module.css";
 
 export default function EventsPage() {
-  const [token, setToken] = useState(null);
   const [bracket, setBracket] = useState(null);
   const [schoolsMap, setSchoolsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeMatch, setActiveMatch] = useState(null);
 
-  // Get token from localStorage
-  const getAuthToken = () => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("ekereAuthToken");
-    }
-    return null;
-  };
-
   useEffect(() => {
-    const authToken = getAuthToken();
-    if (authToken) {
-      setToken(authToken);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!token) return;
-
     const fetchData = async () => {
       try {
         setLoading(true);
 
         const response = await fetch(
-          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match"
         );
         const data = await response.json();
 
@@ -104,54 +81,66 @@ export default function EventsPage() {
     // Initial fetch
     fetchData();
 
-    // Auto refresh every 10 seconds
+    // Auto refresh every 3 minutes
     const interval = setInterval(() => {
       fetchData();
-    }, 180000); //
+    }, 120000);
 
     // Cleanup interval when component unmounts
     return () => clearInterval(interval);
-  }, [token]);
+  }, []);
 
   if (loading)
     return (
-      <div
-        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
-      >
-        <div className="text-center">
-          <div
-            className="spinner-border text-warning mb-3"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
-          <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-            Loading scoreboard...
+      <>
+        <Navbar />
+        <div
+          className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
+        >
+          <div className="text-center">
+            <div
+              className="spinner-border text-warning mb-3"
+              style={{ width: "3rem", height: "3rem" }}
+            ></div>
+            <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
+              Loading scoreboard...
+            </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
 
   if (error)
     return (
-      <div
-        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
-      >
+      <>
+        <Navbar />
         <div
-          style={{ color: "#ef4444", fontSize: "1.25rem", fontWeight: "600" }}
+          className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
         >
-          {error}
+          <div
+            style={{ color: "#ef4444", fontSize: "1.25rem", fontWeight: "600" }}
+          >
+            {error}
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
 
   if (!bracket)
     return (
-      <div
-        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
-      >
-        <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-          No active match found.
+      <>
+        <Navbar />
+        <div
+          className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
+        >
+          <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
+            No active match found.
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
 
   const currentRoundName = Object.keys(bracket)[0];
