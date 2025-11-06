@@ -5,7 +5,7 @@ import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
 import styles from "./schools.module.css";
 
-export default function RankingTable() {
+export default function SchoolsList() {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,22 +13,26 @@ export default function RankingTable() {
   useEffect(() => {
     const fetchSchools = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const response = await fetch(
           "https://api.ekeremgbaakpauche.com/api/school/get-schools"
         );
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          console.warn("Failed to fetch schools:", response.status);
+          setSchools([]);
+          return;
         }
 
         const data = await response.json();
-        if (data?.schools?.allSchools) {
-          setSchools(data.schools.allSchools);
-        } else {
-          setError("No schools found");
-        }
+        const allSchools = data?.schools?.allSchools ?? [];
+
+        setSchools(Array.isArray(allSchools) ? allSchools : []);
       } catch (err) {
         console.error("Error fetching schools:", err);
-        setError("Failed to fetch schools");
+        setSchools([]);
       } finally {
         setLoading(false);
       }
@@ -37,23 +41,87 @@ export default function RankingTable() {
     fetchSchools();
   }, []);
 
+  const EmptyState = () => (
+    <div className="text-center py-5">
+      <div className="mb-4">
+        <svg
+          width="120"
+          height="120"
+          viewBox="0 0 120 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ margin: "0 auto", display: "block" }}
+        >
+          <circle cx="60" cy="60" r="60" fill="#f0f0f0" />
+          <path
+            d="M40 50h40M40 60h40M40 70h30"
+            stroke="#d0d0d0"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <rect
+            x="35"
+            y="35"
+            width="50"
+            height="55"
+            rx="4"
+            stroke="#d0d0d0"
+            strokeWidth="2"
+            fill="none"
+          />
+          <path d="M45 35v-5a5 5 0 0110 0v5" stroke="#d0d0d0" strokeWidth="2" />
+        </svg>
+      </div>
+      <h4 className="fw-semibold mb-2" style={{ color: "#333" }}>
+        No Schools Found
+      </h4>
+      <p
+        className="text-muted mb-4"
+        style={{ maxWidth: "400px", margin: "0 auto" }}
+      >
+        There are currently no schools registered in the system. Schools will
+        appear here once they are added.
+      </p>
+      <button
+        className="btn btn-outline-secondary"
+        style={{
+          borderRadius: "8px",
+          padding: "10px 24px",
+          fontWeight: "500",
+        }}
+        onClick={() => window.location.reload()}
+      >
+        Refresh Page
+      </button>
+    </div>
+  );
+
   return (
     <>
       <Navbar />
       <div style={{ backgroundColor: "#fafafa" }}>
         <div className="container py-5">
           <div className={styles.rankingWrapper}>
-            <h3 className="mb-4 fw-bold">School Rankings</h3>
+            <h3 className="mb-4 fw-bold">Schools</h3>
 
             {loading ? (
-              <p>Loading schools...</p>
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3 text-muted">Loading schools...</p>
+              </div>
             ) : error ? (
-              <p className="text-danger">{error}</p>
+              <div className="alert alert-danger" role="alert">
+                <strong>Error:</strong> {error}
+              </div>
+            ) : schools.length === 0 ? (
+              <EmptyState />
             ) : (
               <table className="table mb-0">
                 <thead>
                   <tr className="text-muted">
-                    <th>Ranking</th>
+                    <th>No.</th>
                     <th>School Name</th>
                     <th>Phone</th>
                     <th>Email</th>

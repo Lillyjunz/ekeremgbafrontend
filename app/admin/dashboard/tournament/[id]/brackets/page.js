@@ -4,6 +4,12 @@ import { Award, ChevronRight, Clock, Plus, Trophy } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+// utils/capitalize.js
+export const capitalizeWords = (str) => {
+  if (!str) return "";
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export default function TournamentBracketPage() {
   const { id } = useParams();
   const [bracketData, setBracketData] = useState(null);
@@ -557,8 +563,9 @@ export default function TournamentBracketPage() {
                             style={{ background: "#f8f9fa" }}
                           >
                             <span className="fw-semibold text-dark">
-                              {match.school1}
+                              {capitalizeWords(match.school1)}
                             </span>
+
                             <span
                               className="fw-bold"
                               style={{ minWidth: "20px", textAlign: "center" }}
@@ -578,8 +585,9 @@ export default function TournamentBracketPage() {
                             style={{ background: "#f8f9fa" }}
                           >
                             <span className="fw-semibold text-dark">
-                              {match.school2}
+                              {capitalizeWords(match.school2)}
                             </span>
+
                             <span
                               className="fw-bold"
                               style={{ minWidth: "20px", textAlign: "center" }}
@@ -595,7 +603,8 @@ export default function TournamentBracketPage() {
                               className="alert alert-success mb-0 py-2"
                               role="alert"
                             >
-                              <strong>Winner:</strong> {match.winner}
+                              <strong>Winner:</strong>{" "}
+                              {capitalizeWords(match.winner)}
                             </div>
                           )}
 
@@ -614,10 +623,10 @@ export default function TournamentBracketPage() {
                               >
                                 <option value="">Select Winner</option>
                                 <option value={match.school1Id}>
-                                  {match.school1}
+                                  {capitalizeWords(match.school1)}
                                 </option>
                                 <option value={match.school2Id}>
-                                  {match.school2}
+                                  {capitalizeWords(match.school2)}
                                 </option>
                               </select>
 
@@ -744,7 +753,7 @@ export default function TournamentBracketPage() {
                         <option value="">Select first school</option>
                         {allSchools.map((school) => (
                           <option key={school.id} value={school.id}>
-                            {school.name}
+                            {capitalizeWords(school.name)}
                           </option>
                         ))}
                       </select>
@@ -765,7 +774,7 @@ export default function TournamentBracketPage() {
                         <option value="">Select second school</option>
                         {allSchools.map((school) => (
                           <option key={school.id} value={school.id}>
-                            {school.name}
+                            {capitalizeWords(school.name)}
                           </option>
                         ))}
                       </select>

@@ -7,6 +7,16 @@ import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import styles from "./schools.module.css";
 
+// ✅ Capitalize helper
+const capitalizeWords = (str) => {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 export default function TournamentSchools() {
   const { id } = useParams();
   const router = useRouter();
@@ -487,8 +497,10 @@ export default function TournamentSchools() {
       ) : (
         <div className="card p-4 shadow-sm border-0">
           <h5>
-            Tournament: {tournamentInfo?.name} ({tournamentInfo?.year})
+            Tournament: {capitalizeWords(tournamentInfo?.name)} (
+            {tournamentInfo?.year})
           </h5>
+
           <p>
             <strong>Total Registered:</strong> {schoolsData?.totalRegistered}
           </p>
@@ -508,7 +520,8 @@ export default function TournamentSchools() {
                   {schoolsData.schools.map((s, i) => (
                     <tr key={s.id}>
                       <td>{i + 1}</td>
-                      <td>{s.name}</td>
+                      <td>{capitalizeWords(s.name)}</td>
+
                       <td>{new Date(s.registered_at).toLocaleString()}</td>
                       <td>
                         <button
@@ -566,7 +579,10 @@ export default function TournamentSchools() {
                 <div className={styles.schoolsList}>
                   {allSchools.map((s) => (
                     <div key={s.id} className={styles.schoolItem}>
-                      <span className={styles.schoolName}>{s.name}</span>
+                      <span className={styles.schoolName}>
+                        {capitalizeWords(s.name)}
+                      </span>
+
                       <button
                         className={`${styles.addBtn} ${
                           selectedSchools.includes(s.id)

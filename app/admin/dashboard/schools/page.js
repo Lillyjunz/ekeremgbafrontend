@@ -100,25 +100,26 @@ export default function Schools() {
   const fetchSchools = async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await fetch(
         "https://api.ekeremgbaakpauche.com/api/school/get-schools"
       );
 
+      // If API fails (400 or 500), don't throw, just set empty schools
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.warn("Failed to fetch schools:", response.status);
+        setSchools([]); // Show "No schools" instead of error
+        return;
       }
 
       const data = await response.json();
+      const allSchools = data?.schools?.allSchools ?? [];
 
-      if (data.status && data.schools && data.schools.allSchools) {
-        setSchools(data.schools.allSchools);
-        setError(null);
-      } else {
-        throw new Error("Invalid response format");
-      }
+      setSchools(Array.isArray(allSchools) ? allSchools : []);
     } catch (err) {
       console.error("Error fetching schools:", err);
-      setError(err.message);
+      setSchools([]); // keep UI stable
     } finally {
       setLoading(false);
     }
