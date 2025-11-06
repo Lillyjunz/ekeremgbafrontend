@@ -11,13 +11,15 @@ const Footer = () => {
         <div className="container pt-5 pb-4">
           <div className="row g-5">
             <div className="col-lg-3 col-md-6">
-              <div>
+              <div style={{ width: 130, height: 60, position: "relative" }}>
                 <Image
-                  src="/images/logo.png"
-                  width={130}
-                  height={80}
-                  alt="logo"
-                ></Image>
+                  src="/images/logo.png" // 2x or 3x higher-res version of your logo
+                  alt="Ekeremgba Logo"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  priority
+                  quality={100}
+                />
               </div>
             </div>
 

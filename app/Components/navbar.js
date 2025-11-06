@@ -195,13 +195,18 @@ export default function Navbar() {
             </button>
 
             {/* Brand always visible */}
+
             <Link href="/" className="navbar-brand fw-bold fs-4 mb-0">
-              <Image
-                src="/images/logo.png"
-                width={130}
-                height={60}
-                alt="logo"
-              ></Image>
+              <div style={{ width: 130, height: 60, position: "relative" }}>
+                <Image
+                  src="/images/logo.png" // 2x or 3x higher-res version of your logo
+                  alt="Ekeremgba Logo"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  priority
+                  quality={100}
+                />
+              </div>
             </Link>
           </div>
 

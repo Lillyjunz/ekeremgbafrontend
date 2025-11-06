@@ -342,14 +342,6 @@ const About = () => {
                     <div className="stat-card">
                       <div className="stat-number">
                         {loading ? "..." : `${counters.students}+`}
-                        {error && (
-                          <span
-                            className="text-danger"
-                            title={`Error: ${error}`}
-                          >
-                            ⚠️
-                          </span>
-                        )}
                       </div>
                       <div className="stat-label">Students</div>
                     </div>
