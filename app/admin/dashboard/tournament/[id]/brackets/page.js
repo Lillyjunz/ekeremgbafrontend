@@ -23,7 +23,7 @@ export default function TournamentBracketPage() {
   const [recordingChampion, setRecordingChampion] = useState(false);
   const [settingActive, setSettingActive] = useState(null);
   const [activeMatchId, setActiveMatchId] = useState(null);
-  const [selectedNextRound, setSelectedNextRound] = useState("");
+  const [selectedNextRound, setSelectedNextRound] = useState("Second Round");
 
   // Add Schools Modal States
   const [showAddSchoolsModal, setShowAddSchoolsModal] = useState(false);
@@ -32,6 +32,17 @@ export default function TournamentBracketPage() {
   const [selectedSchool1, setSelectedSchool1] = useState("");
   const [selectedSchool2, setSelectedSchool2] = useState("");
   const [addingSchools, setAddingSchools] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.bootstrap) {
+      const tooltipTriggerList = document.querySelectorAll(
+        '[data-bs-toggle="tooltip"]'
+      );
+      [...tooltipTriggerList].forEach((tooltipTriggerEl) => {
+        new window.bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    }
+  }, []);
 
   const roundOptions = [
     "First Round",
@@ -444,7 +455,7 @@ export default function TournamentBracketPage() {
                   disabled={generatingNext || !selectedNextRound}
                   className="btn btn-primary px-4 py-2 fw-semibold rounded-pill"
                 >
-                  {generatingNext ? "Generating..." : "Generate Next Round"}
+                  {generatingNext ? "Grouping..." : "Group Next Round"}
                 </button>
               </>
             )}
@@ -741,10 +752,20 @@ export default function TournamentBracketPage() {
                 ) : (
                   <div>
                     <div className="mb-3">
-                      <label className="form-label fw-semibold">
-                        School 1{" "}
-                        <span className="text-secondary">(Main school)</span>
+                      <label className="form-label fw-semibold d-flex align-items-center gap-1">
+                        School 1
+                        <span
+                          className="text-secondary"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="right"
+                          title="Previously Qualified School"
+                          style={{ cursor: "pointer" }}
+                        >
+                          (Main school){" "}
+                          <i className="bi bi-info-circle ms-1"></i>
+                        </span>
                       </label>
+
                       <select
                         className="form-select"
                         value={selectedSchool1}

@@ -141,6 +141,11 @@ a {
   padding: 0.5rem 1rem;
 }
 
+.side-textt {
+  color: orangered;
+  padding: 0.5rem 1rem;
+}
+
 .side-text:hover {
   background: linear-gradient(
     to right,

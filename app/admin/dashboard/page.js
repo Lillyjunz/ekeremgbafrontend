@@ -370,6 +370,7 @@ export default function Dashboard() {
                     : `Ekeremgba − Akpauche ${selectedYear}`}
                   <i className="bi bi-chevron-down ms-2"></i>
                 </button>
+
                 <ul className="dropdown-menu">
                   <li>
                     <a
@@ -383,42 +384,20 @@ export default function Dashboard() {
                       All Tournaments
                     </a>
                   </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedYear("2025");
-                      }}
-                    >
-                      2025
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedYear("2024");
-                      }}
-                    >
-                      2024
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedYear("2023");
-                      }}
-                    >
-                      2023
-                    </a>
-                  </li>
+                  {[2027, 2026, 2025, 2024, 2023].map((year) => (
+                    <li key={year}>
+                      <a
+                        className="dropdown-item"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSelectedYear(year.toString());
+                        }}
+                      >
+                        {year}
+                      </a>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

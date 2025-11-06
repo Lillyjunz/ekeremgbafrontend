@@ -176,7 +176,7 @@ export default function Schools() {
           <div
             className={`d-flex justify-content-between align-items-center ${styles.contentHeader}`}
           >
-            <h4 className="fw-semi-bold">Schools</h4>
+            <h4 className="fw-semi-bold ">Schools</h4>
             <button
               className={styles.createBtn}
               onClick={() => setShowModal(true)}
@@ -197,7 +197,7 @@ export default function Schools() {
 
               <h3 className={styles.emptyTitle}>No School</h3>
               <p className={styles.emptyText}>
-                You have not created any school competition
+                No Schools have registered in the system yet.
               </p>
 
               <button

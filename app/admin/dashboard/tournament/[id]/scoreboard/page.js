@@ -9,6 +9,12 @@ import {
   default as pageStyles,
 } from "./scoreboard.module.css";
 
+// Utility to capitalize each word
+const capitalizeWords = (str) => {
+  if (!str) return "";
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export default function ScoreboardPage() {
   const [token, setToken] = useState(null);
   const [bracket, setBracket] = useState(null);
@@ -277,7 +283,7 @@ export default function ScoreboardPage() {
               style={{ color: "#cbd5e1", fontSize: "0.95rem" }}
             >
               <div>
-                {currentMatches[0].tournament_name}{" "}
+                {capitalizeWords(currentMatches[0].tournament_name)}{" "}
                 {currentMatches[0].tournament_year}
               </div>
               <div>
@@ -344,7 +350,7 @@ export default function ScoreboardPage() {
                             : ""
                         }`}
                       >
-                        {match.school1}
+                        {capitalizeWords(match.school1)}
                       </h3>
                       <div
                         className={`${pageStyles.scoreDisplay} ${
@@ -405,7 +411,7 @@ export default function ScoreboardPage() {
                             : ""
                         }`}
                       >
-                        {match.school2}
+                        {capitalizeWords(match.school2)}
                       </h3>
                       <div
                         className={`${pageStyles.scoreDisplay} ${
@@ -433,7 +439,9 @@ export default function ScoreboardPage() {
                               Team Members:
                             </div>
                             {match.school2Students.map((student) => (
-                              <div key={student.id}>{student.fullname}</div>
+                              <div key={student.id}>
+                                {capitalizeWords(student.fullname)}
+                              </div>
                             ))}
                           </div>
                         )}
@@ -444,7 +452,8 @@ export default function ScoreboardPage() {
                     <div className="text-center mt-4">
                       <span className={pageStyles.winnerBadge}>
                         <Trophy size={20} />
-                        <span>Winner: {match.winner}</span>
+
+                        <span>Winner: {capitalizeWords(match.winner)}</span>
                       </span>
                     </div>
                   )}
@@ -476,8 +485,8 @@ export default function ScoreboardPage() {
                 <div className={modalStyles.modalBody}>
                   <div className={modalStyles.scoreMatchInfo}>
                     <strong>
-                      {schoolsMap[activeMatch?.school1_id]} vs{" "}
-                      {schoolsMap[activeMatch?.school2_id]}
+                      {capitalizeWords(schoolsMap[activeMatch?.school1_id])} vs{" "}
+                      {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
                     </strong>
                   </div>
 
@@ -493,11 +502,12 @@ export default function ScoreboardPage() {
                       }
                     >
                       <option value="">Choose winner...</option>
+
                       <option value={activeMatch?.school1_id}>
-                        {schoolsMap[activeMatch?.school1_id]}
+                        {capitalizeWords(schoolsMap[activeMatch?.school1_id])}
                       </option>
                       <option value={activeMatch?.school2_id}>
-                        {schoolsMap[activeMatch?.school2_id]}
+                        {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
                       </option>
                     </select>
                   </div>
@@ -505,8 +515,9 @@ export default function ScoreboardPage() {
                   <div className="row g-3">
                     <div className="col-6">
                       <label className={modalStyles.formLabel}>
-                        {schoolsMap[activeMatch?.school1_id]}
+                        {capitalizeWords(schoolsMap[activeMatch?.school1_id])}
                       </label>
+
                       <input
                         type="number"
                         className={`form-control ${modalStyles.formControl}`}
@@ -522,8 +533,9 @@ export default function ScoreboardPage() {
                     </div>
                     <div className="col-6">
                       <label className={modalStyles.formLabel}>
-                        {schoolsMap[activeMatch?.school2_id]}
+                        {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
                       </label>
+
                       <input
                         type="number"
                         className={`form-control ${modalStyles.formControl}`}

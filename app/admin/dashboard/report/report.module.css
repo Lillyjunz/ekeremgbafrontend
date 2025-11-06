@@ -306,3 +306,36 @@
   box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
   color: white;
 }
+
+/* new */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+}
+
+.emptyStateIcon {
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+.emptyStateTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.emptyStateText {
+  font-size: 14px;
+  color: #64748b;
+  max-width: 400px;
+  margin: 0;
+  line-height: 1.6;
+}

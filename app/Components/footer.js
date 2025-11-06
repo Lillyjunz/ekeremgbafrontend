@@ -75,34 +75,47 @@ const Footer = () => {
 
             <div className="col-lg-2 col-md-6">
               <div className="d-flex hightech-link">
-                <Link href="https://www.facebook.com/share/17SitWbqNz/">
+                <a
+                  href="https://www.facebook.com/share/17SitWbqNz/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="me-2"
+                >
                   <Image
-                    className="me-2"
                     src="/images/Facebook.png"
                     width={30}
                     height={30}
-                    alt="footer"
-                  ></Image>
-                </Link>
+                    alt="Facebook"
+                  />
+                </a>
 
-                <Link href="https://www.tiktok.com/@ekeremgbaakpauche?_t=ZN-90akK2wuO02&_r=1">
+                <a
+                  href="https://www.tiktok.com/@ekeremgbaakpauche?_t=ZN-90akK2wuO02&_r=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="me-2"
+                >
                   <Image
-                    className="me-2"
                     src="/images/tik.png"
                     width={30}
                     height={30}
-                    alt="footer"
-                  ></Image>
-                </Link>
-                <Link href="https://youtube.com/@ekeremgbaakpauche?si=Gn2pg-5vSO3exhmF">
+                    alt="TikTok"
+                  />
+                </a>
+
+                <a
+                  href="https://youtube.com/@ekeremgbaakpauche?si=Gn2pg-5vSO3exhmF"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="me-2"
+                >
                   <Image
-                    className="me-2"
                     src="/images/Youtube.png"
                     width={30}
                     height={30}
-                    alt="footer"
-                  ></Image>
-                </Link>
+                    alt="YouTube"
+                  />
+                </a>
               </div>
             </div>
           </div>

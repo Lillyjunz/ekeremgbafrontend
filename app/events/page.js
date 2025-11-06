@@ -13,6 +13,15 @@ export default function EventsPage() {
   const [error, setError] = useState("");
   const [activeMatch, setActiveMatch] = useState(null);
 
+  // Helper function to capitalize text
+  const capitalize = (text) => {
+    if (!text) return "";
+    return text
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,10 +45,14 @@ export default function EventsPage() {
           return;
         }
 
+        // Capitalize school names
+        const school1Name = capitalize(matchData.school1_name);
+        const school2Name = capitalize(matchData.school2_name);
+
         // Build schools map
         const map = {
-          [matchData.school1_id]: matchData.school1_name,
-          [matchData.school2_id]: matchData.school2_name,
+          [matchData.school1_id]: school1Name,
+          [matchData.school2_id]: school2Name,
         };
         setSchoolsMap(map);
 
@@ -50,17 +63,25 @@ export default function EventsPage() {
             {
               match_id: matchData.match_id,
               tournament_id: matchData.tournament_id,
-              school1: matchData.school1_name,
-              school2: matchData.school2_name,
+              school1: school1Name,
+              school2: school2Name,
               school1_score: matchData.school1_score ?? 0,
               school2_score: matchData.school2_score ?? 0,
               school1Id: matchData.school1_id,
               school2Id: matchData.school2_id,
-              school1Students: matchData.school1Students || [],
-              school2Students: matchData.school2Students || [],
+              school1Students:
+                matchData.school1Students?.map((student) => ({
+                  ...student,
+                  fullname: capitalize(student.fullname),
+                })) || [],
+              school2Students:
+                matchData.school2Students?.map((student) => ({
+                  ...student,
+                  fullname: capitalize(student.fullname),
+                })) || [],
               winner: matchData.winner_id ? map[matchData.winner_id] : null,
               isActive: matchData.isOngoing === "true",
-              tournament_name: matchData.tournament_name,
+              tournament_name: capitalize(matchData.tournament_name),
               tournament_year: matchData.tournament_year,
               tournament_location: matchData.tournament_location,
               tournament_time: matchData.tournament_time,

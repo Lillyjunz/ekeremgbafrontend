@@ -1,4 +1,3 @@
-// components/FAQ.js
 "use client";
 import { useState } from "react";
 
@@ -13,11 +12,31 @@ const FaqSection = () => {
   };
 
   const faqItems = [
-    "Who can register for the competition?",
-    "How are competitions judged?",
-    "Is there a registration fee?",
-    "How do I track event schedules and results?",
-    "Will participants receive certificates?",
+    {
+      question: "Who can register for the competition?",
+      answer:
+        "The competition is open to students from secondary schools across the Abia State and beyond. Each school may register a team of students under the supervision of a teacher or school coordinator.",
+    },
+    {
+      question: "How are competitions judged?",
+      answer:
+        "All competitions are judged by a panel of qualified educators, linguists, and cultural experts. Entries are evaluated based on accuracy, creativity, presentation, and understanding of Igbo language and cultural values. The judging process is transparent and guided by clearly defined criteria.",
+    },
+    {
+      question: "Is there a registration fee?",
+      answer:
+        "No. Participation in Ekeremgba Akpauche is completely free. The programme is organised as an educational and cultural service to develop the Igbo language and heritage through engaging ideas and innovations from students and researchers.",
+    },
+    {
+      question: "How do I track event schedules and results?",
+      answer:
+        "Event schedules, updates, and results will be published on the Ekeremgba Akpauche website and official social media channels. Registered schools will also receive direct notifications via email or WhatsApp from the organising committee.",
+    },
+    {
+      question: "Will participants receive certificates?",
+      answer:
+        "Yes. All participants, as well as their schools and teachers, will receive certificates of participation. Winners and outstanding performers will also receive special awards and recognitions during the Grand Finale.",
+    },
   ];
 
   return (
@@ -47,7 +66,7 @@ const FaqSection = () => {
                     onClick={() => toggleItem(index)}
                     aria-expanded={openItems[index]}
                   >
-                    <span>{item}</span>
+                    <span>{item.question}</span>
                     <span
                       className={`faq-icon ${openItems[index] ? "open" : ""}`}
                     >
@@ -56,10 +75,7 @@ const FaqSection = () => {
                   </button>
                   {openItems[index] && (
                     <div className="faq-answer">
-                      <p>
-                        This is a sample answer for &quot;{item}&quot;. Replace
-                        this content with the actual answer for each FAQ item.
-                      </p>
+                      <p>{item.answer}</p>
                     </div>
                   )}
                 </div>

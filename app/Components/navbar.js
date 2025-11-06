@@ -242,9 +242,10 @@ export default function Navbar() {
             <li className="nav-item">
               <Link
                 href="/events"
+                style={{ color: "orangeRed" }}
                 className={`nav-link ${isActive("/events") ? "active" : ""}`}
               >
-                Live Event
+                Live Events
               </Link>
             </li>
           </ul>
@@ -373,7 +374,7 @@ export default function Navbar() {
           <li className="mb-3">
             <Link
               href="/events"
-              className={`text-decoration-none side-text ${
+              className={`text-decoration-none side-textt ${
                 isActive("/events") ? "active" : ""
               }`}
               onClick={toggleNavbar}

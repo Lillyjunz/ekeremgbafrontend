@@ -476,11 +476,11 @@ export default function TournamentSchools() {
             disabled={generating || tournamentGenerated}
           >
             {generating ? (
-              <>Generating...</>
+              <>Grouping...</>
             ) : tournamentGenerated ? (
-              <>Tournament Generated</>
+              <>Schools Grouped</>
             ) : (
-              <>Generate Tournament</>
+              <>Group Schools</>
             )}
           </button>
         </div>

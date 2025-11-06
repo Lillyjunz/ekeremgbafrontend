@@ -1,15 +1,13 @@
 const TopSchools = () => {
   const schoolsData = [
-    { rank: 1, name: "St. Mary Major College Abayi Ariria, Aba", score: 91.3 },
-    { rank: 2, name: "St. Paul Secondary School Abaukwu, Aba", score: 91 },
-    { rank: 3, name: "St. Peter Model Secondary School, Aba", score: 78 },
-    { rank: 4, name: "Resurrection Model Academy, Aba", score: 71 },
-    { rank: 5, name: "St. Martin Early Learning Academy, Aba", score: 87 },
-    {
-      rank: 6,
-      name: "Our Lady of Lourdes Model Secondary School, Aba",
-      score: 86.6,
-    },
+    { rank: 1, name: "St. Mary Major College Abayi Ariria, Aba" },
+    { rank: 2, name: "St. Paul Secondary School Abaukwu, Aba" },
+    { rank: 3, name: "St. Peter Model Secondary School, Aba" },
+    { rank: 4, name: "Resurrection Model Academy, Aba" },
+    { rank: 5, name: "St. Martin Early Learning Academy, Aba" },
+    { rank: 6, name: "Our Lady of Lourdes Model Secondary School, Aba" },
+    { rank: 7, name: "St. Peter Secondary School Egbelu Ntigha" },
+    { rank: 8, name: "Mercy Girls Secondary, Aba" },
   ];
 
   const getOrdinalSuffix = (num) => {
@@ -40,9 +38,6 @@ const TopSchools = () => {
                       <th scope="col" className="school-header">
                         School Name
                       </th>
-                      <th scope="col" className="score-header">
-                        Scores (%)
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -55,7 +50,6 @@ const TopSchools = () => {
                           </sup>
                         </td>
                         <td className="school-name-cell">{school.name}</td>
-                        <td className="score-cell">{school.score}</td>
                       </tr>
                     ))}
                   </tbody>
