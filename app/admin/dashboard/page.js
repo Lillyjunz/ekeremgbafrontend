@@ -16,7 +16,12 @@ export default function Dashboard() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
   const [selectedSchools, setSelectedSchools] = useState([]);
   const [availableSchools, setAvailableSchools] = useState([]);
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("selectedTournamentYear") || "2025";
+    }
+    return "2025";
+  });
 
   const [tournamentData, setTournamentData] = useState({
     name: "",
@@ -367,18 +372,20 @@ export default function Dashboard() {
                 >
                   {selectedYear === ""
                     ? "All Tournaments"
-                    : `Ekeremgba − Akpauche ${selectedYear}`}
+                    : `Ekeremgba - Akpauche ${selectedYear}`}
                   <i className="bi bi-chevron-down ms-2"></i>
                 </button>
 
                 <ul className="dropdown-menu">
                   <li>
+                    {" "}
                     <a
                       className="dropdown-item"
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedYear("");
+                        localStorage.setItem("selectedTournamentYear", "");
                       }}
                     >
                       All Tournaments
@@ -391,7 +398,12 @@ export default function Dashboard() {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          setSelectedYear(year.toString());
+                          const yearStr = year.toString();
+                          setSelectedYear(yearStr);
+                          localStorage.setItem(
+                            "selectedTournamentYear",
+                            yearStr
+                          );
                         }}
                       >
                         {year}

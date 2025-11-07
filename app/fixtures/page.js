@@ -11,7 +11,12 @@ export default function FixturesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedTournament, setSelectedTournament] = useState(null);
-  const [selectedYear, setSelectedYear] = useState("2025");
+  const [selectedYear, setSelectedYear] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("selectedTournamentYear") || "2025";
+    }
+    return "2025";
+  });
 
   // Bracket states
   const [bracketData, setBracketData] = useState(null);
@@ -242,15 +247,16 @@ export default function FixturesPage() {
               {getDropdownText()}
               <i className="bi bi-chevron-down"></i>
             </button>
-
             <ul className="dropdown-menu">
               <li>
+                {" "}
                 <a
                   className="dropdown-item"
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
                     setSelectedYear("");
+                    localStorage.setItem("selectedTournamentYear", "");
                   }}
                 >
                   All Tournaments
@@ -263,7 +269,9 @@ export default function FixturesPage() {
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      setSelectedYear(year.toString());
+                      const yearStr = year.toString();
+                      setSelectedYear(yearStr);
+                      localStorage.setItem("selectedTournamentYear", yearStr);
                     }}
                   >
                     {year}
