@@ -13,13 +13,11 @@ export default function FixturesPage() {
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [selectedYear, setSelectedYear] = useState("2026");
 
-  // Bracket states
   const [bracketData, setBracketData] = useState(null);
   const [bracketLoading, setBracketLoading] = useState(false);
   const [bracketError, setBracketError] = useState("");
   const [champion, setChampion] = useState(null);
 
-  // View Schools Modal states
   const [showSchoolsModal, setShowSchoolsModal] = useState(false);
   const [selectedTournamentForSchools, setSelectedTournamentForSchools] =
     useState(null);
@@ -27,7 +25,6 @@ export default function FixturesPage() {
   const [schoolsLoading, setSchoolsLoading] = useState(false);
   const [schoolsError, setSchoolsError] = useState("");
 
-  // Leaderboard Modal states
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
   const [
     selectedTournamentForLeaderboard,
@@ -44,7 +41,6 @@ export default function FixturesPage() {
       ? localStorage.getItem("ekereAuthToken")
       : null;
 
-  // ✅ Fetch tournaments with year filter
   useEffect(() => {
     async function fetchTournaments() {
       setLoading(true);
@@ -74,7 +70,6 @@ export default function FixturesPage() {
     fetchTournaments();
   }, [selectedYear]);
 
-  // ✅ Fetch bracket for selected tournament
   const fetchBracket = useCallback(async (tournamentId) => {
     setBracketLoading(true);
     setBracketError("");
@@ -88,6 +83,7 @@ export default function FixturesPage() {
       if (data?.bracket) {
         setBracketData(data.bracket);
       } else setBracketError("No bracket data found.");
+
       const champRes = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${tournamentId}`
       );
@@ -101,7 +97,6 @@ export default function FixturesPage() {
     }
   }, []);
 
-  // ✅ Fetch schools for selected tournament
   const fetchSchoolsForTournament = useCallback(async (tournamentId) => {
     setSchoolsLoading(true);
     setSchoolsError("");
@@ -126,7 +121,6 @@ export default function FixturesPage() {
     }
   }, []);
 
-  // ✅ Fetch leaderboard for selected tournament
   const fetchLeaderboard = useCallback(async (tournamentId) => {
     setLeaderboardLoading(true);
     setLeaderboardError("");
@@ -154,7 +148,6 @@ export default function FixturesPage() {
     }
   }, []);
 
-  // ✅ Auto-refresh leaderboard
   useEffect(() => {
     if (!showLeaderboardModal || !selectedTournamentForLeaderboard) return;
 
@@ -206,17 +199,31 @@ export default function FixturesPage() {
     setLeaderboardError("");
   };
 
-  // ✅ Dropdown display text
   const getDropdownText = () => {
     if (!selectedYear) return "All Tournaments";
     return `Ekeremgba − Akpauche ${selectedYear}`;
+  };
+
+  // Robust formatter: try parse, if fails return original string
+  const formatEventDate = (date) => {
+    if (!date) return null;
+    // Try parsing
+    const parsed = Date.parse(date);
+    if (!isNaN(parsed)) {
+      return new Date(parsed).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    }
+    // If parsing fails, return the raw string (so user sees what they entered)
+    return String(date).trim();
   };
 
   return (
     <>
       <Navbar />
       <div className={styles.container}>
-        {/* ✅ Tournament Selector Dropdown */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fw-bold mb-0">Tournament Fixtures</h2>
 
@@ -308,9 +315,10 @@ export default function FixturesPage() {
         ) : (
           <div className="row mt-5">
             {tournaments.map((tournament) => {
+              // Show only event_date; if it's null we won't render the date row
               const eventDate = tournament.event_date
-                ? new Date(tournament.event_date).toLocaleDateString()
-                : new Date(tournament.created_at).toLocaleDateString();
+                ? formatEventDate(tournament.event_date)
+                : null;
 
               return (
                 <div key={tournament.id} className="col-md-6 col-lg-4 mb-4">
@@ -361,14 +369,15 @@ export default function FixturesPage() {
                           <small>{tournament.event_time}</small>
                         </div>
 
-                        {/* ✅ Updated to show event_date or fallback to created_at */}
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-calendar-fill text-danger me-2"></i>
-                          <small> {eventDate}</small>
-                        </div>
+                        {/* Show event_date only if it exists (and format safely) */}
+                        {eventDate && (
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-calendar-fill text-danger me-2"></i>
+                            <small>{eventDate}</small>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="mt-3 d-flex flex-wrap gap-2">
                         <button
                           className="btn btn-sm flex-grow-1"

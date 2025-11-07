@@ -476,9 +476,7 @@ export default function Dashboard() {
                         {tournament.event_date && (
                           <div className="d-flex align-items-center mb-2">
                             <i className="bi bi-calendar-event-fill text-danger me-2"></i>
-                            <small className="fw-bold">
-                              {formatDate(tournament.event_date)}
-                            </small>
+                            <small>{formatDate(tournament.event_date)}</small>
                           </div>
                         )}
                         {/* ✅ Moved created_at to bottom with smaller text */}
