@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [availableSchools, setAvailableSchools] = useState([]);
   const [selectedYear, setSelectedYear] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("selectedTournamentYear") || "2025";
+      return localStorage.getItem("adminSelectedTournamentYear") || "2025";
     }
     return "2025";
   });
@@ -385,7 +385,7 @@ export default function Dashboard() {
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedYear("");
-                        localStorage.setItem("selectedTournamentYear", "");
+                        localStorage.setItem("adminSelectedTournamentYear", "");
                       }}
                     >
                       All Tournaments
@@ -401,7 +401,7 @@ export default function Dashboard() {
                           const yearStr = year.toString();
                           setSelectedYear(yearStr);
                           localStorage.setItem(
-                            "selectedTournamentYear",
+                            "adminSelectedTournamentYear",
                             yearStr
                           );
                         }}
