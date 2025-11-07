@@ -16,12 +16,7 @@ export default function Dashboard() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
   const [selectedSchools, setSelectedSchools] = useState([]);
   const [availableSchools, setAvailableSchools] = useState([]);
-  const [selectedYear, setSelectedYear] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("adminSelectedTournamentYear") || "2025";
-    }
-    return "2025";
-  });
+  const [selectedYear, setSelectedYear] = useState("2026");
 
   const [tournamentData, setTournamentData] = useState({
     name: "",
@@ -367,7 +362,6 @@ export default function Dashboard() {
                     : `Ekeremgba - Akpauche ${selectedYear}`}
                   <i className="bi bi-chevron-down ms-2"></i>
                 </button>
-
                 <ul className="dropdown-menu">
                   <li>
                     <a
@@ -376,7 +370,6 @@ export default function Dashboard() {
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedYear("");
-                        localStorage.setItem("adminSelectedTournamentYear", "");
                       }}
                     >
                       All Tournaments
@@ -389,12 +382,7 @@ export default function Dashboard() {
                         href="#"
                         onClick={(e) => {
                           e.preventDefault();
-                          const yearStr = year.toString();
-                          setSelectedYear(yearStr);
-                          localStorage.setItem(
-                            "adminSelectedTournamentYear",
-                            yearStr
-                          );
+                          setSelectedYear(year.toString());
                         }}
                       >
                         {year}
