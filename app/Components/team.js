@@ -26,14 +26,14 @@ const MeetOurTeam = () => {
       id: 3,
       name: " Ụkọ Onyekachi Nwogu",
       role: "Onye Nhazi",
-      image: "/images/for.jpg",
+      image: "/images/ole.jpg",
       bio: "Committed to fostering academic competition and growth.",
     },
     {
       id: 4,
       name: "Ụkọ Ugochukwu Osuagwu",
       role: "Onye Nhazi",
-      image: "/images/forr.jpg",
+      image: "/images/osu.jpg",
       bio: "Dedicated to creating opportunities for student excellence.",
     },
   ];
