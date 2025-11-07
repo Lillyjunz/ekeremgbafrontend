@@ -27,11 +27,11 @@ export default function Dashboard() {
     name: "",
     year: "",
     event_time: "",
+    event_date: "", // ✅ Added event_date
     location: "",
     description: "",
   });
 
-  // ✅ Updated: Initialize with 3 empty participants
   const [schoolFormData, setSchoolFormData] = useState({
     name: "",
     address: "",
@@ -42,7 +42,6 @@ export default function Dashboard() {
 
   const router = useRouter();
 
-  // Get token from localStorage
   const getAuthToken = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("ekereAuthToken");
@@ -50,7 +49,6 @@ export default function Dashboard() {
     return null;
   };
 
-  // Reset form state
   const resetAll = () => {
     setShowModal(false);
     setIsLoading(false);
@@ -60,12 +58,12 @@ export default function Dashboard() {
       name: "",
       year: "",
       event_time: "",
+      event_date: "", // ✅ Reset event_date
       location: "",
       description: "",
     });
   };
 
-  // Reset school modal
   const resetSchoolModal = () => {
     setShowSchoolModal(false);
     setSelectedSchools([]);
@@ -74,14 +72,12 @@ export default function Dashboard() {
     setSuccess("");
   };
 
-  // Fetch all tournaments
   useEffect(() => {
     async function fetchTournaments() {
       setLoadingTournaments(true);
       try {
         const token = getAuthToken();
 
-        // Determine URL based on selectedYear
         const url = selectedYear
           ? `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedYear}`
           : "https://api.ekeremgbaakpauche.com/api/admin/tournaments";
@@ -108,8 +104,6 @@ export default function Dashboard() {
     fetchTournaments();
   }, [selectedYear]);
 
-  // ✅ Updated: Changed to HTTP to match working Schools page
-
   const fetchSchools = async () => {
     try {
       const res = await fetch(
@@ -119,8 +113,8 @@ export default function Dashboard() {
 
       if (res.ok && data.status) {
         const schools = data.schools.allSchools.map((s) => ({
-          id: s.id, // ✅ Changed from school_id to id
-          school_id: s.school_id, // Keep school_id for reference if needed
+          id: s.id,
+          school_id: s.school_id,
           name: s.name,
           address: s.address,
           phoneNumber: s.phone,
@@ -136,7 +130,6 @@ export default function Dashboard() {
     }
   };
 
-  // Run fetchSchools automatically once
   useEffect(() => {
     fetchSchools();
   }, []);
@@ -179,7 +172,6 @@ export default function Dashboard() {
     }));
   };
 
-  // ✅ Updated: Prevent removing below 3 participants
   const removeParticipantField = (index) => {
     if (schoolFormData.participants.length <= 3) {
       setError("Minimum 3 participants required");
@@ -194,13 +186,11 @@ export default function Dashboard() {
     e.preventDefault();
     setError("");
 
-    // Validate minimum 3 participants
     if (schoolFormData.participants.length < 3) {
       setError("Please add at least 3 participants");
       return;
     }
 
-    // Validate all participants have names (trim whitespace)
     const validParticipants = schoolFormData.participants.filter(
       (p) => p.trim() !== ""
     );
@@ -209,7 +199,6 @@ export default function Dashboard() {
       return;
     }
 
-    // Check for duplicate names
     const uniqueNames = new Set(
       validParticipants.map((p) => p.trim().toLowerCase())
     );
@@ -245,8 +234,8 @@ export default function Dashboard() {
 
       if (res.ok && data.status && data.new_school) {
         const newSchool = {
-          id: data.new_school.id || Date.now(), // ✅ Changed to use 'id'
-          school_id: data.new_school.school_id, // Keep school_id for reference
+          id: data.new_school.id || Date.now(),
+          school_id: data.new_school.school_id,
           name: data.new_school.name,
           address: data.new_school.address,
           phoneNumber: data.new_school.phone,
@@ -260,16 +249,14 @@ export default function Dashboard() {
         };
 
         setAvailableSchools((prev) => [...prev, newSchool]);
-        setSelectedSchools((prev) => [...prev, newSchool.id]); // ✅ Changed from school_id to id
+        setSelectedSchools((prev) => [...prev, newSchool.id]);
 
         setSuccess("School added successfully!");
 
-        // Re-fetch to ensure data consistency
         await fetchSchools();
 
         setShowSchoolForm(false);
 
-        // Reset form with 3 empty participants
         setSchoolFormData({
           name: "",
           address: "",
@@ -286,7 +273,6 @@ export default function Dashboard() {
     }
   };
 
-  // Create Tournament
   const createTournament = async () => {
     const token = getAuthToken();
     if (!token) {
@@ -299,6 +285,7 @@ export default function Dashboard() {
       name: tournamentData.name,
       year: tournamentData.year,
       event_time: tournamentData.event_time,
+      event_date: tournamentData.event_date, // ✅ Include event_date
       location: tournamentData.location,
       description: tournamentData.description,
     };
@@ -322,7 +309,6 @@ export default function Dashboard() {
         setSuccess(data.message || "Tournament created successfully!");
         console.log("Tournament ID:", data.tournamentId);
 
-        // Auto-close modal after success
         setTimeout(() => {
           resetAll();
           window.location.reload();
@@ -343,10 +329,16 @@ export default function Dashboard() {
     setIsLoading(false);
   };
 
-  // Open Add Schools Modal for specific tournament
   const handleAddSchools = (tournamentId) => {
     setSelectedTournamentId(tournamentId);
     setShowSchoolModal(true);
+  };
+
+  // ✅ Helper function to display date (text as-is, no formatting needed)
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
+    // Return the date as entered by user (e.g., "20th Jan 2026")
+    return dateString;
   };
 
   return (
@@ -378,7 +370,6 @@ export default function Dashboard() {
 
                 <ul className="dropdown-menu">
                   <li>
-                    {" "}
                     <a
                       className="dropdown-item"
                       href="#"
@@ -421,7 +412,6 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Tournament List or Empty State */}
           {loadingTournaments ? (
             <div className="text-center py-5">
               <div className="spinner-border text-danger" role="status">
@@ -494,9 +484,29 @@ export default function Dashboard() {
                           <i className="bi bi-clock-fill text-danger me-2"></i>
                           <small>{tournament.event_time}</small>
                         </div>
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-calendar-fill text-danger me-2"></i>
-                          <small>
+                        {/* ✅ Display event_date prominently */}
+                        {tournament.event_date && (
+                          <div className="d-flex align-items-center mb-2">
+                            <i className="bi bi-calendar-event-fill text-danger me-2"></i>
+                            <small className="fw-bold">
+                              {formatDate(tournament.event_date)}
+                            </small>
+                          </div>
+                        )}
+                        {/* ✅ Moved created_at to bottom with smaller text */}
+                        <div
+                          className="d-flex align-items-center mt-3 pt-2"
+                          style={{ borderTop: "1px solid #f0f0f0" }}
+                        >
+                          <i
+                            className="bi bi-info-circle text-muted me-2"
+                            style={{ fontSize: "0.85rem" }}
+                          ></i>
+                          <small
+                            className="text-muted"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            Created:{" "}
                             {new Date(
                               tournament.created_at
                             ).toLocaleDateString()}
@@ -504,7 +514,6 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="mt-3 d-flex flex-wrap gap-2">
                         <button
                           className="btn btn-sm flex-grow-1"
@@ -648,6 +657,23 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* ✅ Added Event Date input */}
+                  <div className="mt-3">
+                    <label className="form-label">
+                      Event Date<span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="e.g., 20th Jan 2026"
+                      value={tournamentData.event_date}
+                      onChange={(e) =>
+                        handleTournamentDataChange("event_date", e.target.value)
+                      }
+                      required
+                    />
+                  </div>
+
                   <div className="mt-3">
                     <label className="form-label">Location</label>
                     <input
@@ -742,7 +768,7 @@ export default function Dashboard() {
                               ? styles.addBtnActive
                               : ""
                           }`}
-                          onClick={() => toggleSchoolSelection(s.id)} // <-- numeric ID
+                          onClick={() => toggleSchoolSelection(s.id)}
                         >
                           {selectedSchools.includes(s.id) ? "Added" : "Add"}
                         </button>
@@ -764,7 +790,7 @@ export default function Dashboard() {
 
                         const uniqueSelectedSchools = [
                           ...new Set(selectedSchools),
-                        ]; // Remove duplicates
+                        ];
                         let successCount = 0;
                         let failedSchools = [];
 
@@ -780,7 +806,7 @@ export default function Dashboard() {
                                   "Content-Type": "application/json",
                                   Authorization: `Bearer ${token}`,
                                 },
-                                body: JSON.stringify({ schoolId: id }), // numeric ID
+                                body: JSON.stringify({ schoolId: id }),
                               }
                             );
 
@@ -915,7 +941,6 @@ export default function Dashboard() {
                   />
                 </div>
 
-                {/* ✅ Updated Participants Section */}
                 <div className="mb-3">
                   <label className="form-label fw-bold">
                     Participants{" "}
