@@ -308,7 +308,7 @@ export default function FixturesPage() {
             </p>
           </div>
         ) : (
-          <div className="row mt-5 justify-content-center">
+          <div className="row mt-5 ">
             {tournaments.map((tournament) => (
               <div key={tournament.id} className="col-md-6 col-lg-4 mb-4">
                 <div
