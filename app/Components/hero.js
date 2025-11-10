@@ -15,7 +15,8 @@ const HeroSection = () => {
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", "", ""],
+    participants: ["", "", ""], // reduced to 3
+    schoolReps: ["", ""], // API coordinators
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -27,7 +28,6 @@ const HeroSection = () => {
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       );
     }, 4000);
-
     return () => clearInterval(interval);
   }, [images.length]);
 
@@ -44,18 +44,20 @@ const HeroSection = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      participants: prev.participants.map((participant, i) =>
-        i === index ? value : participant
-      ),
+      participants: prev.participants.map((p, i) => (i === index ? value : p)),
+    }));
+  };
+
+  const handleSchoolRepChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
     }));
   };
 
@@ -65,7 +67,8 @@ const HeroSection = () => {
       address: "",
       phone: "",
       email: "",
-      participants: ["", "", "", ""],
+      participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
     setTermsAccepted(false);
     setError("");
@@ -106,7 +109,10 @@ const HeroSection = () => {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (participant) => participant.trim() !== ""
+        (p) => p.trim() !== ""
+      );
+      const filteredSchoolReps = formData.schoolReps.filter(
+        (rep) => rep.trim() !== ""
       );
 
       const requestBody = {
@@ -115,7 +121,10 @@ const HeroSection = () => {
         phone: formData.phone.trim(),
         address: formData.address.trim(),
         participants: filteredParticipants,
+        schoolReps: filteredSchoolReps, // include coordinators
       };
+
+      console.log("Sending request:", requestBody);
 
       const response = await fetch(
         "https://api.ekeremgbaakpauche.com/api/school/register-school",
@@ -130,6 +139,7 @@ const HeroSection = () => {
       );
 
       const responseData = await response.json();
+      console.log("Response:", responseData);
 
       if (response.ok && responseData.status === true) {
         setShowSuccess(true);
@@ -143,6 +153,7 @@ const HeroSection = () => {
         setError(errorMessage);
       }
     } catch (error) {
+      console.error("Registration error:", error);
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         setError(
           "Network error. Please check your internet connection and try again."
@@ -155,9 +166,7 @@ const HeroSection = () => {
     }
   };
 
-  const handleSuccessClose = () => {
-    setShowSuccess(false);
-  };
+  const handleSuccessClose = () => setShowSuccess(false);
 
   return (
     <>
@@ -176,10 +185,8 @@ const HeroSection = () => {
           />
         ))}
 
-        {/* Overlay */}
         <div className="hero-overlay"></div>
 
-        {/* Content */}
         <div className="hero-content">
           <div className="hero-badge mb-3">Ekeremgba 2.0 is coming soon...</div>
 
@@ -195,9 +202,10 @@ const HeroSection = () => {
           </p>
 
           <p>
-            Next Competition:
+            Next Competition:{" "}
             <span className="fw-bold">January 20th till February 4th 2026</span>
           </p>
+
           <div className="hero-buttons">
             <button onClick={openModal} className="btn btn-primary-custom">
               Register School (2026)
@@ -260,90 +268,42 @@ const HeroSection = () => {
             )}
 
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="schoolName" className="form-label text-muted">
-                  School name*
-                </label>
-                <input
-                  type="text"
-                  className="form-control form-input"
-                  id="schoolName"
-                  name="name"
-                  placeholder="Noah Academy"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
+              {/* School Info */}
+              {["name", "address", "phone", "email"].map((field) => (
+                <div className="mb-3" key={field}>
+                  <label className="form-label text-muted">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}*
+                  </label>
+                  <input
+                    type={field === "email" ? "email" : "text"}
+                    className="form-control form-input"
+                    name={field}
+                    placeholder={`Enter ${field}`}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+              ))}
 
-              <div className="mb-3">
-                <label htmlFor="address" className="form-label text-muted">
-                  Address*
-                </label>
-                <input
-                  type="text"
-                  className="form-control form-input"
-                  id="address"
-                  name="address"
-                  placeholder="Enter school address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="phoneNumber" className="form-label text-muted">
-                  Phone number*
-                </label>
-                <input
-                  type="tel"
-                  className="form-control form-input"
-                  id="phoneNumber"
-                  name="phone"
-                  placeholder="08012345678"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="emailAddress" className="form-label text-muted">
-                  Email address*
-                </label>
-                <input
-                  type="email"
-                  className="form-control form-input"
-                  id="emailAddress"
-                  name="email"
-                  placeholder="school@email.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-
+              {/* Participants (3) */}
               <div className="mb-4">
                 <label className="form-label text-muted mb-3">
-                  Number of Representatives
+                  Participants
                 </label>
                 <div className="representatives-grid">
-                  {[1, 2, 3, 4].map((num, index) => (
+                  {formData.participants.map((p, index) => (
                     <div
-                      key={num}
+                      key={index}
                       className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
                     >
-                      <span className="rep-label">{num}.</span>
+                      <span className="rep-label">{index + 1}.</span>
                       <input
                         type="text"
                         className="form-control rep-input"
                         placeholder="Full Name"
-                        value={formData.participants[index]}
+                        value={p}
                         onChange={(e) =>
                           handleParticipantChange(index, e.target.value)
                         }
@@ -354,6 +314,34 @@ const HeroSection = () => {
                 </div>
               </div>
 
+              {/* School Reps / Coordinators */}
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3">
+                  School Coordinators
+                </label>
+                <div className="representatives-grid">
+                  {formData.schoolReps.map((rep, index) => (
+                    <div
+                      key={index}
+                      className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
+                    >
+                      <span className="rep-label">{index + 1}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        placeholder="Coordinator Name"
+                        value={rep}
+                        onChange={(e) =>
+                          handleSchoolRepChange(index, e.target.value)
+                        }
+                        disabled={isLoading}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Terms */}
               <div className="form-check mb-4 checkbox-container">
                 <input
                   className="form-check-input custom-checkbox"

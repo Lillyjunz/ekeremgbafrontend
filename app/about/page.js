@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import AboutMomentsCarousel from "../Components/aboutmomemt";
@@ -31,7 +32,8 @@ const About = () => {
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", "", ""],
+    participants: ["", "", ""], // reduced to 3
+    schoolReps: ["", ""], // added 2 coordinators
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -146,7 +148,7 @@ const About = () => {
       icon: "bi-trophy",
       title: "The Power of Language",
       description:
-        "Language is not only a means of communication.It is also a medium for thinking, research, governance, art, and craftsmanship.A people who use their language in science, creativity, and technology build stronger societies and better education systems.Thus, Ekeremgba Akpauche encourages our youth to dream, research, and create — in their own tongue.",
+        "Language is not only a means of communication. It is also a medium for thinking, research, governance, art, and craftsmanship. A people who use their language in science, creativity, and technology build stronger societies and better education systems. Thus, Ekeremgba Akpauche encourages our youth to dream, research, and create — in their own tongue.",
     },
     {
       icon: "bi-clipboard-data",
@@ -158,7 +160,7 @@ const About = () => {
       icon: "bi-globe",
       title: "A call to ndi-igbo",
       description:
-        "Fellow Igbo sons and daughters, it is time to wake up from slumber.This movement reminds us — especially our children — of the importance of speaking, studying, and thinking in Igbo, particularly in education and research.Using our language to explore deep ideas gives us the power to build and renew our communities.",
+        "Fellow Igbo sons and daughters, it is time to wake up from slumber. This movement reminds us — especially our children — of the importance of speaking, studying, and thinking in Igbo, particularly in education and research. Using our language to explore deep ideas gives us the power to build and renew our communities.",
     },
   ];
 
@@ -180,7 +182,8 @@ const About = () => {
       address: "",
       phone: "",
       email: "",
-      participants: ["", "", "", ""],
+      participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
     setTermsAccepted(false);
     setModalError("");
@@ -188,16 +191,20 @@ const About = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
       participants: prev.participants.map((p, i) => (i === index ? value : p)),
+    }));
+  };
+
+  const handleSchoolRepChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
     }));
   };
 
@@ -238,12 +245,17 @@ const About = () => {
       const filteredParticipants = formData.participants.filter(
         (p) => p.trim() !== ""
       );
+      const filteredSchoolReps = formData.schoolReps.filter(
+        (rep) => rep.trim() !== ""
+      );
+
       const requestBody = {
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
         address: formData.address.trim(),
         participants: filteredParticipants,
+        schoolReps: filteredSchoolReps,
       };
 
       const response = await fetch(
@@ -267,16 +279,14 @@ const About = () => {
         setModalError(data.message || "Registration failed. Try again.");
       }
     } catch (err) {
-      setModalError("Network error. Please try again later.");
       console.error(err);
+      setModalError("Network error. Please try again later.");
     } finally {
       setIsLoadingModal(false);
     }
   };
 
-  const handleSuccessClose = () => {
-    setShowSuccess(false);
-  };
+  const handleSuccessClose = () => setShowSuccess(false);
 
   return (
     <div>
@@ -377,8 +387,8 @@ const About = () => {
         </div>
       </section>
 
+      {/* Story Section */}
       <section
-        ref={sectionRef}
         className="school-legacy-section py-5"
         style={{ backgroundColor: "#FFF" }}
       >
@@ -401,7 +411,7 @@ const About = () => {
             </div>
 
             <div className="content-wrapper">
-              <h3 className="mb-3 mt-2 fw-semi-bold">Meaning of the name </h3>
+              <h3 className="mb-3 mt-2 fw-semi-bold">Meaning of the name</h3>
               <p className="description mb-4">
                 Ekeremgba Akpauche is a creative initiative designed to promote
                 the Igbo language, wisdom, culture, and identity — the essential
@@ -409,7 +419,7 @@ const About = () => {
                 carries deep meaning. In ancient Igbo expression, “Ekeremgba”
                 referred to a contest of strength and endurance, while
                 “Akpauche” signifies deep thought, reflection, and valuable
-                wisdom.Together, Ekeremgba Akpauche represents a contest not of
+                wisdom. Together, Ekeremgba Akpauche represents a contest not of
                 muscles, but of the mind — a wrestling of intellect,
                 understanding, and wisdom.
               </p>
@@ -500,85 +510,69 @@ const About = () => {
             )}
 
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="schoolName" className="form-label text-muted">
-                  School name*
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="schoolName"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
+              {["name", "address", "phone", "email"].map((field) => (
+                <div className="mb-3" key={field}>
+                  <label className="form-label text-muted">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}*
+                  </label>
+                  <input
+                    type={field === "email" ? "email" : "text"}
+                    className="form-control"
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    disabled={isLoadingModal}
+                    required
+                  />
+                </div>
+              ))}
 
-              <div className="mb-3">
-                <label htmlFor="address" className="form-label text-muted">
-                  Address*
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="phoneNumber" className="form-label text-muted">
-                  Phone number*
-                </label>
-                <input
-                  type="tel"
-                  className="form-control"
-                  id="phoneNumber"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="emailAddress" className="form-label text-muted">
-                  Email address*
-                </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="emailAddress"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
+              {/* Participants */}
               <div className="mb-4">
-                <label className="form-label text-muted mb-3">
-                  Number of Representatives
+                <label className="form-label text-muted mb-3 fw-bold">
+                  Participants
                 </label>
                 <div className="representatives-grid">
-                  {[1, 2, 3, 4].map((num, index) => (
-                    <div key={num} className="rep-input-wrapper">
-                      <span className="rep-label">{num}.</span>
+                  {formData.participants.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
+                    >
+                      <span className="rep-label">{idx + 1}.</span>
                       <input
                         type="text"
                         className="form-control rep-input"
                         placeholder="Full Name"
-                        value={formData.participants[index]}
+                        value={p}
                         onChange={(e) =>
-                          handleParticipantChange(index, e.target.value)
+                          handleParticipantChange(idx, e.target.value)
+                        }
+                        disabled={isLoadingModal}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* School Coordinators */}
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3 fw-bold">
+                  School Coordinators
+                </label>
+                <div className="representatives-grid">
+                  {formData.schoolReps.map((rep, idx) => (
+                    <div
+                      key={idx}
+                      className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
+                    >
+                      <span className="rep-label">{idx + 1}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        placeholder="Full Name"
+                        value={rep}
+                        onChange={(e) =>
+                          handleSchoolRepChange(idx, e.target.value)
                         }
                         disabled={isLoadingModal}
                       />

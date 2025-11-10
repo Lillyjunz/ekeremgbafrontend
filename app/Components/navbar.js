@@ -19,44 +19,42 @@ export default function Navbar() {
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", "", ""],
+    participants: ["", "", ""],
+    schoolReps: ["", ""], // New coordinators field
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const toggleNavbar = () => {
-    setIsOpen(!isOpen);
-  };
-
+  const toggleNavbar = () => setIsOpen(!isOpen);
   const isActive = (href) => pathname === href;
 
   const openModal = () => {
     setShowModal(true);
-    setError(""); // Clear any previous errors
-    // Close mobile menu if open
+    setError("");
     setIsOpen(false);
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setError(""); // Clear errors when closing
-    // Clear form when closing
+    setError("");
     clearForm();
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      participants: prev.participants.map((participant, i) =>
-        i === index ? value : participant
-      ),
+      participants: prev.participants.map((p, i) => (i === index ? value : p)),
+    }));
+  };
+
+  const handleSchoolRepChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
     }));
   };
 
@@ -66,7 +64,8 @@ export default function Navbar() {
       address: "",
       phone: "",
       email: "",
-      participants: ["", "", "", ""],
+      participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
     setTermsAccepted(false);
     setError("");
@@ -74,14 +73,13 @@ export default function Navbar() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
     if (!termsAccepted) {
       setError("Please accept the terms and conditions");
       return;
     }
 
-    // Validate required fields
     if (
       !formData.name.trim() ||
       !formData.address.trim() ||
@@ -92,14 +90,12 @@ export default function Navbar() {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email address");
       return;
     }
 
-    // Validate phone number (basic validation)
     const phoneRegex = /^[0-9+\-\s()]+$/;
     if (!phoneRegex.test(formData.phone)) {
       setError("Please enter a valid phone number");
@@ -109,20 +105,23 @@ export default function Navbar() {
     setIsLoading(true);
 
     try {
-      // Filter out empty participants
       const filteredParticipants = formData.participants.filter(
-        (participant) => participant.trim() !== ""
+        (p) => p.trim() !== ""
+      );
+      const filteredSchoolReps = formData.schoolReps.filter(
+        (rep) => rep.trim() !== ""
       );
 
       const requestBody = {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim(), // Keep as string, don't convert to int
+        phone: formData.phone.trim(),
         address: formData.address.trim(),
         participants: filteredParticipants,
+        schoolReps: filteredSchoolReps, // send coordinators to API
       };
 
-      console.log("Sending request:", requestBody); // Debug log
+      console.log("Sending request:", requestBody);
 
       const response = await fetch(
         "https://api.ekeremgbaakpauche.com/api/school/register-school",
@@ -137,40 +136,32 @@ export default function Navbar() {
       );
 
       const responseData = await response.json();
-      console.log("Response:", responseData); // Debug log
+      console.log("Response:", responseData);
 
       if (response.ok && responseData.status === true) {
-        // Show success popup
         setShowSuccess(true);
         setShowModal(false);
-        // Clear form
         clearForm();
       } else {
-        // Handle API error response
-        const errorMessage =
+        setError(
           responseData.message ||
-          responseData.error ||
-          `Registration failed with status ${response.status}`;
-        setError(errorMessage);
+            responseData.error ||
+            `Registration failed with status ${response.status}`
+        );
       }
     } catch (error) {
       console.error("Registration error:", error);
-
-      if (error.name === "TypeError" && error.message.includes("fetch")) {
-        setError(
-          "Network error. Please check your internet connection and try again."
-        );
-      } else {
-        setError("Registration failed. Please try again later.");
-      }
+      setError(
+        error.name === "TypeError" && error.message.includes("fetch")
+          ? "Network error. Please check your internet connection and try again."
+          : "Registration failed. Please try again later."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSuccessClose = () => {
-    setShowSuccess(false);
-  };
+  const handleSuccessClose = () => setShowSuccess(false);
 
   return (
     <>
@@ -241,7 +232,7 @@ export default function Navbar() {
                 href="/about"
                 className={`nav-link ${isActive("/about") ? "active" : ""}`}
               >
-                About
+                About Us
               </Link>
             </li>
             <li className="nav-item">
@@ -423,7 +414,6 @@ export default function Navbar() {
             className="modal-content bg-white rounded-4 p-4 position-relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button - Inside the modal, top-right corner */}
             <button
               onClick={closeModal}
               className="close-button-modal position-absolute"
@@ -432,8 +422,6 @@ export default function Navbar() {
             >
               ×
             </button>
-
-            {/* Modal Header */}
             <div className="text-center mb-4">
               <h2 className="fw-bold mb-2" style={{ color: "#333" }}>
                 Register your School
@@ -443,15 +431,14 @@ export default function Navbar() {
               </p>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="alert alert-danger mb-3" role="alert">
                 {error}
               </div>
             )}
 
-            {/* Registration Form */}
             <form onSubmit={handleSubmit}>
+              {/* School Name */}
               <div className="mb-3">
                 <label htmlFor="schoolName" className="form-label text-muted">
                   School name*
@@ -469,6 +456,7 @@ export default function Navbar() {
                 />
               </div>
 
+              {/* Address */}
               <div className="mb-3">
                 <label htmlFor="address" className="form-label text-muted">
                   Address*
@@ -486,6 +474,7 @@ export default function Navbar() {
                 />
               </div>
 
+              {/* Phone */}
               <div className="mb-3">
                 <label htmlFor="phoneNumber" className="form-label text-muted">
                   Phone number*
@@ -503,6 +492,7 @@ export default function Navbar() {
                 />
               </div>
 
+              {/* Email */}
               <div className="mb-3">
                 <label htmlFor="emailAddress" className="form-label text-muted">
                   Email address*
@@ -520,12 +510,13 @@ export default function Navbar() {
                 />
               </div>
 
+              {/* Participants */}
               <div className="mb-4">
-                <label className="form-label text-muted mb-3">
-                  Number of Representatives
+                <label className="form-label text-muted mb-3 fw-bold">
+                  Participants
                 </label>
                 <div className="representatives-grid">
-                  {[1, 2, 3, 4].map((num, index) => (
+                  {[1, 2, 3].map((num, index) => (
                     <div key={num} className="rep-input-wrapper">
                       <span className="rep-label">{num}.</span>
                       <input
@@ -543,6 +534,31 @@ export default function Navbar() {
                 </div>
               </div>
 
+              {/* Coordinators (School Reps) */}
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3 fw-bold">
+                  School Coordinators
+                </label>
+                <div className="representatives-grid">
+                  {formData.schoolReps.map((rep, index) => (
+                    <div key={index} className="rep-input-wrapper">
+                      <span className="rep-label">{index + 1}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        placeholder="Coordinator Name"
+                        value={rep}
+                        onChange={(e) =>
+                          handleSchoolRepChange(index, e.target.value)
+                        }
+                        disabled={isLoading}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Terms */}
               <div className="form-check mb-4 checkbox-container">
                 <input
                   className="form-check-input custom-checkbox"

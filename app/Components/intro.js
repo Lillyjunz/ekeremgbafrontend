@@ -25,7 +25,8 @@ const SchoolLegacyStats = () => {
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", "", ""],
+    participants: ["", "", ""], // reduced to 3
+    schoolReps: ["", ""], // added coordinators
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -138,18 +139,20 @@ const SchoolLegacyStats = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      participants: prev.participants.map((participant, i) =>
-        i === index ? value : participant
-      ),
+      participants: prev.participants.map((p, i) => (i === index ? value : p)),
+    }));
+  };
+
+  const handleSchoolRepChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
     }));
   };
 
@@ -159,7 +162,8 @@ const SchoolLegacyStats = () => {
       address: "",
       phone: "",
       email: "",
-      participants: ["", "", "", ""],
+      participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
     setTermsAccepted(false);
     setModalError("");
@@ -200,7 +204,10 @@ const SchoolLegacyStats = () => {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (participant) => participant.trim() !== ""
+        (p) => p.trim() !== ""
+      );
+      const filteredSchoolReps = formData.schoolReps.filter(
+        (rep) => rep.trim() !== ""
       );
 
       const requestBody = {
@@ -209,6 +216,7 @@ const SchoolLegacyStats = () => {
         phone: formData.phone.trim(),
         address: formData.address.trim(),
         participants: filteredParticipants,
+        schoolReps: filteredSchoolReps,
       };
 
       const response = await fetch(
@@ -251,9 +259,7 @@ const SchoolLegacyStats = () => {
     }
   };
 
-  const handleSuccessClose = () => {
-    setShowSuccess(false);
-  };
+  const handleSuccessClose = () => setShowSuccess(false);
 
   return (
     <>
@@ -288,7 +294,6 @@ const SchoolLegacyStats = () => {
             <div className="col-lg-5 col-xl-6">
               <div className="stats-wrapper">
                 <div className="row g-4">
-                  {/* Schools */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -298,7 +303,6 @@ const SchoolLegacyStats = () => {
                     </div>
                   </div>
 
-                  {/* Students */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -308,7 +312,6 @@ const SchoolLegacyStats = () => {
                     </div>
                   </div>
 
-                  {/* Subjects */}
                   <div className="col-6">
                     <div className="stat-card">
                       <div className="stat-number">
@@ -318,10 +321,9 @@ const SchoolLegacyStats = () => {
                     </div>
                   </div>
 
-                  {/* Prize */}
                   <div className="col-6">
                     <div className="stat-card">
-                      <div className=" d-flex justify-content-center align-items-center">
+                      <div className="d-flex justify-content-center align-items-center">
                         <Image
                           className="cash-image"
                           src="/images/naira.png"
@@ -369,95 +371,74 @@ const SchoolLegacyStats = () => {
             </div>
 
             {modalError && (
-              <div className="alert alert-danger mb-3" role="alert">
-                {modalError}
-              </div>
+              <div className="alert alert-danger mb-3">{modalError}</div>
             )}
 
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="schoolName" className="form-label text-muted">
-                  School name*
-                </label>
-                <input
-                  type="text"
-                  className="form-control form-input"
-                  id="schoolName"
-                  name="name"
-                  placeholder="Noah Academy"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
+              {["name", "address", "phone", "email"].map((field) => (
+                <div className="mb-3" key={field}>
+                  <label className="form-label text-muted">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}*
+                  </label>
+                  <input
+                    type={field === "email" ? "email" : "text"}
+                    className="form-control form-input"
+                    name={field}
+                    placeholder={`Enter ${field}`}
+                    value={formData[field]}
+                    onChange={handleInputChange}
+                    disabled={isLoadingModal}
+                    required
+                  />
+                </div>
+              ))}
 
-              <div className="mb-3">
-                <label htmlFor="address" className="form-label text-muted">
-                  Address*
-                </label>
-                <input
-                  type="text"
-                  className="form-control form-input"
-                  id="address"
-                  name="address"
-                  placeholder="Enter school address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="phoneNumber" className="form-label text-muted">
-                  Phone number*
-                </label>
-                <input
-                  type="tel"
-                  className="form-control form-input"
-                  id="phoneNumber"
-                  name="phone"
-                  placeholder="08012345678"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="emailAddress" className="form-label text-muted">
-                  Email address*
-                </label>
-                <input
-                  type="email"
-                  className="form-control form-input"
-                  id="emailAddress"
-                  name="email"
-                  placeholder="school@email.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isLoadingModal}
-                  required
-                />
-              </div>
-
+              {/* Participants */}
               <div className="mb-4">
-                <label className="form-label text-muted mb-3">
-                  Number of Representatives
+                <label className="form-label text-muted mb-3 fw-bold">
+                  Participants
                 </label>
                 <div className="representatives-grid">
-                  {[1, 2, 3, 4].map((num, index) => (
-                    <div key={num} className="rep-input-wrapper">
-                      <span className="rep-label">{num}.</span>
+                  {formData.participants.map((p, index) => (
+                    <div
+                      key={index}
+                      className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
+                    >
+                      <span className="rep-label">{index + 1}.</span>
                       <input
                         type="text"
                         className="form-control rep-input"
                         placeholder="Full Name"
-                        value={formData.participants[index]}
+                        value={p}
                         onChange={(e) =>
                           handleParticipantChange(index, e.target.value)
+                        }
+                        disabled={isLoadingModal}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* School Reps */}
+              <div className="mb-4">
+                <label className="form-label text-muted mb-3 fw-bold">
+                  School Coordinators
+                </label>
+                <div className="representatives-grid">
+                  {formData.schoolReps.map((rep, index) => (
+                    <div
+                      key={index}
+                      className="rep-input-wrapper mb-2 d-flex align-items-center gap-2"
+                    >
+                      <span className="rep-label">{index + 1}.</span>
+                      <input
+                        type="text"
+                        className="form-control rep-input"
+                        placeholder="Coordinator Name"
+                        value={rep}
+                        onChange={(e) =>
+                          handleSchoolRepChange(index, e.target.value)
                         }
                         disabled={isLoadingModal}
                       />
