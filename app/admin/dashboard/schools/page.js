@@ -225,26 +225,22 @@ export default function Schools() {
                     <th>Phone number</th>
                     <th>Email</th>
                     <th>Students</th>
+                    <th>Coordinators</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginationData.currentItems.map((school, index) => (
                     <tr key={`school-${school.school_id}-${index}`}>
-                      {/* ✅ Capitalized school name */}
                       <td>{capitalizeWords(school.name)}</td>
                       <td>{school.address}</td>
                       <td>{school.phone}</td>
                       <td>{school.email}</td>
                       <td>
-                        {school.students && school.students.length > 0 ? (
+                        {school.students?.length > 0 ? (
                           <div>
-                            {school.students.map((student, studentIndex) => (
-                              <div
-                                key={`student-${student.id}-${school.school_id}-${studentIndex}`}
-                                className="small"
-                              >
-                                {/* ✅ Capitalized student name */}
+                            {school.students.map((student, i) => (
+                              <div key={`student-${i}`} className="small">
                                 {capitalizeWords(student.fullname)}
                               </div>
                             ))}
@@ -253,6 +249,20 @@ export default function Schools() {
                           <span className="text-muted">No students</span>
                         )}
                       </td>
+                      <td>
+                        {school.schoolReps?.length > 0 ? (
+                          <div>
+                            {school.schoolReps.map((rep, i) => (
+                              <div key={`rep-${i}`} className="small">
+                                {capitalizeWords(rep.rep_name)}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-muted">No coordinators</span>
+                        )}
+                      </td>
+
                       <td className="position-relative">
                         <button
                           className="btn btn-light rounded-circle"
