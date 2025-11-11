@@ -539,7 +539,7 @@ export default function FixturesPage() {
                 ></i>
                 <h5 className="text-muted mt-3">No Bracket Available</h5>
                 <p className="text-muted">
-                  The tournament bracket hasn't been created yet.
+                  The tournament bracket hasn&apos;t been created yet.
                 </p>
               </div>
             ) : (
