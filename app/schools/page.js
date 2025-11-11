@@ -41,6 +41,14 @@ export default function SchoolsList() {
     fetchSchools();
   }, []);
 
+  const capitalizeWords = (str) =>
+    str
+      ? str
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "N/A";
+
   const EmptyState = () => (
     <div className="text-center py-5">
       <div className="mb-4">
@@ -132,7 +140,7 @@ export default function SchoolsList() {
                   {schools.map((school, index) => (
                     <tr key={school.school_id}>
                       <td>{index + 1}</td>
-                      <td>{school.name}</td>
+                      <td>{capitalizeWords(school.name)}</td>
                       <td>{school.phone}</td>
                       <td>{school.email}</td>
                       <td>{school.students?.length || 0}</td>

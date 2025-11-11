@@ -378,7 +378,9 @@ export default function ScoreboardPage() {
                               Team Members:
                             </div>
                             {match.school1Students.map((student) => (
-                              <div key={student.id}>{student.fullname}</div>
+                              <div key={student.id}>
+                                {capitalizeWords(student.fullname)}
+                              </div>
                             ))}
                           </div>
                         )}

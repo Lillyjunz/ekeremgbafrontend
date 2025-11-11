@@ -15,6 +15,12 @@ export default function Schools() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // ✅ Utility function to capitalize each word
+  const capitalizeWords = (text) => {
+    if (!text) return "";
+    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   // Fetch schools data from API on component mount
   useEffect(() => {
     fetchSchools();
@@ -46,17 +52,11 @@ export default function Schools() {
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is less than max
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
-      // Complex pagination logic
       if (currentPage <= 3) {
-        // Show first few pages
         pages.push(1, 2, 3, 4, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        // Show last few pages
         pages.push(
           1,
           "...",
@@ -66,7 +66,6 @@ export default function Schools() {
           totalPages
         );
       } else {
-        // Show current page with context
         pages.push(
           1,
           "...",
@@ -82,21 +81,18 @@ export default function Schools() {
     return pages;
   };
 
-  // Handle page change
   const handlePageChange = (page) => {
     if (page >= 1 && page <= paginationData.totalPages) {
       setCurrentPage(page);
-      setDropdownIndex(null); // Close any open dropdowns
+      setDropdownIndex(null);
     }
   };
 
-  // Handle items per page change
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   };
 
-  // Fetch schools function (extracted so it can be reused)
   const fetchSchools = async () => {
     try {
       setLoading(true);
@@ -106,10 +102,9 @@ export default function Schools() {
         "https://api.ekeremgbaakpauche.com/api/school/get-schools"
       );
 
-      // If API fails (400 or 500), don't throw, just set empty schools
       if (!response.ok) {
         console.warn("Failed to fetch schools:", response.status);
-        setSchools([]); // Show "No schools" instead of error
+        setSchools([]);
         return;
       }
 
@@ -119,22 +114,19 @@ export default function Schools() {
       setSchools(Array.isArray(allSchools) ? allSchools : []);
     } catch (err) {
       console.error("Error fetching schools:", err);
-      setSchools([]); // keep UI stable
+      setSchools([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle modal close and refresh data
   const handleModalClose = (shouldRefresh = false) => {
     setShowModal(false);
-    // Refresh data if a school was added
     if (shouldRefresh) {
       fetchSchools();
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="container mt-2">
@@ -150,7 +142,6 @@ export default function Schools() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="container mt-2">
@@ -172,11 +163,10 @@ export default function Schools() {
     <>
       <div className="row">
         <div className="col-12">
-          {/* Schools Header */}
           <div
             className={`d-flex justify-content-between align-items-center ${styles.contentHeader}`}
           >
-            <h4 className="fw-semi-bold ">Schools</h4>
+            <h4 className="fw-semi-bold">Schools</h4>
             <button
               className={styles.createBtn}
               onClick={() => setShowModal(true)}
@@ -185,9 +175,7 @@ export default function Schools() {
             </button>
           </div>
 
-          {/* Conditional rendering based on schools length */}
           {schools.length === 0 ? (
-            // Empty State - Show when no schools
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>
                 <div className={styles.iconCircle}>
@@ -208,9 +196,7 @@ export default function Schools() {
               </button>
             </div>
           ) : (
-            // Schools Table - Show when schools exist
             <div className="table-responsive bg-white rounded-4 p-3">
-              {/* Items per page selector */}
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div className="d-flex align-items-center">
                   <span className="me-2">Show</span>
@@ -245,7 +231,8 @@ export default function Schools() {
                 <tbody>
                   {paginationData.currentItems.map((school, index) => (
                     <tr key={`school-${school.school_id}-${index}`}>
-                      <td>{school.name}</td>
+                      {/* ✅ Capitalized school name */}
+                      <td>{capitalizeWords(school.name)}</td>
                       <td>{school.address}</td>
                       <td>{school.phone}</td>
                       <td>{school.email}</td>
@@ -257,7 +244,8 @@ export default function Schools() {
                                 key={`student-${student.id}-${school.school_id}-${studentIndex}`}
                                 className="small"
                               >
-                                {student.fullname}
+                                {/* ✅ Capitalized student name */}
+                                {capitalizeWords(student.fullname)}
                               </div>
                             ))}
                           </div>
@@ -299,7 +287,6 @@ export default function Schools() {
                 </tbody>
               </table>
 
-              {/* Pagination Controls */}
               <div className="d-flex justify-content-between align-items-center px-2 pt-2">
                 <span>
                   Showing {paginationData.showingStart} to{" "}
@@ -310,7 +297,6 @@ export default function Schools() {
                 {paginationData.totalPages > 1 && (
                   <nav aria-label="Table pagination">
                     <ul className="pagination mb-0">
-                      {/* Previous button */}
                       <li
                         className={`page-item ${
                           currentPage === 1 ? "disabled" : ""
@@ -325,7 +311,6 @@ export default function Schools() {
                         </button>
                       </li>
 
-                      {/* Page numbers */}
                       {getPageNumbers().map((page, index) => (
                         <li
                           key={index}
@@ -350,7 +335,6 @@ export default function Schools() {
                         </li>
                       ))}
 
-                      {/* Next button */}
                       <li
                         className={`page-item ${
                           currentPage === paginationData.totalPages
@@ -375,7 +359,6 @@ export default function Schools() {
         </div>
       </div>
 
-      {/* Right Slide Modal */}
       <AddSchoolModal
         show={showModal}
         onClose={() => setShowModal(false)}

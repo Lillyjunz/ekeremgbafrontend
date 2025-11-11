@@ -34,12 +34,19 @@ export default function FixturesPage() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [leaderboardError, setLeaderboardError] = useState("");
 
+  const [showBracketModal, setShowBracketModal] = useState(false);
+
   const router = useRouter();
 
   const getAuthToken = () =>
     typeof window !== "undefined"
       ? localStorage.getItem("ekereAuthToken")
       : null;
+
+  const capitalizeWords = (str) => {
+    if (!str) return "";
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
 
   useEffect(() => {
     async function fetchTournaments() {
@@ -162,12 +169,14 @@ export default function FixturesPage() {
     fetchLeaderboard,
   ]);
 
-  const openModal = (t) => {
+  const openBracketModal = (t) => {
     setSelectedTournament(t);
+    setShowBracketModal(true);
     fetchBracket(t.id);
   };
 
-  const closeModal = () => {
+  const closeBracketModal = () => {
+    setShowBracketModal(false);
     setSelectedTournament(null);
     setBracketData(null);
     setChampion(null);
@@ -204,10 +213,8 @@ export default function FixturesPage() {
     return `Ekeremgba − Akpauche ${selectedYear}`;
   };
 
-  // Robust formatter: try parse, if fails return original string
   const formatEventDate = (date) => {
     if (!date) return null;
-    // Try parsing
     const parsed = Date.parse(date);
     if (!isNaN(parsed)) {
       return new Date(parsed).toLocaleDateString("en-GB", {
@@ -216,7 +223,6 @@ export default function FixturesPage() {
         year: "numeric",
       });
     }
-    // If parsing fails, return the raw string (so user sees what they entered)
     return String(date).trim();
   };
 
@@ -315,7 +321,6 @@ export default function FixturesPage() {
         ) : (
           <div className="row mt-5">
             {tournaments.map((tournament) => {
-              // Show only event_date; if it's null we won't render the date row
               const eventDate = tournament.event_date
                 ? formatEventDate(tournament.event_date)
                 : null;
@@ -369,7 +374,6 @@ export default function FixturesPage() {
                           <small>{tournament.event_time}</small>
                         </div>
 
-                        {/* Show event_date only if it exists (and format safely) */}
                         {eventDate && (
                           <div className="d-flex align-items-center">
                             <i className="bi bi-calendar-fill text-danger me-2"></i>
@@ -396,7 +400,7 @@ export default function FixturesPage() {
                         <button
                           className="btn btn-sm btn-outline-danger flex-grow-1"
                           style={{ borderRadius: "20px" }}
-                          onClick={() => openModal(tournament)}
+                          onClick={() => openBracketModal(tournament)}
                         >
                           <i className="bi bi-diagram-3-fill me-1"></i>
                           Groups
@@ -419,6 +423,361 @@ export default function FixturesPage() {
           </div>
         )}
       </div>
+
+      {/* Schools Modal */}
+      {showSchoolsModal && (
+        <div className={styles.modalBackdrop} onClick={closeSchoolsModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h5 className="fw-bold mb-0">
+                <i className="bi bi-building me-2 text-danger"></i>
+                Schools Registered
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={closeSchoolsModal}
+              ></button>
+            </div>
+
+            {schoolsLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-danger"></div>
+                <p className="mt-3">Loading schools...</p>
+              </div>
+            ) : schoolsError ? (
+              <div className="alert alert-danger">{schoolsError}</div>
+            ) : (
+              <>
+                <div className="mb-4 p-3 bg-light rounded">
+                  <h6 className="mb-2">
+                    <strong>Tournament:</strong>{" "}
+                    {capitalizeWords(selectedTournamentForSchools?.name)} (
+                    {selectedTournamentForSchools?.year})
+                  </h6>
+                  <p className="mb-0">
+                    <strong>Total Registered:</strong>{" "}
+                    {schoolsData?.totalRegistered || 0}
+                  </p>
+                </div>
+
+                {schoolsData?.schools && schoolsData.schools.length > 0 ? (
+                  <div className="table-responsive">
+                    <table className="table table-hover align-middle">
+                      <thead className="table-danger">
+                        <tr>
+                          <th>#</th>
+                          <th>School Name</th>
+                          <th>Registered At</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {schoolsData.schools.map((s, i) => (
+                          <tr key={s.id}>
+                            <td>{i + 1}</td>
+                            <td>{capitalizeWords(s.name)}</td>
+                            <td>
+                              {new Date(s.registered_at).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <i
+                      className="bi bi-inbox text-muted"
+                      style={{ fontSize: "3rem" }}
+                    ></i>
+                    <p className="text-muted mt-2">
+                      No schools registered yet.
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bracket Modal */}
+      {showBracketModal && (
+        <div className={styles.modalBackdrop} onClick={closeBracketModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "1200px" }}
+          >
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h5 className="fw-bold mb-0">
+                <i className="bi bi-trophy me-2 text-warning"></i>
+                Tournament Groups
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={closeBracketModal}
+              ></button>
+            </div>
+
+            {bracketLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-danger"></div>
+                <p className="mt-3">Loading bracket...</p>
+              </div>
+            ) : bracketError ? (
+              <div className="alert alert-danger">{bracketError}</div>
+            ) : !bracketData || Object.keys(bracketData).length === 0 ? (
+              <div className="text-center py-5">
+                <i
+                  className="bi bi-trophy text-muted"
+                  style={{ fontSize: "4rem" }}
+                ></i>
+                <h5 className="text-muted mt-3">No Bracket Available</h5>
+                <p className="text-muted">
+                  The tournament bracket hasn't been created yet.
+                </p>
+              </div>
+            ) : (
+              <>
+                {champion && (
+                  <div
+                    className="text-center p-4 rounded-4 mb-4 shadow"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)",
+                      border: "3px solid #f0c000",
+                    }}
+                  >
+                    <i
+                      className="bi bi-award-fill text-warning"
+                      style={{ fontSize: "3rem" }}
+                    ></i>
+                    <h3 className="fw-bold text-dark mb-1 mt-2">🏆 Champion</h3>
+                    <h4 className="text-dark fw-bold">
+                      {capitalizeWords(champion)}
+                    </h4>
+                  </div>
+                )}
+
+                {Object.keys(bracketData).map((round, roundIndex) => (
+                  <div key={round} className="mb-4">
+                    <div className="d-flex align-items-center gap-2 mb-3">
+                      <div
+                        className="px-3 py-2 rounded-3 shadow d-inline-flex align-items-center gap-2"
+                        style={{
+                          background:
+                            "linear-gradient(#c71d12 0%, #680b05 100%)",
+                          color: "white",
+                        }}
+                      >
+                        <span className="fw-bold">{round}</span>
+                      </div>
+                    </div>
+
+                    <div className="row g-3">
+                      {bracketData[round].map((match) => (
+                        <div
+                          key={match.match_id}
+                          className="col-12 col-md-6 col-lg-4"
+                        >
+                          <div
+                            className="card shadow-sm border-0 h-100"
+                            style={{
+                              borderLeft: match.winner
+                                ? "4px solid #28a745"
+                                : "4px solid #ffc107",
+                            }}
+                          >
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                <small className="text-muted fw-semibold">
+                                  Match {match.match_id}
+                                </small>
+                                {match.match_time && (
+                                  <div className="d-flex align-items-center gap-1 text-danger small">
+                                    <i className="bi bi-clock"></i>
+                                    <span>{match.match_time}</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div
+                                className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded"
+                                style={{ background: "#f8f9fa" }}
+                              >
+                                <span className="fw-semibold text-dark">
+                                  {capitalizeWords(match.school1)}
+                                </span>
+                                <span
+                                  className="fw-bold"
+                                  style={{
+                                    minWidth: "20px",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {match.school1_score !== undefined
+                                    ? match.school1_score
+                                    : "-"}
+                                </span>
+                              </div>
+
+                              <div className="text-center text-muted small fw-semibold my-2">
+                                VS
+                              </div>
+
+                              <div
+                                className="d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded"
+                                style={{ background: "#f8f9fa" }}
+                              >
+                                <span className="fw-semibold text-dark">
+                                  {capitalizeWords(match.school2)}
+                                </span>
+                                <span
+                                  className="fw-bold"
+                                  style={{
+                                    minWidth: "20px",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {match.school2_score !== undefined
+                                    ? match.school2_score
+                                    : "-"}
+                                </span>
+                              </div>
+
+                              {match.winner && (
+                                <div
+                                  className="alert alert-success mb-0 py-2"
+                                  role="alert"
+                                >
+                                  <i className="bi bi-trophy-fill me-2"></i>
+                                  <strong>Winner:</strong>{" "}
+                                  {capitalizeWords(match.winner)}
+                                </div>
+                              )}
+
+                              {!match.winner && (
+                                <div
+                                  className="alert alert-warning mb-0 py-2"
+                                  role="alert"
+                                >
+                                  <i className="bi bi-hourglass-split me-2"></i>
+                                  Match Pending
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Leaderboard Modal */}
+      {showLeaderboardModal && (
+        <div className={styles.modalBackdrop} onClick={closeLeaderboardModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h5 className="fw-bold mb-0">
+                <i className="bi bi-bar-chart-fill me-2 text-primary"></i>
+                Tournament Leaderboard
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={closeLeaderboardModal}
+              ></button>
+            </div>
+
+            {leaderboardLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary"></div>
+                <p className="mt-3">Loading leaderboard...</p>
+              </div>
+            ) : leaderboardError ? (
+              <div className="alert alert-danger">{leaderboardError}</div>
+            ) : leaderboard.length > 0 ? (
+              <>
+                <div className="table-responsive">
+                  <table className="table table-hover align-middle text-center">
+                    <thead className="table-primary">
+                      <tr>
+                        <th style={{ width: "15%" }}>#</th>
+                        <th>School</th>
+                        <th style={{ width: "30%" }}>Progress</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leaderboard.map((item, index) => (
+                        <tr key={index}>
+                          <td>
+                            <div
+                              className="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold"
+                              style={{
+                                width: "35px",
+                                height: "35px",
+                                background:
+                                  index === 0
+                                    ? "#ffd700"
+                                    : index === 1
+                                    ? "#c0c0c0"
+                                    : index === 2
+                                    ? "#cd7f32"
+                                    : "#e9ecef",
+                                color: index < 3 ? "#000" : "#6c757d",
+                              }}
+                            >
+                              {index + 1}
+                            </div>
+                          </td>
+                          <td className="text-start fw-semibold">
+                            {capitalizeWords(item.school)}
+                          </td>
+                          <td>
+                            <span className="badge bg-primary px-3 py-2">
+                              {item.progress}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="text-center mt-3">
+                  <small className="text-muted">
+                    <i className="bi bi-arrow-clockwise me-1"></i>
+                    Auto-refreshing every 10 seconds
+                  </small>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-5">
+                <i
+                  className="bi bi-trophy text-muted"
+                  style={{ fontSize: "3rem" }}
+                ></i>
+                <p className="text-muted mt-3">
+                  No leaderboard data available yet.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

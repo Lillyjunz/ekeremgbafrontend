@@ -9,14 +9,13 @@ const HeroSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Form state
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", ""], // reduced to 3
-    schoolReps: ["", ""], // API coordinators
+    participants: ["", "", ""],
+    schoolReps: ["", ""],
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -74,6 +73,13 @@ const HeroSection = () => {
     setError("");
   };
 
+  // ✅ Capitalize each word
+  const capitalizeWords = (str) =>
+    str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+      .trim();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -108,20 +114,22 @@ const HeroSection = () => {
     setIsLoading(true);
 
     try {
-      const filteredParticipants = formData.participants.filter(
-        (p) => p.trim() !== ""
-      );
-      const filteredSchoolReps = formData.schoolReps.filter(
-        (rep) => rep.trim() !== ""
-      );
+      // ✅ Capitalize all names before sending
+      const filteredParticipants = formData.participants
+        .filter((p) => p.trim() !== "")
+        .map(capitalizeWords);
+
+      const filteredSchoolReps = formData.schoolReps
+        .filter((rep) => rep.trim() !== "")
+        .map(capitalizeWords);
 
       const requestBody = {
-        name: formData.name.trim(),
+        name: capitalizeWords(formData.name),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        address: formData.address.trim(),
+        address: capitalizeWords(formData.address),
         participants: filteredParticipants,
-        schoolReps: filteredSchoolReps, // include coordinators
+        schoolReps: filteredSchoolReps,
       };
 
       console.log("Sending request:", requestBody);

@@ -814,11 +814,17 @@ export default function Dashboard() {
                             failedSchools.length === 0 ? "success" : "warning",
                           title: "Add Schools Result",
                           html: `<p><strong>${successCount}</strong> school(s) added successfully.</p>
-         ${
-           failedSchools.length > 0
-             ? `<p><strong>${failedSchools.length}</strong> school(s) failed to add.</p>`
-             : ""
-         }`,
+    ${
+      failedSchools.length > 0
+        ? `<p><strong>${failedSchools.length}</strong> school(s) failed to add.</p>`
+        : ""
+    }`,
+                          confirmButtonText: "OK",
+                        }).then(() => {
+                          // ✅ Redirect to the Schools page of this tournament
+                          router.push(
+                            `/admin/dashboard/tournament/${selectedTournamentId}/schools`
+                          );
                         });
 
                         setSelectedSchools([]);

@@ -49,6 +49,7 @@ export default function TournamentSchools() {
     phoneNumber: "",
     emailAddress: "",
     participants: ["", "", ""],
+    schoolReps: ["", ""],
   });
 
   // ✅ Get token safely on client
@@ -285,6 +286,7 @@ export default function TournamentSchools() {
       phoneNumber: "",
       emailAddress: "",
       participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
   };
 
@@ -297,6 +299,12 @@ export default function TournamentSchools() {
     const updated = [...schoolFormData.participants];
     updated[index] = value;
     setSchoolFormData((prev) => ({ ...prev, participants: updated }));
+  };
+
+  const handleSchoolRepChange = (index, value) => {
+    const updated = [...schoolFormData.schoolReps];
+    updated[index] = value;
+    setSchoolFormData((prev) => ({ ...prev, schoolReps: updated }));
   };
 
   const addParticipantField = () => {
@@ -342,13 +350,22 @@ export default function TournamentSchools() {
       return;
     }
 
+    const validSchoolReps = schoolFormData.schoolReps.filter(
+      (r) => r.trim() !== ""
+    );
+    if (validSchoolReps.length < 2) {
+      setModalError("Please fill in at least 2 school coordinators");
+      return;
+    }
+
     try {
       const payload = {
-        name: schoolFormData.name,
-        address: schoolFormData.address,
+        name: capitalizeWords(schoolFormData.name),
+        address: capitalizeWords(schoolFormData.address),
         phone: schoolFormData.phoneNumber,
         email: schoolFormData.emailAddress,
-        participants: validParticipants.map((p) => p.trim()),
+        participants: validParticipants.map((p) => capitalizeWords(p.trim())),
+        schoolReps: validSchoolReps.map((r) => capitalizeWords(r.trim())),
       };
 
       const res = await fetch(
@@ -396,6 +413,7 @@ export default function TournamentSchools() {
           phoneNumber: "",
           emailAddress: "",
           participants: ["", "", ""],
+          schoolReps: ["", ""],
         });
 
         setTimeout(() => setModalSuccess(""), 3000);
@@ -767,6 +785,45 @@ export default function TournamentSchools() {
                   <i className="bi bi-plus-circle me-2"></i>
                   Add Another Participant
                 </button>
+              </div>
+
+              {/* School Coordinators Section */}
+              <div className="mb-3">
+                <label className="form-label fw-bold">
+                  School Coordinators{" "}
+                  <span className="text-muted small">(2 required)</span>
+                  <span className="text-danger">*</span>
+                </label>
+                <div className="alert alert-info py-2 small mb-3">
+                  <i className="bi bi-info-circle me-2"></i>
+                  Please enter the full names of 2 school coordinators
+                </div>
+
+                {schoolFormData.schoolReps.map((rep, i) => (
+                  <div key={i} className="mb-3">
+                    <div className="input-group">
+                      <span
+                        className="input-group-text"
+                        style={{
+                          minWidth: "45px",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Coordinator ${i + 1} - Full Name`}
+                        value={rep}
+                        onChange={(e) =>
+                          handleSchoolRepChange(i, e.target.value)
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="d-grid">

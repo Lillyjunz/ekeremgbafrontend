@@ -13,6 +13,14 @@ export default function Navbar() {
   const [error, setError] = useState("");
   const pathname = usePathname();
 
+  // ✅ Capitalize helper
+  function capitalizeWords(str) {
+    return str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+      .trim();
+  }
+
   // Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +28,7 @@ export default function Navbar() {
     phone: "",
     email: "",
     participants: ["", "", ""],
-    schoolReps: ["", ""], // New coordinators field
+    schoolReps: ["", ""],
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -39,22 +47,35 @@ export default function Navbar() {
     clearForm();
   };
 
+  // ✅ Capitalize school name before saving to state
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let newValue = value;
+
+    if (name === "name") {
+      newValue = capitalizeWords(value);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
+  // ✅ Capitalize each participant name as typed
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      participants: prev.participants.map((p, i) => (i === index ? value : p)),
+      participants: prev.participants.map((p, i) =>
+        i === index ? capitalizeWords(value) : p
+      ),
     }));
   };
 
+  // ✅ Capitalize each coordinator name as typed
   const handleSchoolRepChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
+      schoolReps: prev.schoolReps.map((rep, i) =>
+        i === index ? capitalizeWords(value) : rep
+      ),
     }));
   };
 
@@ -113,12 +134,12 @@ export default function Navbar() {
       );
 
       const requestBody = {
-        name: formData.name.trim(),
+        name: capitalizeWords(formData.name.trim()),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
         address: formData.address.trim(),
-        participants: filteredParticipants,
-        schoolReps: filteredSchoolReps, // send coordinators to API
+        participants: filteredParticipants.map((p) => capitalizeWords(p)),
+        schoolReps: filteredSchoolReps.map((rep) => capitalizeWords(rep)),
       };
 
       console.log("Sending request:", requestBody);

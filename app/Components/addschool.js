@@ -1,23 +1,26 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
   const router = useRouter();
 
-  // Form state
+  // ✅ Form state
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     phone: "",
     email: "",
-    participants: ["", "", "", ""],
+    participants: ["", "", ""],
+    schoolReps: ["", ""], // ✅ Added two coordinator fields
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  // ✅ Handle general input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -26,26 +29,36 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
     }));
   };
 
+  // ✅ Handle participant change
   const handleParticipantChange = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      participants: prev.participants.map((participant, i) =>
-        i === index ? value : participant
-      ),
+      participants: prev.participants.map((p, i) => (i === index ? value : p)),
     }));
   };
 
+  // ✅ Handle coordinator (schoolRep) change
+  const handleRepChange = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      schoolReps: prev.schoolReps.map((rep, i) => (i === index ? value : rep)),
+    }));
+  };
+
+  // ✅ Clear all fields
   const clearForm = () => {
     setFormData({
       name: "",
       address: "",
       phone: "",
       email: "",
-      participants: ["", "", "", ""],
+      participants: ["", "", ""],
+      schoolReps: ["", ""],
     });
     setTermsAccepted(false);
   };
 
+  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -72,15 +85,22 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
       return;
     }
 
+    const filteredReps = formData.schoolReps.filter((r) => r.trim() !== "");
+    if (filteredReps.length === 0) {
+      alert("Please enter at least one coordinator");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const requestBody = {
         name: formData.name,
         email: formData.email,
-        phone: Number(formData.phone), // ✅ match backend type
+        phone: Number(formData.phone),
         address: formData.address,
         participants: filteredParticipants,
+        schoolReps: filteredReps, // ✅ Send coordinators to API
       };
 
       console.log("Request body:", requestBody);
@@ -113,18 +133,17 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
     }
   };
 
+  // ✅ Handle success modal close
   const handleSuccessClose = () => {
     setShowSuccess(false);
-
-    // Call onSchoolAdded to refresh the schools list if provided
     if (onSchoolAdded) {
-      onSchoolAdded(); // This will close modal AND refresh the list
+      onSchoolAdded();
     } else {
-      onClose(); // Fallback to just closing modal
+      onClose();
     }
   };
 
-  // Handle regular modal close (without success)
+  // ✅ Handle cancel/close
   const handleModalClose = () => {
     if (onClose) {
       onClose();
@@ -135,6 +154,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
 
   return (
     <>
+      {/* Main Modal */}
       <div className="modalOverlay">
         <div className="modalContent">
           <button
@@ -147,6 +167,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
           <h5 className="mb-4">Add a School</h5>
 
           <form onSubmit={handleSubmit}>
+            {/* School Name */}
             <div className="mb-3">
               <label className="form-label">
                 School name<span className="text-danger">*</span>
@@ -162,6 +183,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               />
             </div>
 
+            {/* Address */}
             <div className="mb-3">
               <label className="form-label">
                 Address<span className="text-danger">*</span>
@@ -177,6 +199,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               />
             </div>
 
+            {/* Phone */}
             <div className="mb-3">
               <label className="form-label">
                 Phone number<span className="text-danger">*</span>
@@ -193,6 +216,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               />
             </div>
 
+            {/* Email */}
             <div className="mb-3">
               <label className="form-label">
                 Email address<span className="text-danger">*</span>
@@ -209,9 +233,10 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               />
             </div>
 
+            {/* Participants */}
             <div className="mb-3">
               <label className="form-label">Number of Representatives</label>
-              {[1, 2, 3, 4].map((n, index) => (
+              {[1, 2, 3].map((n, index) => (
                 <input
                   key={n}
                   type="text"
@@ -226,6 +251,26 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               ))}
             </div>
 
+            {/* Coordinators */}
+            <div className="mb-3">
+              <label className="form-label">
+                School Coordinators<span className="text-danger">*</span>
+              </label>
+              {[1, 2].map((n, index) => (
+                <input
+                  key={n}
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder={`Coordinator ${n} Name`}
+                  value={formData.schoolReps[index]}
+                  onChange={(e) => handleRepChange(index, e.target.value)}
+                  disabled={isLoading}
+                  required={index === 0} // Require at least the first one
+                />
+              ))}
+            </div>
+
+            {/* Terms Checkbox */}
             <div className="form-check mb-3">
               <input
                 className="form-check-input"
@@ -241,6 +286,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
               </label>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               className="submitBtn btn"
@@ -263,7 +309,7 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
         </div>
       </div>
 
-      {/* Success Popup */}
+      {/* Success Modal */}
       {showSuccess && (
         <div className="modalOverlay">
           <div className="modalContent text-center">
@@ -272,8 +318,8 @@ export default function AddSchoolModal({ show, onClose, onSchoolAdded }) {
             </div>
             <h4 className="text-success mb-3">School Added Successfully!</h4>
             <p className="text-muted mb-4">
-              The school has been registered successfully and has been added to
-              your schools list.
+              The school has been registered successfully and added to your
+              list.
             </p>
             <button className="btn btn-success" onClick={handleSuccessClose}>
               Close
