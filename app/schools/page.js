@@ -108,9 +108,9 @@ export default function SchoolsList() {
     <>
       <Navbar />
       <div style={{ backgroundColor: "#fafafa" }}>
-        <div className="container py-5">
+        <div className="container py-3 py-md-5">
           <div className={styles.rankingWrapper}>
-            <h3 className="mb-4 fw-bold">Schools</h3>
+            <h3 className="mb-3 mb-md-4 fw-bold">Schools</h3>
 
             {loading ? (
               <div className="text-center py-5">
@@ -126,28 +126,104 @@ export default function SchoolsList() {
             ) : schools.length === 0 ? (
               <EmptyState />
             ) : (
-              <table className="table mb-0">
-                <thead>
-                  <tr className="text-muted">
-                    <th>No.</th>
-                    <th>School Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>No. of Students</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* Desktop Table View */}
+                <div className="d-none d-md-block table-responsive">
+                  <table className="table mb-0">
+                    <thead>
+                      <tr className="text-muted">
+                        <th>No.</th>
+                        <th>School Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>No. of Students</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {schools.map((school, index) => (
+                        <tr key={school.school_id}>
+                          <td>{index + 1}</td>
+                          <td>{capitalizeWords(school.name)}</td>
+                          <td>{school.phone}</td>
+                          <td>{school.email}</td>
+                          <td>{school.students?.length || 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="d-md-none">
                   {schools.map((school, index) => (
-                    <tr key={school.school_id}>
-                      <td>{index + 1}</td>
-                      <td>{capitalizeWords(school.name)}</td>
-                      <td>{school.phone}</td>
-                      <td>{school.email}</td>
-                      <td>{school.students?.length || 0}</td>
-                    </tr>
+                    <div
+                      key={school.school_id}
+                      className="card mb-3"
+                      style={{
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      <div className="card-body p-3">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <h6 className="fw-bold mb-0" style={{ flex: 1 }}>
+                            {capitalizeWords(school.name)}
+                          </h6>
+                          <span
+                            className="badge bg-primary"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            #{index + 1}
+                          </span>
+                        </div>
+
+                        <div className="mt-3" style={{ fontSize: "0.9rem" }}>
+                          <div className="mb-2">
+                            <span
+                              className="text-muted d-inline-block"
+                              style={{ width: "80px" }}
+                            >
+                              Phone:
+                            </span>
+                            <span className="fw-medium">{school.phone}</span>
+                          </div>
+
+                          <div className="mb-2">
+                            <span
+                              className="text-muted d-inline-block"
+                              style={{ width: "80px" }}
+                            >
+                              Email:
+                            </span>
+                            <span
+                              className="fw-medium"
+                              style={{
+                                wordBreak: "break-word",
+                                fontSize: "0.85rem",
+                              }}
+                            >
+                              {school.email}
+                            </span>
+                          </div>
+
+                          <div>
+                            <span
+                              className="text-muted d-inline-block"
+                              style={{ width: "80px" }}
+                            >
+                              Students:
+                            </span>
+                            <span className="fw-medium">
+                              {school.students?.length || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </>
             )}
           </div>
         </div>
