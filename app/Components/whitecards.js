@@ -52,8 +52,8 @@ export default function SubjectsEvents() {
                   className="subject-icon-img"
                 />
               </div>
-              <h5 className="fw-semibold">{item.title}</h5>
-              <p className="mb-0">{item.description}</p>
+              <h5 className="fw-semibold text-black">{item.title}</h5>
+              <p className="mb-0 text-black">{item.description}</p>
             </div>
           </div>
         ))}

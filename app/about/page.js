@@ -581,6 +581,20 @@ const About = () => {
                 </div>
               </div>
 
+              {/* Terms and Conditions */}
+              <div
+                className="mb-3 p-3 border rounded"
+                style={{ backgroundColor: "#f8f9fa" }}
+              >
+                <p className="text-muted small mb-0">
+                  <strong>Terms and Conditions:</strong> By completing the
+                  registration form, the school and it&apos;s students agree to
+                  abide by all rules and guidelines set forth by the organisers.
+                  Incomplete or inaccurate registration details may lead to
+                  disqualification.
+                </p>
+              </div>
+
               <div className="form-check mb-4">
                 <input
                   className="form-check-input"
@@ -601,7 +615,7 @@ const About = () => {
 
               <button
                 type="submit"
-                className="btn w-100 text-white fw-bold py-3"
+                className="btn w-100 text-white fw-bold py-3 submit-button"
                 disabled={isLoadingModal}
               >
                 {isLoadingModal ? "Registering..." : "Join the Tournament"}

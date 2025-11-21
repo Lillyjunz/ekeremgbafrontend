@@ -447,6 +447,20 @@ const SchoolLegacyStats = () => {
                 </div>
               </div>
 
+              {/* Terms and Conditions */}
+              <div
+                className="mb-3 p-3 border rounded"
+                style={{ backgroundColor: "#f8f9fa" }}
+              >
+                <p className="text-muted small mb-0">
+                  <strong>Terms and Conditions:</strong> By completing the
+                  registration form, the school and it&apos;s students agree to
+                  abide by all rules and guidelines set forth by the organisers.
+                  Incomplete or inaccurate registration details may lead to
+                  disqualification.
+                </p>
+              </div>
+
               <div className="form-check mb-4 checkbox-container">
                 <input
                   className="form-check-input custom-checkbox"
@@ -461,7 +475,7 @@ const SchoolLegacyStats = () => {
                   className="form-check-label text-muted"
                   htmlFor="termsConditions"
                 >
-                  Accept our Terms and Conditions
+                  I accept the Terms and Conditions
                 </label>
               </div>
 
