@@ -196,25 +196,46 @@ const HeroSection = () => {
         <div className="hero-overlay"></div>
 
         <div className="hero-content">
-          <div className="hero-badge mb-3">Ekeremgba 2.0 is coming soon...</div>
+          <div
+            className="hero-badge mb-3"
+            data-aos="fade-down"
+            data-aos-duration="1000"
+          >
+            Ekeremgba 2.0 is coming soon...
+          </div>
 
-          <h1 className="hero-title">
+          <h1
+            className="hero-title"
+            data-aos="fade-up"
+            data-aos-duration="1000"
+            data-aos-delay="200"
+          >
             Developing Igbo language and Culture through
             <br />
             intellectual Competitions
           </h1>
 
-          <p className="hero-description">
+          <p
+            className="hero-description"
+            data-aos="fade-up"
+            data-aos-duration="1000"
+            data-aos-delay="400"
+          >
             Promoting pride in our heritage through education, creativity, and
             friendly competition among secondary schools in Nigeria.
           </p>
 
-          <p>
+          <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="600">
             Next Competition:{" "}
             <span className="fw-bold">January 20th till February 4th 2026</span>
           </p>
 
-          <div className="hero-buttons">
+          <div
+            className="hero-buttons"
+            data-aos="zoom-in"
+            data-aos-duration="1000"
+            data-aos-delay="800"
+          >
             <button onClick={openModal} className="btn btn-primary-custom">
               Register School (2026)
             </button>
@@ -241,6 +262,8 @@ const HeroSection = () => {
               overflowY: "auto",
             }}
             onClick={(e) => e.stopPropagation()}
+            data-aos="zoom-in"
+            data-aos-duration="500"
           >
             <button
               onClick={closeModal}
@@ -415,14 +438,33 @@ const HeroSection = () => {
           <div
             className="modal-content bg-white rounded-4 p-4 text-center position-relative"
             style={{ maxWidth: "400px", width: "90%" }}
+            data-aos="zoom-in"
+            data-aos-duration="500"
           >
-            <div className="mb-3">
+            <div
+              className="mb-3"
+              data-aos="zoom-in"
+              data-aos-duration="800"
+              data-aos-delay="200"
+            >
               <div className="text-success" style={{ fontSize: "3rem" }}>
                 ✓
               </div>
             </div>
-            <h4 className="text-success mb-3">Registration Successful!</h4>
-            <p className="text-muted mb-4">
+            <h4
+              className="text-success mb-3"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="400"
+            >
+              Registration Successful!
+            </h4>
+            <p
+              className="text-muted mb-4"
+              data-aos="fade-up"
+              data-aos-duration="800"
+              data-aos-delay="600"
+            >
               Your school has been registered successfully. A consultant will
               reach out to you soon.
             </p>
@@ -430,6 +472,9 @@ const HeroSection = () => {
               className="btn text-white px-4 py-2"
               style={{ backgroundColor: "#28a745" }}
               onClick={handleSuccessClose}
+              data-aos="zoom-in"
+              data-aos-duration="800"
+              data-aos-delay="800"
             >
               Close
             </button>
