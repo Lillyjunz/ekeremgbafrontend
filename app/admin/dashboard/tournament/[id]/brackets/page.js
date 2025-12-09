@@ -527,7 +527,7 @@ export default function TournamentBracketPage() {
               </div>
 
               <div className="row g-3">
-                {bracketData[round].map((match) => {
+                {bracketData[round].map((match, matchIndex) => {
                   const isUpcoming = !match.winner;
                   const matchInput = matchInputs[match.match_id] || {};
                   const isActiveMatch = match.match_id === activeMatchId;
@@ -554,7 +554,7 @@ export default function TournamentBracketPage() {
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <small className="text-muted fw-semibold">
-                              Match {match.match_id}
+                              Match {matchIndex + 1}
                               {isActiveMatch && (
                                 <span className="badge bg-success ms-2">
                                   ACTIVE
@@ -573,7 +573,16 @@ export default function TournamentBracketPage() {
                             className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded"
                             style={{ background: "#f8f9fa" }}
                           >
-                            <span className="fw-semibold text-dark">
+                            <span className="fw-semibold text-dark d-flex align-items-center gap-2">
+                              <span
+                                className="badge bg-primary"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  minWidth: "35px",
+                                }}
+                              >
+                                {match.school1Id}
+                              </span>
                               {capitalizeWords(match.school1)}
                             </span>
 
@@ -595,7 +604,16 @@ export default function TournamentBracketPage() {
                             className="d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded"
                             style={{ background: "#f8f9fa" }}
                           >
-                            <span className="fw-semibold text-dark">
+                            <span className="fw-semibold text-dark d-flex align-items-center gap-2">
+                              <span
+                                className="badge bg-primary"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  minWidth: "35px",
+                                }}
+                              >
+                                {match.school2Id}
+                              </span>
                               {capitalizeWords(match.school2)}
                             </span>
 

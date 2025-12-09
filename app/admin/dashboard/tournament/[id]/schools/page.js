@@ -534,13 +534,16 @@ export default function TournamentSchools() {
                     <th>Action</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {schoolsData.schools.map((s, i) => (
                     <tr key={s.id}>
-                      <td>{i + 1}</td>
-                      <td>{capitalizeWords(s.name)}</td>
+                      {/* SHOW SCHOOL ID INSTEAD OF SERIAL NUMBER */}
+                      <td>{s.school_id ?? s.id}</td>
 
+                      <td>{capitalizeWords(s.name)}</td>
                       <td>{new Date(s.registered_at).toLocaleString()}</td>
+
                       <td>
                         <button
                           className="btn btn-sm btn-outline-danger"
