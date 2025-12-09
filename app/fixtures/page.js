@@ -107,12 +107,12 @@ export default function FixturesPage() {
   const fetchSchoolsForTournament = useCallback(async (tournamentId) => {
     setSchoolsLoading(true);
     setSchoolsError("");
+
     try {
-      const token = getAuthToken();
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${tournamentId}/registrations`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${tournamentId}/registrations`
       );
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to load schools");
 
