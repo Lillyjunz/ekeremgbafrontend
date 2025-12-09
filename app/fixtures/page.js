@@ -474,10 +474,11 @@ export default function FixturesPage() {
                           <th>Registered At</th>
                         </tr>
                       </thead>
+
                       <tbody>
                         {schoolsData.schools.map((s, i) => (
                           <tr key={s.id}>
-                            <td>{i + 1}</td>
+                            <td>{s.id}</td>
                             <td>{capitalizeWords(s.name)}</td>
                             <td>
                               {new Date(s.registered_at).toLocaleString()}
@@ -580,7 +581,7 @@ export default function FixturesPage() {
                     </div>
 
                     <div className="row g-3">
-                      {bracketData[round].map((match) => (
+                      {bracketData[round].map((match, matchIndex) => (
                         <div
                           key={match.match_id}
                           className="col-12 col-md-6 col-lg-4"
@@ -596,8 +597,9 @@ export default function FixturesPage() {
                             <div className="card-body">
                               <div className="d-flex justify-content-between align-items-center mb-3">
                                 <small className="text-muted fw-semibold">
-                                  Match {match.match_id}
+                                  Match {matchIndex + 1}
                                 </small>
+
                                 {match.match_time && (
                                   <div className="d-flex align-items-center gap-1 text-danger small">
                                     <i className="bi bi-clock"></i>
@@ -610,9 +612,19 @@ export default function FixturesPage() {
                                 className="d-flex justify-content-between align-items-center py-2 px-3 mb-2 rounded"
                                 style={{ background: "#f8f9fa" }}
                               >
-                                <span className="fw-semibold text-dark">
+                                <span className="fw-semibold text-dark d-flex align-items-center gap-2">
+                                  <span
+                                    className="badge bg-primary"
+                                    style={{
+                                      fontSize: "0.75rem",
+                                      minWidth: "35px",
+                                    }}
+                                  >
+                                    {match.school1Id}
+                                  </span>
                                   {capitalizeWords(match.school1)}
                                 </span>
+
                                 <span
                                   className="fw-bold"
                                   style={{
@@ -634,9 +646,19 @@ export default function FixturesPage() {
                                 className="d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded"
                                 style={{ background: "#f8f9fa" }}
                               >
-                                <span className="fw-semibold text-dark">
+                                <span className="fw-semibold text-dark d-flex align-items-center gap-2">
+                                  <span
+                                    className="badge bg-primary"
+                                    style={{
+                                      fontSize: "0.75rem",
+                                      minWidth: "35px",
+                                    }}
+                                  >
+                                    {match.school2Id}
+                                  </span>
                                   {capitalizeWords(match.school2)}
                                 </span>
+
                                 <span
                                   className="fw-bold"
                                   style={{
@@ -650,7 +672,7 @@ export default function FixturesPage() {
                                 </span>
                               </div>
 
-                              {match.winner && (
+                              {match.winner ? (
                                 <div
                                   className="alert alert-success mb-0 py-2"
                                   role="alert"
@@ -659,9 +681,7 @@ export default function FixturesPage() {
                                   <strong>Winner:</strong>{" "}
                                   {capitalizeWords(match.winner)}
                                 </div>
-                              )}
-
-                              {!match.winner && (
+                              ) : (
                                 <div
                                   className="alert alert-warning mb-0 py-2"
                                   role="alert"
