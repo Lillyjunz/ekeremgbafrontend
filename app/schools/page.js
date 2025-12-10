@@ -134,6 +134,7 @@ export default function SchoolsList() {
                       <tr className="text-muted">
                         <th>No.</th>
                         <th>School Name</th>
+                        <th> ID</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>No. of Students</th>
@@ -144,6 +145,7 @@ export default function SchoolsList() {
                         <tr key={school.school_id}>
                           <td>{index + 1}</td>
                           <td>{capitalizeWords(school.name)}</td>
+                          <td>{school.id || "N/A"}</td>
                           <td>{school.phone}</td>
                           <td>{school.email}</td>
                           <td>{school.students?.length || 0}</td>
@@ -179,6 +181,18 @@ export default function SchoolsList() {
                         </div>
 
                         <div className="mt-3" style={{ fontSize: "0.9rem" }}>
+                          <div className="mb-2">
+                            <span
+                              className="text-muted d-inline-block"
+                              style={{ width: "80px" }}
+                            >
+                              School ID:
+                            </span>
+                            <span className="fw-medium">
+                              {school.id || "N/A"}
+                            </span>
+                          </div>
+
                           <div className="mb-2">
                             <span
                               className="text-muted d-inline-block"

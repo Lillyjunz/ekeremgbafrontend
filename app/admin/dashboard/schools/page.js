@@ -220,6 +220,7 @@ export default function Schools() {
               <table className="table">
                 <thead>
                   <tr>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Address</th>
                     <th>Phone number</th>
@@ -232,6 +233,7 @@ export default function Schools() {
                 <tbody>
                   {paginationData.currentItems.map((school, index) => (
                     <tr key={`school-${school.school_id}-${index}`}>
+                      <td>{school.id || "N/A"}</td>
                       <td>{capitalizeWords(school.name)}</td>
                       <td>{school.address}</td>
                       <td>{school.phone}</td>

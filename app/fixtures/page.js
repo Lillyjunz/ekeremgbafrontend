@@ -52,16 +52,13 @@ export default function FixturesPage() {
     async function fetchTournaments() {
       setLoading(true);
       try {
-        const token = getAuthToken();
-
         const url = selectedYear
           ? `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${selectedYear}`
           : "https://api.ekeremgbaakpauche.com/api/admin/tournaments";
 
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(url);
         const data = await res.json();
+
         if (res.ok && Array.isArray(data)) {
           setTournaments(data);
         } else {
@@ -74,29 +71,36 @@ export default function FixturesPage() {
         setLoading(false);
       }
     }
+
     fetchTournaments();
   }, [selectedYear]);
 
   const fetchBracket = useCallback(async (tournamentId) => {
     setBracketLoading(true);
     setBracketError("");
+
     try {
-      const token = getAuthToken();
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
       );
       const data = await res.json();
+
       if (data?.bracket) {
         setBracketData(data.bracket);
-      } else setBracketError("No bracket data found.");
+      } else {
+        setBracketError("No bracket data found.");
+      }
 
       const champRes = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${tournamentId}`
       );
       const champData = await champRes.json();
-      if (champData?.champion) setChampion(champData.champion);
-      else setChampion(null);
+
+      if (champData?.champion) {
+        setChampion(champData.champion);
+      } else {
+        setChampion(null);
+      }
     } catch {
       setBracketError("Failed to load bracket data.");
     } finally {
@@ -131,15 +135,10 @@ export default function FixturesPage() {
   const fetchLeaderboard = useCallback(async (tournamentId) => {
     setLeaderboardLoading(true);
     setLeaderboardError("");
-    try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Missing authentication token");
 
+    try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${tournamentId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${tournamentId}`
       );
 
       const data = await res.json();
