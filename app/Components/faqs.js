@@ -44,23 +44,61 @@ const FaqSection = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-5 col-md-6">
-            <div className="faq-intro">
-              <h2 className="faq-title">Check Our FAQs</h2>
-              <p className="faq-description">
+            <div
+              className="faq-intro"
+              data-aos="fade-right"
+              data-aos-duration="800"
+            >
+              <h2
+                className="faq-title"
+                data-aos="fade-up"
+                data-aos-delay="100"
+                data-aos-duration="800"
+              >
+                Check Our FAQs
+              </h2>
+              <p
+                className="faq-description"
+                data-aos="fade-up"
+                data-aos-delay="200"
+                data-aos-duration="800"
+              >
                 Have a question about Ekeremgba? Our FAQ section has got you
                 covered with helpful information on all of our offerings.
               </p>
-              <p className="faq-subtitle">
+              <p
+                className="faq-subtitle"
+                data-aos="fade-up"
+                data-aos-delay="300"
+                data-aos-duration="800"
+              >
                 Do you have any questions or could not find what you are looking
                 for?
               </p>
-              <button className="btn-contact">Contact us</button>
+              <button
+                className="btn-contact"
+                data-aos="fade-up"
+                data-aos-delay="400"
+                data-aos-duration="800"
+              >
+                Contact us
+              </button>
             </div>
           </div>
           <div className="col-lg-7 col-md-6">
-            <div className="faq-items">
+            <div
+              className="faq-items"
+              data-aos="fade-left"
+              data-aos-duration="800"
+            >
               {faqItems.map((item, index) => (
-                <div key={index} className="faq-item">
+                <div
+                  key={index}
+                  className="faq-item"
+                  data-aos="fade-up"
+                  data-aos-delay={100 + index * 100}
+                  data-aos-duration="600"
+                >
                   <button
                     className="faq-question"
                     onClick={() => toggleItem(index)}

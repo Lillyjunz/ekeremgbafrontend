@@ -7,7 +7,7 @@ const TopSchools = () => {
     { rank: 5, name: "St. Martin Early Learning Academy, Aba" },
     { rank: 6, name: "Our Lady of Lourdes Model Secondary School, Aba" },
     { rank: 7, name: "St. Peter Secondary School Egbelu Ntigha" },
-    { rank: 8, name: "Mercy Girls Secondary, Aba" },
+    { rank: 8, name: "Mercy Girls Secondary, Aba" },
   ];
 
   const getOrdinalSuffix = (num) => {
@@ -23,26 +23,53 @@ const TopSchools = () => {
       <div className="container-fluid">
         <div className="row justify-content-center">
           <div className="col-12 col-lg-10 col-xl-8">
-            <h1 className="top-schools-title text-center mb-5">
+            <h1
+              className="top-schools-title text-center mb-5"
+              data-aos="fade-up"
+              data-aos-duration="800"
+            >
               Top schools from Our Last Competition
             </h1>
 
-            <div className="schools-table-wrapper">
+            <div
+              className="schools-table-wrapper"
+              data-aos="fade-up"
+              data-aos-delay="100"
+              data-aos-duration="800"
+            >
               <div className="table-responsive">
                 <table className="table schools-table">
                   <thead>
                     <tr>
-                      <th scope="col" className="rank-header">
+                      <th
+                        scope="col"
+                        className="rank-header"
+                        data-aos="fade-right"
+                        data-aos-delay="200"
+                        data-aos-duration="600"
+                      >
                         #
                       </th>
-                      <th scope="col" className="school-header">
+                      <th
+                        scope="col"
+                        className="school-header"
+                        data-aos="fade-left"
+                        data-aos-delay="200"
+                        data-aos-duration="600"
+                      >
                         School Name
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {schoolsData.map((school, index) => (
-                      <tr key={index} className="school-row">
+                      <tr
+                        key={index}
+                        className="school-row"
+                        data-aos="fade-up"
+                        data-aos-delay={300 + index * 50}
+                        data-aos-duration="600"
+                      >
                         <td className="rank-cell">
                           {school.rank}
                           <sup className="ordinal-suffix">

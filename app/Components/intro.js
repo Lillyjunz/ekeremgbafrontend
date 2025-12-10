@@ -268,14 +268,26 @@ const SchoolLegacyStats = () => {
           <div className="row align-items-center">
             {/* Left Section */}
             <div className="col-lg-7 col-xl-6 mb-5 mb-lg-0">
-              <div className="content-wrapper">
-                <h2 className="main-title mb-4">
+              <div
+                className="content-wrapper"
+                data-aos="fade-right"
+                data-aos-duration="1000"
+              >
+                <h2
+                  className="main-title mb-4"
+                  data-aos="fade-up"
+                  data-aos-delay="100"
+                >
                   More Than Just Competitions
                   <br />
                   <span className="highlight-text">We Build Legacies</span>
                 </h2>
 
-                <p className="description mb-4">
+                <p
+                  className="description mb-4"
+                  data-aos="fade-up"
+                  data-aos-delay="200"
+                >
                   Ekeremgba Akpauche is more than a competition — it is a
                   movement to revive the Igbo spirit of wisdom (Amamihe),
                   eloquence (Nkwuwa Okwu), and unity (ịdịnotu). We bring
@@ -284,7 +296,12 @@ const SchoolLegacyStats = () => {
                   meaningful ways.
                 </p>
 
-                <button onClick={openModal} className="register-btn">
+                <button
+                  onClick={openModal}
+                  className="register-btn"
+                  data-aos="fade-up"
+                  data-aos-delay="300"
+                >
                   Register School (2026)
                 </button>
               </div>
@@ -292,10 +309,18 @@ const SchoolLegacyStats = () => {
 
             {/* Right Stats Section */}
             <div className="col-lg-5 col-xl-6">
-              <div className="stats-wrapper">
+              <div
+                className="stats-wrapper"
+                data-aos="fade-left"
+                data-aos-duration="1000"
+              >
                 <div className="row g-4">
                   <div className="col-6">
-                    <div className="stat-card">
+                    <div
+                      className="stat-card"
+                      data-aos="zoom-in"
+                      data-aos-delay="100"
+                    >
                       <div className="stat-number">
                         {loading ? "..." : `${counters.schools}+`}
                       </div>
@@ -304,7 +329,11 @@ const SchoolLegacyStats = () => {
                   </div>
 
                   <div className="col-6">
-                    <div className="stat-card">
+                    <div
+                      className="stat-card"
+                      data-aos="zoom-in"
+                      data-aos-delay="200"
+                    >
                       <div className="stat-number">
                         {loading ? "..." : `${counters.students}+`}
                       </div>
@@ -313,7 +342,11 @@ const SchoolLegacyStats = () => {
                   </div>
 
                   <div className="col-6">
-                    <div className="stat-card">
+                    <div
+                      className="stat-card"
+                      data-aos="zoom-in"
+                      data-aos-delay="300"
+                    >
                       <div className="stat-number">
                         {loading ? "..." : `${counters.subjects}+`}
                       </div>
@@ -322,7 +355,11 @@ const SchoolLegacyStats = () => {
                   </div>
 
                   <div className="col-6">
-                    <div className="stat-card">
+                    <div
+                      className="stat-card"
+                      data-aos="zoom-in"
+                      data-aos-delay="400"
+                    >
                       <div className="d-flex justify-content-center align-items-center">
                         <Image
                           className="cash-image"
@@ -351,6 +388,8 @@ const SchoolLegacyStats = () => {
           <div
             className="modal-content bg-white rounded-4 p-4 position-relative"
             onClick={(e) => e.stopPropagation()}
+            data-aos="zoom-in"
+            data-aos-duration="300"
           >
             <button
               onClick={closeModal}
@@ -505,7 +544,11 @@ const SchoolLegacyStats = () => {
       {/* Success Popup */}
       {showSuccess && (
         <div className="modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-          <div className="modal-content bg-white rounded-4 p-4 text-center position-relative">
+          <div
+            className="modal-content bg-white rounded-4 p-4 text-center position-relative"
+            data-aos="zoom-in"
+            data-aos-duration="300"
+          >
             <div className="mb-3">
               <div className="text-success" style={{ fontSize: "3rem" }}>
                 ✓

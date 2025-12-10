@@ -4,10 +4,21 @@ const HowItWorks = () => {
   return (
     <section className="how-it-works py-5">
       <div className="container">
-        <h2 className="section-title mb-5">How it works</h2>
+        <h2
+          className="section-title mb-5"
+          data-aos="fade-up"
+          data-aos-duration="800"
+        >
+          How it works
+        </h2>
         <div className="row g-4">
           <div className="col-md-4">
-            <div className="how-card p-4 h-100">
+            <div
+              className="how-card p-4 h-100"
+              data-aos="fade-up"
+              data-aos-delay="100"
+              data-aos-duration="800"
+            >
               <div className="icon-wrapper mb-3">
                 <i className="bi bi-mortarboard"></i>
               </div>
@@ -20,7 +31,12 @@ const HowItWorks = () => {
             </div>
           </div>
           <div className="col-md-4">
-            <div className="how-card p-4 h-100">
+            <div
+              className="how-card p-4 h-100"
+              data-aos="fade-up"
+              data-aos-delay="200"
+              data-aos-duration="800"
+            >
               <div className="icon-wrapper mb-3">
                 <i className="bi bi-mic"></i>
               </div>
@@ -32,7 +48,12 @@ const HowItWorks = () => {
             </div>
           </div>
           <div className="col-md-4">
-            <div className="how-card p-4 h-100">
+            <div
+              className="how-card p-4 h-100"
+              data-aos="fade-up"
+              data-aos-delay="300"
+              data-aos-duration="800"
+            >
               <div className="icon-wrapper mb-3">
                 <i className="bi bi-award"></i>
               </div>
