@@ -22,7 +22,7 @@ export default function TournamentBracketPage() {
   const [champion, setChampion] = useState(null);
   const [recordingChampion, setRecordingChampion] = useState(false);
   const [settingActive, setSettingActive] = useState(null);
-  const [activeMatchId, setActiveMatchId] = useState(null);
+  const [activeMatchIds, setActiveMatchIds] = useState([]); // Changed to array
   const [selectedNextRound, setSelectedNextRound] = useState("Second Round");
 
   // Add Schools Modal States
@@ -95,17 +95,26 @@ export default function TournamentBracketPage() {
 
       try {
         const activeResponse = await fetch(
-          `https://api.ekeremgbaakpauche.com/api/admin/active-match?tournamentId=${id}`,
+          `https://api.ekeremgbaakpauche.com/api/admin/get-active-match`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (activeResponse.ok) {
           const activeData = await activeResponse.json();
-          if (activeData?.activeMatchId) {
-            setActiveMatchId(activeData.activeMatchId);
+          // Extract match_id from all active matches in the response
+          if (activeData?.data && Array.isArray(activeData.data)) {
+            const activeIds = activeData.data
+              .map((item) => item.match?.match_id)
+              .filter((id) => id !== null && id !== undefined);
+            setActiveMatchIds(activeIds);
+          } else {
+            setActiveMatchIds([]);
           }
+        } else {
+          setActiveMatchIds([]);
         }
       } catch (activeErr) {
-        console.log("Active match fetch not available");
+        console.log("Active match fetch not available:", activeErr);
+        setActiveMatchIds([]);
       }
     } catch (err) {
       console.error(err);
@@ -327,12 +336,17 @@ export default function TournamentBracketPage() {
     }
   };
 
-  const handleSetActiveMatch = async (matchId) => {
+  const handleToggleActiveMatch = async (matchId) => {
+    const isCurrentlyActive = activeMatchIds.includes(matchId);
+    const newStatus = isCurrentlyActive ? 0 : 1; // Toggle: 1 = active, 0 = inactive
+
     setSettingActive(matchId);
     setError("");
     setSuccessMsg("");
+
     try {
       const token = localStorage.getItem("ekereAuthToken");
+
       const response = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/match/${matchId}/active-match/tournament/${id}`,
         {
@@ -341,15 +355,36 @@ export default function TournamentBracketPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
         }
       );
 
       const data = await response.json();
       if (!response.ok)
-        throw new Error(data.message || "Failed to set active match");
+        throw new Error(
+          data.message ||
+            `Failed to ${isCurrentlyActive ? "remove" : "set"} active match`
+        );
 
-      setActiveMatchId(matchId);
-      setSuccessMsg(data.message || "Active match set successfully!");
+      // Update local state: add or remove from array
+      setActiveMatchIds((prev) => {
+        if (newStatus === 1) {
+          // Add to active matches if not already there
+          return prev.includes(matchId) ? prev : [...prev, matchId];
+        } else {
+          // Remove from active matches
+          return prev.filter((id) => id !== matchId);
+        }
+      });
+
+      // Use custom message based on action
+      if (newStatus === 1) {
+        setSuccessMsg("Active match added successfully!");
+      } else {
+        setSuccessMsg("Active match removed successfully!");
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -421,6 +456,16 @@ export default function TournamentBracketPage() {
             <Trophy className="text-warning" size={32} />
             <h1 className="fw-bold text-dark mb-0">Tournament Groups</h1>
           </div>
+
+          {/* Show active matches count */}
+          {activeMatchIds.length > 0 && (
+            <div className="mt-2">
+              <span className="badge bg-success px-3 py-2">
+                {activeMatchIds.length} Active Match
+                {activeMatchIds.length !== 1 ? "es" : ""}
+              </span>
+            </div>
+          )}
 
           {/* Action Buttons Row */}
           <div className="mt-3 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
@@ -530,7 +575,7 @@ export default function TournamentBracketPage() {
                 {bracketData[round].map((match, matchIndex) => {
                   const isUpcoming = !match.winner;
                   const matchInput = matchInputs[match.match_id] || {};
-                  const isActiveMatch = match.match_id === activeMatchId;
+                  const isActiveMatch = activeMatchIds.includes(match.match_id);
 
                   return (
                     <div
@@ -705,20 +750,25 @@ export default function TournamentBracketPage() {
                                     : "Record Winner"}
                                 </button>
                                 <button
-                                  className="btn btn-primary btn-sm"
-                                  disabled={
-                                    settingActive === match.match_id ||
+                                  className={`btn btn-sm ${
                                     isActiveMatch
-                                  }
+                                      ? "btn-warning"
+                                      : "btn-primary"
+                                  }`}
+                                  disabled={settingActive === match.match_id}
                                   onClick={() =>
-                                    handleSetActiveMatch(match.match_id)
+                                    handleToggleActiveMatch(match.match_id)
                                   }
-                                  title="Set as active match"
+                                  title={
+                                    isActiveMatch
+                                      ? "Remove from active matches"
+                                      : "Add to active matches"
+                                  }
                                 >
                                   {settingActive === match.match_id
                                     ? "Setting..."
                                     : isActiveMatch
-                                    ? "Active"
+                                    ? "Remove"
                                     : "Set Active"}
                                 </button>
                               </div>

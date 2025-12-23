@@ -17,12 +17,12 @@ const capitalizeWords = (str) => {
 
 export default function ScoreboardPage() {
   const [token, setToken] = useState(null);
-  const [bracket, setBracket] = useState(null);
-  const [schoolsMap, setSchoolsMap] = useState({});
+  const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeMatch, setActiveMatch] = useState(null);
+  const [tournamentInfo, setTournamentInfo] = useState(null);
   const [showScoreModal, setShowScoreModal] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
   const [scores, setScores] = useState({
     school1_score: "",
     school2_score: "",
@@ -52,7 +52,6 @@ export default function ScoreboardPage() {
       try {
         setLoading(true);
 
-        // Fetch active match from API
         const response = await fetch(
           "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
           {
@@ -64,51 +63,59 @@ export default function ScoreboardPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch active match");
+          throw new Error(data.message || "Failed to fetch active matches");
         }
 
-        const matchData = data.activeMatch;
+        const matchesData = data.data;
 
-        if (!matchData) {
-          setBracket(null);
-          setActiveMatch(null);
+        if (!matchesData || matchesData.length === 0) {
+          setMatches([]);
+          setTournamentInfo(null);
           setLoading(false);
           return;
         }
 
-        // Build schools map
-        const map = {
-          [matchData.school1_id]: matchData.school1_name,
-          [matchData.school2_id]: matchData.school2_name,
-        };
-        setSchoolsMap(map);
-
-        // Build bracket structure
-        const roundName = matchData.round || "Round of 32";
-        setBracket({
-          [roundName]: [
-            {
-              match_id: matchData.match_id,
-              tournament_id: matchData.tournament_id,
-              school1: matchData.school1_name,
-              school2: matchData.school2_name,
-              school1_score: matchData.school1_score ?? 0,
-              school2_score: matchData.school2_score ?? 0,
-              school1Id: matchData.school1_id,
-              school2Id: matchData.school2_id,
-              school1Students: matchData.school1Students || [],
-              school2Students: matchData.school2Students || [],
-              winner: matchData.winner_id ? map[matchData.winner_id] : null,
-              isActive: matchData.isOngoing === "true",
-              tournament_name: matchData.tournament_name,
-              tournament_year: matchData.tournament_year,
-              tournament_location: matchData.tournament_location,
-              tournament_time: matchData.tournament_time,
-            },
-          ],
+        // Extract tournament info from first match
+        const firstMatch = matchesData[0].match;
+        setTournamentInfo({
+          name: firstMatch.tournament_name,
+          year: firstMatch.tournament_year,
+          location: firstMatch.tournament_location,
+          time: firstMatch.tournament_time,
+          description: firstMatch.tournament_description,
         });
 
-        setActiveMatch(matchData);
+        // Process all matches
+        const processedMatches = matchesData.map((item) => {
+          const match = item.match;
+
+          return {
+            match_id: match.match_id,
+            tournament_id: match.tournament_id,
+            round: match.round || "First Round",
+            school1: match.school1_name,
+            school2: match.school2_name,
+            school1_score: match.school1_score ?? 0,
+            school2_score: match.school2_score ?? 0,
+            school1_id: match.school1_id,
+            school2_id: match.school2_id,
+            school1Students: item.school1Students || [],
+            school2Students: item.school2Students || [],
+            winner_id: match.winner_id,
+            winner: match.winner_id
+              ? match.winner_id === match.school1_id
+                ? match.school1_name
+                : match.school2_name
+              : null,
+            isActive: match.isOngoing === "1" || match.isOngoing === "true",
+            tournament_name: match.tournament_name,
+            tournament_year: match.tournament_year,
+            tournament_location: match.tournament_location,
+            tournament_time: match.tournament_time,
+          };
+        });
+
+        setMatches(processedMatches);
         setError("");
       } catch (err) {
         console.error(err);
@@ -119,9 +126,17 @@ export default function ScoreboardPage() {
     };
 
     fetchData();
+
+    // Auto refresh every 2 minutes
+    const interval = setInterval(() => {
+      fetchData();
+    }, 120000);
+
+    return () => clearInterval(interval);
   }, [token]);
 
-  const handleOpenScoreForm = () => {
+  const handleOpenScoreForm = (match) => {
+    setSelectedMatch(match);
     setShowScoreModal(true);
     setScores({ school1_score: "", school2_score: "", winnerId: "" });
   };
@@ -146,7 +161,7 @@ export default function ScoreboardPage() {
 
       // Call the winner API
       const response = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/match/${activeMatch.match_id}/winner/tournament/${activeMatch.tournament_id}`,
+        `https://api.ekeremgbaakpauche.com/api/admin/match/${selectedMatch.match_id}/winner/tournament/${selectedMatch.tournament_id}`,
         {
           method: "POST",
           headers: {
@@ -171,29 +186,23 @@ export default function ScoreboardPage() {
       setShowScoreModal(false);
 
       // Update local state
-      setActiveMatch((prev) => ({
-        ...prev,
-        winner_id: parseInt(scores.winnerId),
-        school1_score: parseInt(scores.school1_score),
-        school2_score: parseInt(scores.school2_score),
-      }));
-
-      // Update bracket
-      const roundName = Object.keys(bracket)[0];
-      setBracket((prev) => ({
-        ...prev,
-        [roundName]: prev[roundName].map((match) => {
-          if (match.match_id === activeMatch.match_id) {
+      setMatches((prevMatches) =>
+        prevMatches.map((match) => {
+          if (match.match_id === selectedMatch.match_id) {
             return {
               ...match,
+              winner_id: parseInt(scores.winnerId),
               school1_score: parseInt(scores.school1_score),
               school2_score: parseInt(scores.school2_score),
-              winner: schoolsMap[scores.winnerId],
+              winner:
+                parseInt(scores.winnerId) === match.school1_id
+                  ? match.school1
+                  : match.school2,
             };
           }
           return match;
-        }),
-      }));
+        })
+      );
     } catch (err) {
       console.error("Error submitting scores:", err);
       alert("Error: " + err.message);
@@ -232,19 +241,16 @@ export default function ScoreboardPage() {
       </div>
     );
 
-  if (!bracket)
+  if (matches.length === 0)
     return (
       <div
         className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
       >
         <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-          No active match found.
+          No active matches found.
         </div>
       </div>
     );
-
-  const currentRoundName = Object.keys(bracket)[0];
-  const currentMatches = bracket[currentRoundName];
 
   return (
     <div className={pageStyles.pageContainer}>
@@ -272,43 +278,48 @@ export default function ScoreboardPage() {
         <div className="text-center mb-5">
           <div className={pageStyles.roundBadge}>
             <Trophy size={20} />
-            <span>Current Round</span>
+            <span>Active Matches</span>
           </div>
-          <h1 className={pageStyles.roundTitle}>{currentRoundName}</h1>
+          <h1 className={pageStyles.roundTitle}>
+            {matches[0]?.round || "Tournament Matches"}
+          </h1>
 
           {/* Tournament Info */}
-          {currentMatches[0] && (
+          {tournamentInfo && (
             <div
               className="mt-3"
               style={{ color: "#cbd5e1", fontSize: "0.95rem" }}
             >
               <div>
-                {capitalizeWords(currentMatches[0].tournament_name)}{" "}
-                {currentMatches[0].tournament_year}
+                {capitalizeWords(tournamentInfo.name)} {tournamentInfo.year}
               </div>
               <div>
-                {currentMatches[0].tournament_location} •{" "}
-                {currentMatches[0].tournament_time}
+                {tournamentInfo.location} • {tournamentInfo.time}
               </div>
+              {tournamentInfo.description && (
+                <div style={{ fontSize: "0.875rem", marginTop: "0.25rem" }}>
+                  {tournamentInfo.description}
+                </div>
+              )}
             </div>
           )}
 
-          {activeMatch && (
-            <div className="mt-4">
-              <button
-                className={`btn ${pageStyles.recordButton}`}
-                onClick={handleOpenScoreForm}
-              >
-                <Award size={20} className="me-2" />
-                Record Match Scores
-              </button>
-            </div>
-          )}
+          <div
+            className="mt-3"
+            style={{
+              color: "#4ade80",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+            }}
+          >
+            <Zap size={16} className="me-1" />
+            {matches.length} {matches.length === 1 ? "Match" : "Matches"} Live
+          </div>
         </div>
 
         {/* Matches */}
         <div className="row g-4 justify-content-center">
-          {currentMatches.map((match) => {
+          {matches.map((match) => {
             const school1Score = Number(match.school1_score) || 0;
             const school2Score = Number(match.school2_score) || 0;
             const isLive = match.isActive && match.winner === null;
@@ -454,9 +465,21 @@ export default function ScoreboardPage() {
                     <div className="text-center mt-4">
                       <span className={pageStyles.winnerBadge}>
                         <Trophy size={20} />
-
                         <span>Winner: {capitalizeWords(match.winner)}</span>
                       </span>
+                    </div>
+                  )}
+
+                  {/* Record Scores Button */}
+                  {isLive && (
+                    <div className="text-center mt-4">
+                      <button
+                        className={`btn ${pageStyles.recordButton}`}
+                        onClick={() => handleOpenScoreForm(match)}
+                      >
+                        <Award size={20} className="me-2" />
+                        Record Scores
+                      </button>
                     </div>
                   )}
                 </div>
@@ -467,7 +490,7 @@ export default function ScoreboardPage() {
       </div>
 
       {/* Score Modal */}
-      {showScoreModal && (
+      {showScoreModal && selectedMatch && (
         <>
           <div
             className={modalStyles.modalBackdrop}
@@ -487,8 +510,8 @@ export default function ScoreboardPage() {
                 <div className={modalStyles.modalBody}>
                   <div className={modalStyles.scoreMatchInfo}>
                     <strong>
-                      {capitalizeWords(schoolsMap[activeMatch?.school1_id])} vs{" "}
-                      {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
+                      {capitalizeWords(selectedMatch.school1)} vs{" "}
+                      {capitalizeWords(selectedMatch.school2)}
                     </strong>
                   </div>
 
@@ -504,12 +527,11 @@ export default function ScoreboardPage() {
                       }
                     >
                       <option value="">Choose winner...</option>
-
-                      <option value={activeMatch?.school1_id}>
-                        {capitalizeWords(schoolsMap[activeMatch?.school1_id])}
+                      <option value={selectedMatch.school1_id}>
+                        {capitalizeWords(selectedMatch.school1)}
                       </option>
-                      <option value={activeMatch?.school2_id}>
-                        {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
+                      <option value={selectedMatch.school2_id}>
+                        {capitalizeWords(selectedMatch.school2)}
                       </option>
                     </select>
                   </div>
@@ -517,9 +539,8 @@ export default function ScoreboardPage() {
                   <div className="row g-3">
                     <div className="col-6">
                       <label className={modalStyles.formLabel}>
-                        {capitalizeWords(schoolsMap[activeMatch?.school1_id])}
+                        {capitalizeWords(selectedMatch.school1)}
                       </label>
-
                       <input
                         type="number"
                         className={`form-control ${modalStyles.formControl}`}
@@ -535,9 +556,8 @@ export default function ScoreboardPage() {
                     </div>
                     <div className="col-6">
                       <label className={modalStyles.formLabel}>
-                        {capitalizeWords(schoolsMap[activeMatch?.school2_id])}
+                        {capitalizeWords(selectedMatch.school2)}
                       </label>
-
                       <input
                         type="number"
                         className={`form-control ${modalStyles.formControl}`}

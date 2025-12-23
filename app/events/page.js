@@ -7,11 +7,10 @@ import Navbar from "../Components/navbar";
 import pageStyles from "./events.module.css";
 
 export default function EventsPage() {
-  const [bracket, setBracket] = useState(null);
-  const [schoolsMap, setSchoolsMap] = useState({});
+  const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeMatch, setActiveMatch] = useState(null);
+  const [tournamentInfo, setTournamentInfo] = useState(null);
 
   // Helper function to capitalize text
   const capitalize = (text) => {
@@ -33,63 +32,64 @@ export default function EventsPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch active match");
+          throw new Error(data.message || "Failed to fetch active matches");
         }
 
-        const matchData = data.activeMatch;
+        const matchesData = data.data;
 
-        if (!matchData) {
-          setBracket(null);
-          setActiveMatch(null);
+        if (!matchesData || matchesData.length === 0) {
+          setMatches([]);
+          setTournamentInfo(null);
           setLoading(false);
           return;
         }
 
-        // Capitalize school names
-        const school1Name = capitalize(matchData.school1_name);
-        const school2Name = capitalize(matchData.school2_name);
-
-        // Build schools map
-        const map = {
-          [matchData.school1_id]: school1Name,
-          [matchData.school2_id]: school2Name,
-        };
-        setSchoolsMap(map);
-
-        // Build bracket structure
-        const roundName = matchData.round || "Round of 32";
-        setBracket({
-          [roundName]: [
-            {
-              match_id: matchData.match_id,
-              tournament_id: matchData.tournament_id,
-              school1: school1Name,
-              school2: school2Name,
-              school1_score: matchData.school1_score ?? 0,
-              school2_score: matchData.school2_score ?? 0,
-              school1Id: matchData.school1_id,
-              school2Id: matchData.school2_id,
-              school1Students:
-                matchData.school1Students?.map((student) => ({
-                  ...student,
-                  fullname: capitalize(student.fullname),
-                })) || [],
-              school2Students:
-                matchData.school2Students?.map((student) => ({
-                  ...student,
-                  fullname: capitalize(student.fullname),
-                })) || [],
-              winner: matchData.winner_id ? map[matchData.winner_id] : null,
-              isActive: matchData.isOngoing === "true",
-              tournament_name: capitalize(matchData.tournament_name),
-              tournament_year: matchData.tournament_year,
-              tournament_location: matchData.tournament_location,
-              tournament_time: matchData.tournament_time,
-            },
-          ],
+        // Extract tournament info from first match
+        const firstMatch = matchesData[0].match;
+        setTournamentInfo({
+          name: capitalize(firstMatch.tournament_name),
+          year: firstMatch.tournament_year,
+          location: firstMatch.tournament_location,
+          time: firstMatch.tournament_time,
+          description: firstMatch.tournament_description,
         });
 
-        setActiveMatch(matchData);
+        // Process all matches
+        const processedMatches = matchesData.map((item) => {
+          const match = item.match;
+          const school1Name = capitalize(match.school1_name);
+          const school2Name = capitalize(match.school2_name);
+
+          return {
+            match_id: match.match_id,
+            tournament_id: match.tournament_id,
+            round: match.round || "First Round",
+            school1: school1Name,
+            school2: school2Name,
+            school1_score: match.school1_score ?? 0,
+            school2_score: match.school2_score ?? 0,
+            school1Id: match.school1_id,
+            school2Id: match.school2_id,
+            school1Students:
+              item.school1Students?.map((student) => ({
+                ...student,
+                fullname: capitalize(student.fullname),
+              })) || [],
+            school2Students:
+              item.school2Students?.map((student) => ({
+                ...student,
+                fullname: capitalize(student.fullname),
+              })) || [],
+            winner: match.winner_id
+              ? match.winner_id === match.school1_id
+                ? school1Name
+                : school2Name
+              : null,
+            isActive: match.isOngoing === "1" || match.isOngoing === "true",
+          };
+        });
+
+        setMatches(processedMatches);
         setError("");
       } catch (err) {
         console.error(err);
@@ -102,7 +102,7 @@ export default function EventsPage() {
     // Initial fetch
     fetchData();
 
-    // Auto refresh every 3 minutes
+    // Auto refresh every 2 minutes
     const interval = setInterval(() => {
       fetchData();
     }, 120000);
@@ -149,7 +149,7 @@ export default function EventsPage() {
       </>
     );
 
-  if (!bracket)
+  if (matches.length === 0)
     return (
       <>
         <Navbar />
@@ -157,15 +157,12 @@ export default function EventsPage() {
           className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
         >
           <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-            No active match found.
+            No active matches found.
           </div>
         </div>
         <Footer />
       </>
     );
-
-  const currentRoundName = Object.keys(bracket)[0];
-  const currentMatches = bracket[currentRoundName];
 
   return (
     <>
@@ -180,29 +177,46 @@ export default function EventsPage() {
           <div className="text-center mb-5">
             <div className={pageStyles.roundBadge}>
               <Trophy size={20} />
-              <span>Current Round</span>
+              <span>Active Matches</span>
             </div>
-            <h1 className={pageStyles.roundTitle}>{currentRoundName}</h1>
+            <h1 className={pageStyles.roundTitle}>
+              {matches[0]?.round || "Tournament Matches"}
+            </h1>
 
-            {currentMatches[0] && (
+            {tournamentInfo && (
               <div
                 className="mt-3"
                 style={{ color: "#cbd5e1", fontSize: "0.95rem" }}
               >
                 <div>
-                  {currentMatches[0].tournament_name}{" "}
-                  {currentMatches[0].tournament_year}
+                  {tournamentInfo.name} {tournamentInfo.year}
                 </div>
                 <div>
-                  {currentMatches[0].tournament_location} •{" "}
-                  {currentMatches[0].tournament_time}
+                  {tournamentInfo.location} • {tournamentInfo.time}
                 </div>
+                {tournamentInfo.description && (
+                  <div style={{ fontSize: "0.875rem", marginTop: "0.25rem" }}>
+                    {tournamentInfo.description}
+                  </div>
+                )}
               </div>
             )}
+
+            <div
+              className="mt-3"
+              style={{
+                color: "#4ade80",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+              }}
+            >
+              <Zap size={16} className="me-1" />
+              {matches.length} {matches.length === 1 ? "Match" : "Matches"} Live
+            </div>
           </div>
 
           <div className="row g-4 justify-content-center">
-            {currentMatches.map((match) => {
+            {matches.map((match) => {
               const school1Score = Number(match.school1_score) || 0;
               const school2Score = Number(match.school2_score) || 0;
               const isLive = match.isActive && match.winner === null;
