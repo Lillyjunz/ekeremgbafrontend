@@ -84,8 +84,15 @@ export default function TournamentBracketPage() {
       }
 
       const champResponse = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${id}`
+        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       const champData = await champResponse.json();
       if (champData?.champion) {
         setChampion(champData.champion);
@@ -313,22 +320,50 @@ export default function TournamentBracketPage() {
     setRecordingChampion(true);
     setError("");
     setSuccessMsg("");
+
     try {
       const token = localStorage.getItem("ekereAuthToken");
+
+      // 1️⃣ Find the last round
+      const rounds = bracketData ? Object.keys(bracketData) : [];
+      if (!rounds.length) throw new Error("No rounds available");
+
+      const lastRoundName = rounds[rounds.length - 1];
+      const lastRoundMatches = bracketData[lastRoundName];
+
+      if (!lastRoundMatches || lastRoundMatches.length === 0)
+        throw new Error("No matches found in the last round");
+
+      // 2️⃣ Check winner exists
+      const finalMatch = lastRoundMatches[0];
+      if (!finalMatch.winner)
+        throw new Error(
+          "Cannot record champion. Please record the winner of the last match first."
+        );
+
+      // 3️⃣ Call GET endpoint (backend should automatically find winner in last match)
       const response = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${id}`,
         {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
       const data = await response.json();
+
       if (!response.ok)
         throw new Error(data.message || "Failed to record champion");
 
-      setChampion(data.champion);
-      setSuccessMsg(data.message || "Champion recorded successfully!");
+      // 4️⃣ Set champion in state
+      if (data?.champion) {
+        setChampion(data.champion);
+        setSuccessMsg("Champion recorded successfully!");
+      } else {
+        throw new Error(data.message || "Final match not found");
+      }
     } catch (err) {
       setError(err.message);
     } finally {
