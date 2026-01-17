@@ -8,6 +8,9 @@ export default function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [showSchoolModal, setShowSchoolModal] = useState(false);
   const [showSchoolForm, setShowSchoolForm] = useState(false);
+  const [showChampionModal, setShowChampionModal] = useState(false);
+  const [championData, setChampionData] = useState(null);
+  const [loadingChampion, setLoadingChampion] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -22,7 +25,7 @@ export default function Dashboard() {
     name: "",
     year: "",
     event_time: "",
-    event_date: "", // ✅ Added event_date
+    event_date: "",
     location: "",
     description: "",
   });
@@ -44,6 +47,70 @@ export default function Dashboard() {
     return null;
   };
 
+  const capitalizeWords = (str) => {
+    if (!str) return "";
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const getChampionFromBracket = (bracket) => {
+    if (!bracket) return null;
+
+    const rounds = Object.keys(bracket);
+    if (rounds.length === 0) return null;
+
+    const lastRoundName = rounds[rounds.length - 1];
+    const lastRoundMatches = bracket[lastRoundName];
+
+    if (!lastRoundMatches || lastRoundMatches.length !== 1) {
+      return null;
+    }
+
+    const finalMatch = lastRoundMatches[0];
+    return finalMatch.winner || null;
+  };
+
+  const fetchChampion = async (tournamentId) => {
+    setLoadingChampion(true);
+    setChampionData(null);
+    try {
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const data = await response.json();
+      if (data?.bracket && Object.keys(data.bracket).length > 0) {
+        const champion = getChampionFromBracket(data.bracket);
+        setChampionData({
+          tournamentName:
+            tournaments.find((t) => t.id === tournamentId)?.name ||
+            "Unknown Tournament",
+          champion: champion,
+          year: tournaments.find((t) => t.id === tournamentId)?.year || "",
+        });
+      } else {
+        setChampionData({
+          tournamentName:
+            tournaments.find((t) => t.id === tournamentId)?.name ||
+            "Unknown Tournament",
+          champion: null,
+          year: tournaments.find((t) => t.id === tournamentId)?.year || "",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setChampionData(null);
+    } finally {
+      setLoadingChampion(false);
+    }
+  };
+
+  const handleViewChampion = (tournamentId) => {
+    setShowChampionModal(true);
+    fetchChampion(tournamentId);
+  };
+
   const resetAll = () => {
     setShowModal(false);
     setIsLoading(false);
@@ -53,7 +120,7 @@ export default function Dashboard() {
       name: "",
       year: "",
       event_time: "",
-      event_date: "", // ✅ Reset event_date
+      event_date: "",
       location: "",
       description: "",
     });
@@ -131,8 +198,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     document.body.style.overflow =
-      showModal || showSchoolModal ? "hidden" : "auto";
-  }, [showModal, showSchoolModal]);
+      showModal || showSchoolModal || showChampionModal || showSchoolForm
+        ? "hidden"
+        : "auto";
+  }, [showModal, showSchoolModal, showChampionModal, showSchoolForm]);
 
   const handleTournamentDataChange = (field, value) => {
     setTournamentData((prev) => ({ ...prev, [field]: value }));
@@ -280,7 +349,7 @@ export default function Dashboard() {
       name: tournamentData.name,
       year: tournamentData.year,
       event_time: tournamentData.event_time,
-      event_date: tournamentData.event_date, // ✅ Include event_date
+      event_date: tournamentData.event_date,
       location: tournamentData.location,
       description: tournamentData.description,
     };
@@ -329,10 +398,8 @@ export default function Dashboard() {
     setShowSchoolModal(true);
   };
 
-  // ✅ Helper function to display date (text as-is, no formatting needed)
   const formatDate = (dateString) => {
     if (!dateString) return null;
-    // Return the date as entered by user (e.g., "20th Jan 2026")
     return dateString;
   };
 
@@ -472,14 +539,12 @@ export default function Dashboard() {
                           <i className="bi bi-clock-fill text-danger me-2"></i>
                           <small>{tournament.event_time}</small>
                         </div>
-                        {/* ✅ Display event_date prominently */}
                         {tournament.event_date && (
                           <div className="d-flex align-items-center mb-2">
                             <i className="bi bi-calendar-event-fill text-danger me-2"></i>
                             <small>{formatDate(tournament.event_date)}</small>
                           </div>
                         )}
-                        {/* ✅ Moved created_at to bottom with smaller text */}
                         <div
                           className="d-flex align-items-center mt-3 pt-2"
                           style={{ borderTop: "1px solid #f0f0f0" }}
@@ -544,18 +609,14 @@ export default function Dashboard() {
                         </button>
 
                         <button
-                          className="btn btn-sm btn-outline-danger flex-grow-1"
+                          className="btn btn-sm btn-outline-success flex-grow-1"
                           style={{
                             borderRadius: "20px",
                           }}
-                          onClick={() =>
-                            router.push(
-                              `/admin/dashboard/tournament/${tournament.id}/leaderboard`
-                            )
-                          }
+                          onClick={() => handleViewChampion(tournament.id)}
                         >
-                          <i className="bi bi-bar-chart-fill me-1"></i>
-                          Leaderboard
+                          <i className="bi bi-trophy-fill me-1"></i>
+                          View Champion
                         </button>
 
                         <button
@@ -567,7 +628,7 @@ export default function Dashboard() {
                             )
                           }
                         >
-                          <i className="bi bi-trophy me-1"></i>
+                          <i className="bi bi-bar-chart-fill me-1"></i>
                           Scoreboard
                         </button>
                       </div>
@@ -643,7 +704,6 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* ✅ Added Event Date input */}
                   <div className="mt-3">
                     <label className="form-label">
                       Event Date<span className="text-danger">*</span>
@@ -821,7 +881,6 @@ export default function Dashboard() {
     }`,
                           confirmButtonText: "OK",
                         }).then(() => {
-                          // ✅ Redirect to the Schools page of this tournament
                           router.push(
                             `/admin/dashboard/tournament/${selectedTournamentId}/schools`
                           );
@@ -1010,6 +1069,79 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* View Champion Modal */}
+      {showChampionModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalPanel}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="fw-bold">Tournament Champion</h5>
+              <button
+                onClick={() => {
+                  setShowChampionModal(false);
+                  setChampionData(null);
+                }}
+                className="btn-close"
+              />
+            </div>
+
+            {loadingChampion ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-danger" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3">Loading champion data...</p>
+              </div>
+            ) : championData ? (
+              <div className="text-center py-4">
+                <div className="mb-4">
+                  <div
+                    className="mx-auto mb-3"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      background: "linear-gradient(to right, #b30000, #660000)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                    }}
+                  >
+                    <i
+                      className="bi bi-trophy-fill"
+                      style={{ fontSize: "2.5rem" }}
+                    ></i>
+                  </div>
+                  <h4 className="fw-bold">{championData.tournamentName}</h4>
+                  <p className="text-muted">Year: {championData.year}</p>
+                </div>
+
+                {championData.champion ? (
+                  <div className="alert alert-success">
+                    <h5 className="mb-0">
+                      <i className="bi bi-award-fill me-2"></i>
+                      Champion:{" "}
+                      <strong>{capitalizeWords(championData.champion)}</strong>
+                    </h5>
+                  </div>
+                ) : (
+                  <div className="alert alert-warning">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    No champion determined yet. Complete the tournament bracket
+                    to determine a winner.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="alert alert-danger">
+                <i className="bi bi-exclamation-circle me-2"></i>
+                Unable to load champion data
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

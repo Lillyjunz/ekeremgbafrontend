@@ -25,14 +25,12 @@ export default function FixturesPage() {
   const [schoolsLoading, setSchoolsLoading] = useState(false);
   const [schoolsError, setSchoolsError] = useState("");
 
-  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
-  const [
-    selectedTournamentForLeaderboard,
-    setSelectedTournamentForLeaderboard,
-  ] = useState(null);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [leaderboardLoading, setLeaderboardLoading] = useState(false);
-  const [leaderboardError, setLeaderboardError] = useState("");
+  const [showChampionModal, setShowChampionModal] = useState(false);
+  const [selectedTournamentForChampion, setSelectedTournamentForChampion] =
+    useState(null);
+  const [championData, setChampionData] = useState(null);
+  const [championLoading, setChampionLoading] = useState(false);
+  const [championError, setChampionError] = useState("");
 
   const [showBracketModal, setShowBracketModal] = useState(false);
 
@@ -46,6 +44,23 @@ export default function FixturesPage() {
   const capitalizeWords = (str) => {
     if (!str) return "";
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const getChampionFromBracket = (bracket) => {
+    if (!bracket) return null;
+
+    const rounds = Object.keys(bracket);
+    if (rounds.length === 0) return null;
+
+    const lastRoundName = rounds[rounds.length - 1];
+    const lastRoundMatches = bracket[lastRoundName];
+
+    if (!lastRoundMatches || lastRoundMatches.length !== 1) {
+      return null;
+    }
+
+    const finalMatch = lastRoundMatches[0];
+    return finalMatch.winner || null;
   };
 
   useEffect(() => {
@@ -132,41 +147,36 @@ export default function FixturesPage() {
     }
   }, []);
 
-  const fetchLeaderboard = useCallback(async (tournamentId) => {
-    setLeaderboardLoading(true);
-    setLeaderboardError("");
+  const fetchChampion = useCallback(async (tournamentId) => {
+    setChampionLoading(true);
+    setChampionError("");
+    setChampionData(null);
 
     try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/leaderboard?tournamentId=${tournamentId}`
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
       );
-
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.message || "Failed to load leaderboard");
 
-      setLeaderboard(data.leaderboard || []);
+      if (data?.bracket && Object.keys(data.bracket).length > 0) {
+        const champion = getChampionFromBracket(data.bracket);
+        setChampionData({
+          champion: champion,
+          hasBracket: true,
+        });
+      } else {
+        setChampionData({
+          champion: null,
+          hasBracket: false,
+        });
+      }
     } catch (err) {
-      console.error("Leaderboard fetch error:", err);
-      setLeaderboardError(err.message);
+      console.error(err);
+      setChampionError("Failed to load champion data");
     } finally {
-      setLeaderboardLoading(false);
+      setChampionLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    if (!showLeaderboardModal || !selectedTournamentForLeaderboard) return;
-
-    const interval = setInterval(() => {
-      fetchLeaderboard(selectedTournamentForLeaderboard.id);
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [
-    showLeaderboardModal,
-    selectedTournamentForLeaderboard,
-    fetchLeaderboard,
-  ]);
 
   const openBracketModal = (t) => {
     setSelectedTournament(t);
@@ -194,17 +204,17 @@ export default function FixturesPage() {
     setSchoolsError("");
   };
 
-  const openLeaderboardModal = (tournament) => {
-    setSelectedTournamentForLeaderboard(tournament);
-    setShowLeaderboardModal(true);
-    fetchLeaderboard(tournament.id);
+  const openChampionModal = (tournament) => {
+    setSelectedTournamentForChampion(tournament);
+    setShowChampionModal(true);
+    fetchChampion(tournament.id);
   };
 
-  const closeLeaderboardModal = () => {
-    setShowLeaderboardModal(false);
-    setSelectedTournamentForLeaderboard(null);
-    setLeaderboard([]);
-    setLeaderboardError("");
+  const closeChampionModal = () => {
+    setShowChampionModal(false);
+    setSelectedTournamentForChampion(null);
+    setChampionData(null);
+    setChampionError("");
   };
 
   const getDropdownText = () => {
@@ -406,12 +416,12 @@ export default function FixturesPage() {
                         </button>
 
                         <button
-                          className="btn btn-sm btn-outline-danger flex-grow-1"
+                          className="btn btn-sm btn-outline-success flex-grow-1"
                           style={{ borderRadius: "20px" }}
-                          onClick={() => openLeaderboardModal(tournament)}
+                          onClick={() => openChampionModal(tournament)}
                         >
-                          <i className="bi bi-bar-chart-fill me-1"></i>
-                          Leaderboard
+                          <i className="bi bi-trophy-fill me-1"></i>
+                          View Champion
                         </button>
                       </div>
                     </div>
@@ -702,95 +712,100 @@ export default function FixturesPage() {
         </div>
       )}
 
-      {/* Leaderboard Modal */}
-      {showLeaderboardModal && (
-        <div className={styles.modalBackdrop} onClick={closeLeaderboardModal}>
+      {/* Champion Modal */}
+      {showChampionModal && (
+        <div className={styles.modalBackdrop} onClick={closeChampionModal}>
           <div
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h5 className="fw-bold mb-0">
-                <i className="bi bi-bar-chart-fill me-2 text-primary"></i>
-                Tournament Leaderboard
+                <i className="bi bi-trophy-fill me-2 text-warning"></i>
+                Tournament Champion
               </h5>
               <button
                 type="button"
                 className="btn-close"
-                onClick={closeLeaderboardModal}
+                onClick={closeChampionModal}
               ></button>
             </div>
 
-            {leaderboardLoading ? (
+            {championLoading ? (
               <div className="text-center py-5">
-                <div className="spinner-border text-primary"></div>
-                <p className="mt-3">Loading leaderboard...</p>
+                <div className="spinner-border text-danger"></div>
+                <p className="mt-3">Loading champion data...</p>
               </div>
-            ) : leaderboardError ? (
-              <div className="alert alert-danger">{leaderboardError}</div>
-            ) : leaderboard.length > 0 ? (
-              <>
-                <div className="table-responsive">
-                  <table className="table table-hover align-middle text-center">
-                    <thead className="table-primary">
-                      <tr>
-                        <th style={{ width: "15%" }}>#</th>
-                        <th>School</th>
-                        <th style={{ width: "30%" }}>Progress</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leaderboard.map((item, index) => (
-                        <tr key={index}>
-                          <td>
-                            <div
-                              className="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold"
-                              style={{
-                                width: "35px",
-                                height: "35px",
-                                background:
-                                  index === 0
-                                    ? "#ffd700"
-                                    : index === 1
-                                    ? "#c0c0c0"
-                                    : index === 2
-                                    ? "#cd7f32"
-                                    : "#e9ecef",
-                                color: index < 3 ? "#000" : "#6c757d",
-                              }}
-                            >
-                              {index + 1}
-                            </div>
-                          </td>
-                          <td className="text-start fw-semibold">
-                            {capitalizeWords(item.school)}
-                          </td>
-                          <td>
-                            <span className="badge bg-primary px-3 py-2">
-                              {item.progress}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            ) : championError ? (
+              <div className="alert alert-danger">{championError}</div>
+            ) : championData ? (
+              <div className="text-center py-4">
+                <div className="mb-4">
+                  <div
+                    className="mx-auto mb-3"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "50%",
+                      background:
+                        "linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "4px solid #f0c000",
+                      boxShadow: "0 8px 16px rgba(255, 215, 0, 0.3)",
+                    }}
+                  >
+                    <i
+                      className="bi bi-trophy-fill"
+                      style={{ fontSize: "3rem", color: "#b8860b" }}
+                    ></i>
+                  </div>
+                  <h4 className="fw-bold">
+                    {capitalizeWords(selectedTournamentForChampion?.name)}
+                  </h4>
+                  <p className="text-muted">
+                    Year: {selectedTournamentForChampion?.year}
+                  </p>
                 </div>
-                <div className="text-center mt-3">
-                  <small className="text-muted">
-                    <i className="bi bi-arrow-clockwise me-1"></i>
-                    Auto-refreshing every 10 seconds
-                  </small>
-                </div>
-              </>
+
+                {championData.champion ? (
+                  <div
+                    className="p-4 rounded-4 shadow"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
+                      border: "3px solid #1e7e34",
+                    }}
+                  >
+                    <div className="mb-3">
+                      <i
+                        className="bi bi-award-fill"
+                        style={{ fontSize: "2.5rem", color: "#fff" }}
+                      ></i>
+                    </div>
+                    <h5 className="text-white fw-bold mb-2">🏆 Champion 🏆</h5>
+                    <h3 className="text-white fw-bold mb-0">
+                      {capitalizeWords(championData.champion)}
+                    </h3>
+                  </div>
+                ) : championData.hasBracket ? (
+                  <div className="alert alert-warning">
+                    <i className="bi bi-hourglass-split me-2"></i>
+                    Tournament is in progress. No champion has been determined
+                    yet.
+                  </div>
+                ) : (
+                  <div className="alert alert-info">
+                    <i className="bi bi-info-circle me-2"></i>
+                    The tournament bracket hasn&apos;t been created yet.
+                  </div>
+                )}
+              </div>
             ) : (
-              <div className="text-center py-5">
-                <i
-                  className="bi bi-trophy text-muted"
-                  style={{ fontSize: "3rem" }}
-                ></i>
-                <p className="text-muted mt-3">
-                  No leaderboard data available yet.
-                </p>
+              <div className="alert alert-danger">
+                <i className="bi bi-exclamation-circle me-2"></i>
+                Unable to load champion data
               </div>
             )}
           </div>

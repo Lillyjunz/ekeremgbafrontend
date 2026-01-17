@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Trophy, Users, Zap } from "lucide-react";
+import { Clock, Trophy, Users, Video, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import Footer from "../Components/footer";
 import Navbar from "../Components/navbar";
@@ -11,6 +11,10 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tournamentInfo, setTournamentInfo] = useState(null);
+
+  // YouTube channel link
+  const YOUTUBE_LIVE_LINK =
+    "https://youtube.com/@ekeremgbaakpauche?si=GExSKHHMZFigE9zr";
 
   // Helper function to capitalize text
   const capitalize = (text) => {
@@ -164,6 +168,10 @@ export default function EventsPage() {
       </>
     );
 
+  const hasLiveMatches = matches.some(
+    (match) => match.isActive && match.winner === null
+  );
+
   return (
     <>
       <Navbar />
@@ -213,6 +221,47 @@ export default function EventsPage() {
               <Zap size={16} className="me-1" />
               {matches.length} {matches.length === 1 ? "Match" : "Matches"} Live
             </div>
+
+            {/* YouTube Live Button */}
+            {hasLiveMatches && (
+              <div className="mt-4">
+                <a
+                  href={YOUTUBE_LIVE_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-lg"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #ff0000 0%, #cc0000 100%)",
+                    color: "white",
+                    border: "none",
+                    padding: "0.75rem 2rem",
+                    borderRadius: "50px",
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    boxShadow: "0 4px 15px rgba(255, 0, 0, 0.3)",
+                    transition: "all 0.3s ease",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 20px rgba(255, 0, 0, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 15px rgba(255, 0, 0, 0.3)";
+                  }}
+                >
+                  <Video size={20} />
+                  Watch Live on YouTube
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="row g-4 justify-content-center">

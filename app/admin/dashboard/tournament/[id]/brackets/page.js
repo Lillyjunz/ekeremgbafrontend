@@ -22,7 +22,7 @@ export default function TournamentBracketPage() {
   const [champion, setChampion] = useState(null);
   const [recordingChampion, setRecordingChampion] = useState(false);
   const [settingActive, setSettingActive] = useState(null);
-  const [activeMatchIds, setActiveMatchIds] = useState([]); // Changed to array
+  const [activeMatchIds, setActiveMatchIds] = useState([]);
   const [selectedNextRound, setSelectedNextRound] = useState("Second Round");
 
   // Add Schools Modal States
@@ -44,19 +44,58 @@ export default function TournamentBracketPage() {
     }
   }, []);
 
-  const roundOptions = [
-    "First Round",
-    "Second Round",
-    "Third Round",
-    "Fourth Round",
-    "Fifth Round",
-    "Sixth Round",
-    "Final",
-  ];
+  // Generate round options dynamically based on current bracket
+
+  const generateRoundOptions = () => {
+    if (!bracketData) return [];
+
+    const rounds = Object.keys(bracketData); // e.g., ["First Round", "Second Round"]
+    const lastRound = rounds[rounds.length - 1];
+    const lastRoundMatches = bracketData[lastRound];
+
+    // If only one match remains → tournament finished
+    if (lastRoundMatches?.length === 1) return ["Final"];
+
+    // Otherwise, generate the next round name
+    const nextRoundNumber = rounds.length + 1; // e.g., 2 → Second Round, 3 → Third Round
+    const nextRoundName = `${ordinal(nextRoundNumber)} Round`;
+
+    return [nextRoundName];
+  };
+
+  // Helper to convert number to ordinal string
+  const ordinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  // Helper function to extract champion from bracket data
+
+  const getChampionFromBracket = (bracket) => {
+    if (!bracket) return null;
+
+    const rounds = Object.keys(bracket);
+    if (rounds.length === 0) return null;
+
+    const lastRoundName = rounds[rounds.length - 1];
+    const lastRoundMatches = bracket[lastRoundName];
+
+    // ✅ IMPORTANT: must be ONLY ONE match left
+    if (!lastRoundMatches || lastRoundMatches.length !== 1) {
+      return null;
+    }
+
+    const finalMatch = lastRoundMatches[0];
+
+    // Only return champion if a winner exists
+    return finalMatch.winner || null;
+  };
 
   const fetchBracket = useCallback(async () => {
     setLoading(true);
     setError("");
+    setChampion(null);
     try {
       const token = localStorage.getItem("ekereAuthToken");
       const response = await fetch(
@@ -67,6 +106,10 @@ export default function TournamentBracketPage() {
       const data = await response.json();
       if (data?.bracket && Object.keys(data.bracket).length > 0) {
         setBracketData(data.bracket);
+
+        // Extract champion from bracket data
+        const championName = getChampionFromBracket(data.bracket);
+        setChampion(championName);
 
         const initialInputs = {};
         Object.values(data.bracket)
@@ -81,22 +124,6 @@ export default function TournamentBracketPage() {
         setMatchInputs(initialInputs);
       } else {
         setBracketData(null);
-      }
-
-      const champResponse = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const champData = await champResponse.json();
-      if (champData?.champion) {
-        setChampion(champData.champion);
-      } else if (champData?.message?.includes("Final match not found")) {
         setChampion(null);
       }
 
@@ -107,7 +134,6 @@ export default function TournamentBracketPage() {
         );
         if (activeResponse.ok) {
           const activeData = await activeResponse.json();
-          // Extract match_id from all active matches in the response
           if (activeData?.data && Array.isArray(activeData.data)) {
             const activeIds = activeData.data
               .map((item) => item.match?.match_id)
@@ -308,6 +334,12 @@ export default function TournamentBracketPage() {
         throw new Error(data.message || "Failed to record winner");
 
       setSuccessMsg(data.message);
+
+      // Automatically remove from active matches when winner is recorded
+      if (activeMatchIds.includes(matchId)) {
+        await handleToggleActiveMatch(matchId, true);
+      }
+
       fetchBracket();
     } catch (err) {
       setError(err.message);
@@ -324,7 +356,7 @@ export default function TournamentBracketPage() {
     try {
       const token = localStorage.getItem("ekereAuthToken");
 
-      // 1️⃣ Find the last round
+      // Find the last round
       const rounds = bracketData ? Object.keys(bracketData) : [];
       if (!rounds.length) throw new Error("No rounds available");
 
@@ -334,14 +366,14 @@ export default function TournamentBracketPage() {
       if (!lastRoundMatches || lastRoundMatches.length === 0)
         throw new Error("No matches found in the last round");
 
-      // 2️⃣ Check winner exists
+      // Check winner exists
       const finalMatch = lastRoundMatches[0];
       if (!finalMatch.winner)
         throw new Error(
           "Cannot record champion. Please record the winner of the last match first."
         );
 
-      // 3️⃣ Call GET endpoint (backend should automatically find winner in last match)
+      // Call GET endpoint
       const response = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${id}`,
         {
@@ -357,13 +389,9 @@ export default function TournamentBracketPage() {
       if (!response.ok)
         throw new Error(data.message || "Failed to record champion");
 
-      // 4️⃣ Set champion in state
-      if (data?.champion) {
-        setChampion(data.champion);
-        setSuccessMsg("Champion recorded successfully!");
-      } else {
-        throw new Error(data.message || "Final match not found");
-      }
+      // Refresh bracket to get updated champion
+      fetchBracket();
+      setSuccessMsg("Champion recorded successfully!");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -371,13 +399,18 @@ export default function TournamentBracketPage() {
     }
   };
 
-  const handleToggleActiveMatch = async (matchId) => {
+  const handleToggleActiveMatch = async (
+    matchId,
+    skipSuccessMessage = false
+  ) => {
     const isCurrentlyActive = activeMatchIds.includes(matchId);
-    const newStatus = isCurrentlyActive ? 0 : 1; // Toggle: 1 = active, 0 = inactive
+    const newStatus = isCurrentlyActive ? 0 : 1;
 
     setSettingActive(matchId);
     setError("");
-    setSuccessMsg("");
+    if (!skipSuccessMessage) {
+      setSuccessMsg("");
+    }
 
     try {
       const token = localStorage.getItem("ekereAuthToken");
@@ -403,22 +436,20 @@ export default function TournamentBracketPage() {
             `Failed to ${isCurrentlyActive ? "remove" : "set"} active match`
         );
 
-      // Update local state: add or remove from array
       setActiveMatchIds((prev) => {
         if (newStatus === 1) {
-          // Add to active matches if not already there
           return prev.includes(matchId) ? prev : [...prev, matchId];
         } else {
-          // Remove from active matches
           return prev.filter((id) => id !== matchId);
         }
       });
 
-      // Use custom message based on action
-      if (newStatus === 1) {
-        setSuccessMsg("Active match added successfully!");
-      } else {
-        setSuccessMsg("Active match removed successfully!");
+      if (!skipSuccessMessage) {
+        if (newStatus === 1) {
+          setSuccessMsg("Active match added successfully!");
+        } else {
+          setSuccessMsg("Active match removed successfully!");
+        }
       }
     } catch (err) {
       setError(err.message);
@@ -482,6 +513,7 @@ export default function TournamentBracketPage() {
   const lastRoundMatches =
     rounds.length > 0 ? bracketData[rounds[rounds.length - 1]] : [];
   const isLastRound = lastRoundMatches?.length <= 1;
+  const roundOptions = generateRoundOptions();
 
   return (
     <div className="min-vh-100 bg-light py-4">
@@ -492,7 +524,6 @@ export default function TournamentBracketPage() {
             <h1 className="fw-bold text-dark mb-0">Tournament Groups</h1>
           </div>
 
-          {/* Show active matches count */}
           {activeMatchIds.length > 0 && (
             <div className="mt-2">
               <span className="badge bg-success px-3 py-2">
@@ -502,9 +533,7 @@ export default function TournamentBracketPage() {
             </div>
           )}
 
-          {/* Action Buttons Row */}
           <div className="mt-3 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
-            {/* Add Schools Button */}
             <button
               onClick={handleOpenAddSchoolsModal}
               className="btn btn-success px-4 py-2 fw-semibold rounded-pill"
@@ -513,7 +542,6 @@ export default function TournamentBracketPage() {
               Add Schools to Next Round
             </button>
 
-            {/* Round Selection and Generate Button */}
             {!isLastRound && (
               <>
                 <select
@@ -709,11 +737,28 @@ export default function TournamentBracketPage() {
 
                           {match.winner && (
                             <div
-                              className="alert alert-success mb-0 py-2"
+                              className="alert alert-success mb-3 py-2"
                               role="alert"
                             >
                               <strong>Winner:</strong>{" "}
                               {capitalizeWords(match.winner)}
+                            </div>
+                          )}
+
+                          {/* Show active match toggle for completed matches */}
+                          {match.winner && isActiveMatch && (
+                            <div className="mt-2">
+                              <button
+                                className="btn btn-warning btn-sm w-100"
+                                disabled={settingActive === match.match_id}
+                                onClick={() =>
+                                  handleToggleActiveMatch(match.match_id)
+                                }
+                              >
+                                {settingActive === match.match_id
+                                  ? "Removing..."
+                                  : "Remove Active Status"}
+                              </button>
                             </div>
                           )}
 
@@ -820,7 +865,6 @@ export default function TournamentBracketPage() {
         </div>
       </div>
 
-      {/* Add Schools Modal */}
       {showAddSchoolsModal && (
         <div
           className="modal show d-block"
