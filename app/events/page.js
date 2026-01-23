@@ -31,19 +31,30 @@ export default function EventsPage() {
         setLoading(true);
 
         const response = await fetch(
-          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match"
+          "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
         );
         const data = await response.json();
 
         if (!response.ok) {
+          if (data.message === "No active match/game") {
+            setMatches([]);
+            setTournamentInfo(null);
+            setError("");
+            setLoading(false);
+            return;
+          }
+
+          // Real error
           throw new Error(data.message || "Failed to fetch active matches");
         }
 
         const matchesData = data.data;
 
+        // This is NOT an error - just no active matches
         if (!matchesData || matchesData.length === 0) {
           setMatches([]);
           setTournamentInfo(null);
+          setError(""); // Clear any previous errors
           setLoading(false);
           return;
         }
@@ -94,10 +105,12 @@ export default function EventsPage() {
         });
 
         setMatches(processedMatches);
-        setError("");
+        setError(""); // Clear any previous errors
       } catch (err) {
         console.error(err);
         setError(err.message || "Failed to load match data");
+        setMatches([]); // Clear matches on error
+        setTournamentInfo(null); // Clear tournament info on error
       } finally {
         setLoading(false);
       }
@@ -169,7 +182,7 @@ export default function EventsPage() {
     );
 
   const hasLiveMatches = matches.some(
-    (match) => match.isActive && match.winner === null
+    (match) => match.isActive && match.winner === null,
   );
 
   return (
