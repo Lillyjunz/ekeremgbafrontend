@@ -44,7 +44,7 @@ const SchoolLegacyStats = () => {
 
         const [studentsRes, schoolsRes, tournamentsRes] = await Promise.all([
           fetch(
-            "https://api.ekeremgbaakpauche.com/api/school/get-all-students"
+            "https://api.ekeremgbaakpauche.com/api/school/get-all-students",
           ),
           fetch("https://api.ekeremgbaakpauche.com/api/school/get-schools"),
           fetch("https://api.ekeremgbaakpauche.com/api/admin/tournaments"),
@@ -64,7 +64,7 @@ const SchoolLegacyStats = () => {
             : 0;
 
         targetValues.current.schools = Array.isArray(
-          schoolsData?.schools?.allSchools
+          schoolsData?.schools?.allSchools,
         )
           ? schoolsData.schools.allSchools.length
           : 0;
@@ -89,7 +89,7 @@ const SchoolLegacyStats = () => {
       (entries) => {
         if (entries[0].isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (sectionRef.current) observer.observe(sectionRef.current);
@@ -204,10 +204,10 @@ const SchoolLegacyStats = () => {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (p) => p.trim() !== ""
+        (p) => p.trim() !== "",
       );
       const filteredSchoolReps = formData.schoolReps.filter(
-        (rep) => rep.trim() !== ""
+        (rep) => rep.trim() !== "",
       );
 
       const requestBody = {
@@ -228,7 +228,7 @@ const SchoolLegacyStats = () => {
             Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const responseData = await response.json();
@@ -249,7 +249,7 @@ const SchoolLegacyStats = () => {
 
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         setModalError(
-          "Network error. Please check your internet connection and try again."
+          "Network error. Please check your internet connection and try again.",
         );
       } else {
         setModalError("Registration failed. Please try again later.");
@@ -301,6 +301,7 @@ const SchoolLegacyStats = () => {
                   className="register-btn"
                   data-aos="fade-up"
                   data-aos-delay="300"
+                  disabled
                 >
                   Register School (2026)
                 </button>

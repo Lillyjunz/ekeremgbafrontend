@@ -53,7 +53,7 @@ const About = () => {
 
         const [studentsRes, schoolsRes, tournamentsRes] = await Promise.all([
           fetch(
-            "https://api.ekeremgbaakpauche.com/api/school/get-all-students"
+            "https://api.ekeremgbaakpauche.com/api/school/get-all-students",
           ),
           fetch("https://api.ekeremgbaakpauche.com/api/school/get-schools"),
           fetch("https://api.ekeremgbaakpauche.com/api/admin/tournaments"),
@@ -73,7 +73,7 @@ const About = () => {
             : 0;
 
         targetValues.current.schools = Array.isArray(
-          schoolsData?.schools?.allSchools
+          schoolsData?.schools?.allSchools,
         )
           ? schoolsData.schools.allSchools.length
           : 0;
@@ -100,7 +100,7 @@ const About = () => {
       (entries) => {
         if (entries[0].isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (sectionRef.current) observer.observe(sectionRef.current);
@@ -243,10 +243,10 @@ const About = () => {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (p) => p.trim() !== ""
+        (p) => p.trim() !== "",
       );
       const filteredSchoolReps = formData.schoolReps.filter(
-        (rep) => rep.trim() !== ""
+        (rep) => rep.trim() !== "",
       );
 
       const requestBody = {
@@ -267,7 +267,7 @@ const About = () => {
             Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const data = await response.json();
@@ -469,7 +469,7 @@ const About = () => {
           <h2 className="fw-bold mb-3 text-light">
             Want to join the next edition?
           </h2>
-          <button onClick={openModal} className="btn registerBtn">
+          <button disabled onClick={openModal} className="btn registerBtn">
             Register School (2026)
           </button>
         </div>

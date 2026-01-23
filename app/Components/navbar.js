@@ -64,7 +64,7 @@ export default function Navbar() {
     setFormData((prev) => ({
       ...prev,
       participants: prev.participants.map((p, i) =>
-        i === index ? capitalizeWords(value) : p
+        i === index ? capitalizeWords(value) : p,
       ),
     }));
   };
@@ -74,7 +74,7 @@ export default function Navbar() {
     setFormData((prev) => ({
       ...prev,
       schoolReps: prev.schoolReps.map((rep, i) =>
-        i === index ? capitalizeWords(value) : rep
+        i === index ? capitalizeWords(value) : rep,
       ),
     }));
   };
@@ -127,10 +127,10 @@ export default function Navbar() {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (p) => p.trim() !== ""
+        (p) => p.trim() !== "",
       );
       const filteredSchoolReps = formData.schoolReps.filter(
-        (rep) => rep.trim() !== ""
+        (rep) => rep.trim() !== "",
       );
 
       const requestBody = {
@@ -153,7 +153,7 @@ export default function Navbar() {
             Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const responseData = await response.json();
@@ -167,7 +167,7 @@ export default function Navbar() {
         setError(
           responseData.message ||
             responseData.error ||
-            `Registration failed with status ${response.status}`
+            `Registration failed with status ${response.status}`,
         );
       }
     } catch (error) {
@@ -175,7 +175,7 @@ export default function Navbar() {
       setError(
         error.name === "TypeError" && error.message.includes("fetch")
           ? "Network error. Please check your internet connection and try again."
-          : "Registration failed. Please try again later."
+          : "Registration failed. Please try again later.",
       );
     } finally {
       setIsLoading(false);
@@ -310,6 +310,7 @@ export default function Navbar() {
               onClick={openModal}
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
+              disabled
             >
               Register School (2026)
             </button>

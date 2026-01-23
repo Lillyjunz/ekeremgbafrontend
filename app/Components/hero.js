@@ -24,7 +24,7 @@ const HeroSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
+        prevIndex === images.length - 1 ? 0 : prevIndex + 1,
       );
     }, 4000);
     return () => clearInterval(interval);
@@ -143,7 +143,7 @@ const HeroSection = () => {
             Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const responseData = await response.json();
@@ -164,7 +164,7 @@ const HeroSection = () => {
       console.error("Registration error:", error);
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         setError(
-          "Network error. Please check your internet connection and try again."
+          "Network error. Please check your internet connection and try again.",
         );
       } else {
         setError("Registration failed. Please try again later.");
@@ -201,7 +201,7 @@ const HeroSection = () => {
             data-aos="fade-down"
             data-aos-duration="1000"
           >
-            Ekeremgba 2.0 is coming soon...
+            Ekeremgba 2.0 is Ongoing now...
           </div>
 
           <h1
@@ -236,7 +236,11 @@ const HeroSection = () => {
             data-aos-duration="1000"
             data-aos-delay="800"
           >
-            <button onClick={openModal} className="btn btn-primary-custom">
+            <button
+              disabled
+              onClick={openModal}
+              className="btn btn-primary-custom"
+            >
               Register School (2026)
             </button>
             <Link href="/fixtures" className="btn btn-secondary-custom">

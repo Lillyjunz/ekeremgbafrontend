@@ -97,10 +97,10 @@ export default function CallToAction() {
 
     try {
       const filteredParticipants = formData.participants.filter(
-        (p) => p.trim() !== ""
+        (p) => p.trim() !== "",
       );
       const filteredSchoolReps = formData.schoolReps.filter(
-        (rep) => rep.trim() !== ""
+        (rep) => rep.trim() !== "",
       );
 
       const requestBody = {
@@ -123,7 +123,7 @@ export default function CallToAction() {
             Accept: "application/json",
           },
           body: JSON.stringify(requestBody),
-        }
+        },
       );
 
       const responseData = await response.json();
@@ -144,7 +144,7 @@ export default function CallToAction() {
       console.error("Registration error:", err);
       if (err.name === "TypeError" && err.message.includes("fetch")) {
         setError(
-          "Network error. Please check your internet connection and try again."
+          "Network error. Please check your internet connection and try again.",
         );
       } else {
         setError("Registration failed. Please try again later.");
@@ -161,7 +161,7 @@ export default function CallToAction() {
       <div className="py-5" style={{ backgroundColor: "#fafafa" }}>
         <div className="bannerContainer d-flex flex-column justify-content-center align-items-center text-white text-center">
           <h2 className="fw-bold mb-3">Ready to Join the Game?</h2>
-          <button onClick={openModal} className="btn registerBtn">
+          <button disabled onClick={openModal} className="btn registerBtn">
             Register School (2026)
           </button>
         </div>
