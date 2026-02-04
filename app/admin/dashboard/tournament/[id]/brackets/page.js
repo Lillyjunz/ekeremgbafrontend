@@ -36,7 +36,7 @@ export default function TournamentBracketPage() {
   useEffect(() => {
     if (typeof window !== "undefined" && window.bootstrap) {
       const tooltipTriggerList = document.querySelectorAll(
-        '[data-bs-toggle="tooltip"]'
+        '[data-bs-toggle="tooltip"]',
       );
       [...tooltipTriggerList].forEach((tooltipTriggerEl) => {
         new window.bootstrap.Tooltip(tooltipTriggerEl);
@@ -81,15 +81,22 @@ export default function TournamentBracketPage() {
     const lastRoundName = rounds[rounds.length - 1];
     const lastRoundMatches = bracket[lastRoundName];
 
-    // ✅ IMPORTANT: must be ONLY ONE match left
     if (!lastRoundMatches || lastRoundMatches.length !== 1) {
       return null;
     }
 
     const finalMatch = lastRoundMatches[0];
 
-    // Only return champion if a winner exists
-    return finalMatch.winner || null;
+    // ✅ Only return champion if winner exists AND scores are recorded
+    if (
+      finalMatch.winner &&
+      finalMatch.school1_score !== null &&
+      finalMatch.school2_score !== null
+    ) {
+      return finalMatch.winner;
+    }
+
+    return null;
   };
 
   const fetchBracket = useCallback(async () => {
@@ -100,7 +107,7 @@ export default function TournamentBracketPage() {
       const token = localStorage.getItem("ekereAuthToken");
       const response = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/bracket/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       const data = await response.json();
@@ -130,7 +137,7 @@ export default function TournamentBracketPage() {
       try {
         const activeResponse = await fetch(
           `https://api.ekeremgbaakpauche.com/api/admin/get-active-match`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (activeResponse.ok) {
           const activeData = await activeResponse.json();
@@ -169,7 +176,7 @@ export default function TournamentBracketPage() {
         "https://api.ekeremgbaakpauche.com/api/school/get-schools",
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       const data = await response.json();
 
@@ -230,7 +237,7 @@ export default function TournamentBracketPage() {
             school1_id: Number(selectedSchool1),
             school2_id: Number(selectedSchool2),
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -271,7 +278,7 @@ export default function TournamentBracketPage() {
           body: JSON.stringify({
             nextRound: selectedNextRound,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -326,7 +333,7 @@ export default function TournamentBracketPage() {
             school1_score: s1,
             school2_score: s2,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -370,7 +377,7 @@ export default function TournamentBracketPage() {
       const finalMatch = lastRoundMatches[0];
       if (!finalMatch.winner)
         throw new Error(
-          "Cannot record champion. Please record the winner of the last match first."
+          "Cannot record champion. Please record the winner of the last match first.",
         );
 
       // Call GET endpoint
@@ -381,7 +388,7 @@ export default function TournamentBracketPage() {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       const data = await response.json();
@@ -401,7 +408,7 @@ export default function TournamentBracketPage() {
 
   const handleToggleActiveMatch = async (
     matchId,
-    skipSuccessMessage = false
+    skipSuccessMessage = false,
   ) => {
     const isCurrentlyActive = activeMatchIds.includes(matchId);
     const newStatus = isCurrentlyActive ? 0 : 1;
@@ -426,14 +433,14 @@ export default function TournamentBracketPage() {
           body: JSON.stringify({
             status: newStatus,
           }),
-        }
+        },
       );
 
       const data = await response.json();
       if (!response.ok)
         throw new Error(
           data.message ||
-            `Failed to ${isCurrentlyActive ? "remove" : "set"} active match`
+            `Failed to ${isCurrentlyActive ? "remove" : "set"} active match`,
         );
 
       setActiveMatchIds((prev) => {
@@ -636,7 +643,11 @@ export default function TournamentBracketPage() {
 
               <div className="row g-3">
                 {bracketData[round].map((match, matchIndex) => {
-                  const isUpcoming = !match.winner;
+                  // const isUpcoming = !match.winner;
+                  const isUpcoming =
+                    !match.winner ||
+                    match.school1_score === null ||
+                    match.school2_score === null;
                   const matchInput = matchInputs[match.match_id] || {};
                   const isActiveMatch = activeMatchIds.includes(match.match_id);
 
@@ -651,8 +662,8 @@ export default function TournamentBracketPage() {
                           borderLeft: isActiveMatch
                             ? "4px solid #00ff00"
                             : isUpcoming
-                            ? "4px solid #ffc107"
-                            : "4px solid #6c757d",
+                              ? "4px solid #ffc107"
+                              : "4px solid #6c757d",
                           background: isActiveMatch
                             ? "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)"
                             : "white",
@@ -735,7 +746,7 @@ export default function TournamentBracketPage() {
                             </span>
                           </div>
 
-                          {match.winner && (
+                          {/* {match.winner && (
                             <div
                               className="alert alert-success mb-3 py-2"
                               role="alert"
@@ -743,7 +754,18 @@ export default function TournamentBracketPage() {
                               <strong>Winner:</strong>{" "}
                               {capitalizeWords(match.winner)}
                             </div>
-                          )}
+                          )} */}
+                          {match.winner &&
+                            match.school1_score !== null &&
+                            match.school2_score !== null && (
+                              <div
+                                className="alert alert-success mb-3 py-2"
+                                role="alert"
+                              >
+                                <strong>Winner:</strong>{" "}
+                                {capitalizeWords(match.winner)}
+                              </div>
+                            )}
 
                           {/* Show active match toggle for completed matches */}
                           {match.winner && isActiveMatch && (
@@ -771,7 +793,7 @@ export default function TournamentBracketPage() {
                                   handleInputChange(
                                     match.match_id,
                                     "selectedWinner",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                               >
@@ -795,7 +817,7 @@ export default function TournamentBracketPage() {
                                       handleInputChange(
                                         match.match_id,
                                         "school1Score",
-                                        e.target.value
+                                        e.target.value,
                                       )
                                     }
                                   />
@@ -810,7 +832,7 @@ export default function TournamentBracketPage() {
                                       handleInputChange(
                                         match.match_id,
                                         "school2Score",
-                                        e.target.value
+                                        e.target.value,
                                       )
                                     }
                                   />
@@ -848,8 +870,8 @@ export default function TournamentBracketPage() {
                                   {settingActive === match.match_id
                                     ? "Setting..."
                                     : isActiveMatch
-                                    ? "Remove"
-                                    : "Set Active"}
+                                      ? "Remove"
+                                      : "Set Active"}
                                 </button>
                               </div>
                             </div>
