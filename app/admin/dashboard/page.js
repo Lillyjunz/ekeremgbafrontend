@@ -21,6 +21,11 @@ export default function Dashboard() {
   const [availableSchools, setAvailableSchools] = useState([]);
   const [selectedYear, setSelectedYear] = useState("2026");
 
+  // Tracks whether the Create/Edit modal is currently editing an existing
+  // tournament (vs. creating a brand new one), and which tournament it is.
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingTournamentId, setEditingTournamentId] = useState(null);
+
   const [tournamentData, setTournamentData] = useState({
     name: "",
     year: "",
@@ -76,7 +81,7 @@ export default function Dashboard() {
       const token = getAuthToken();
       const response = await fetch(
         `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       const data = await response.json();
@@ -116,6 +121,8 @@ export default function Dashboard() {
     setIsLoading(false);
     setError("");
     setSuccess("");
+    setIsEditMode(false);
+    setEditingTournamentId(null);
     setTournamentData({
       name: "",
       year: "",
@@ -169,7 +176,7 @@ export default function Dashboard() {
   const fetchSchools = async () => {
     try {
       const res = await fetch(
-        "https://api.ekeremgbaakpauche.com/api/school/get-schools"
+        "https://api.ekeremgbaakpauche.com/api/school/get-schools",
       );
       const data = await res.json();
 
@@ -212,7 +219,7 @@ export default function Dashboard() {
     setSelectedSchools((prev) =>
       prev.includes(schoolId)
         ? prev.filter((id) => id !== schoolId)
-        : [...prev, schoolId]
+        : [...prev, schoolId],
     );
   };
 
@@ -256,7 +263,7 @@ export default function Dashboard() {
     }
 
     const validParticipants = schoolFormData.participants.filter(
-      (p) => p.trim() !== ""
+      (p) => p.trim() !== "",
     );
     if (validParticipants.length < 3) {
       setError("Please fill in at least 3 participant names");
@@ -264,7 +271,7 @@ export default function Dashboard() {
     }
 
     const uniqueNames = new Set(
-      validParticipants.map((p) => p.trim().toLowerCase())
+      validParticipants.map((p) => p.trim().toLowerCase()),
     );
     if (uniqueNames.size < validParticipants.length) {
       setError("Participant names must be unique");
@@ -291,7 +298,7 @@ export default function Dashboard() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const data = await res.json();
@@ -364,7 +371,7 @@ export default function Dashboard() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const data = await res.json();
@@ -386,16 +393,105 @@ export default function Dashboard() {
     }
   };
 
+  // update tournament
+  const updateTournament = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setError("Missing auth token, please log in again.");
+      router.push("/login");
+      return;
+    }
+
+    if (!editingTournamentId) {
+      setError("Missing tournament id, please try again.");
+      return;
+    }
+
+    const payload = {
+      id: editingTournamentId,
+      name: tournamentData.name,
+      year: tournamentData.year,
+      event_time: tournamentData.event_time,
+      event_date: tournamentData.event_date,
+      location: tournamentData.location,
+      description: tournamentData.description,
+    };
+
+    try {
+      const res = await fetch(
+        "https://api.ekeremgbaakpauche.com/api/admin/tournament/edit",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const responseText = await res.text();
+
+      let data = {};
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = { message: responseText };
+      }
+
+      if (res.ok) {
+        setSuccess(data.result?.message);
+
+        setTournaments((prev) =>
+          prev.map((t) =>
+            t.id === editingTournamentId ? { ...t, ...payload } : t,
+          ),
+        );
+
+        setTimeout(() => {
+          resetAll();
+        }, 1200);
+      } else {
+        throw new Error(data.result?.message || "Failed");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Error updating tournament");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    await createTournament();
+    if (isEditMode) {
+      await updateTournament();
+    } else {
+      await createTournament();
+    }
     setIsLoading(false);
   };
 
   const handleAddSchools = (tournamentId) => {
     setSelectedTournamentId(tournamentId);
     setShowSchoolModal(true);
+  };
+
+  const handleEditClick = (tournament) => {
+    setTournamentData({
+      name: tournament.name || "",
+      year: tournament.year ? tournament.year.toString() : "",
+      event_time: tournament.event_time || "",
+      event_date: tournament.event_date || "",
+      location: tournament.location || "",
+      description: tournament.description || "",
+    });
+    setEditingTournamentId(tournament.id);
+    setIsEditMode(true);
+    setError("");
+    setSuccess("");
+    setShowModal(true);
   };
 
   const formatDate = (dateString) => {
@@ -559,13 +655,22 @@ export default function Dashboard() {
                           >
                             Created:{" "}
                             {new Date(
-                              tournament.created_at
+                              tournament.created_at,
                             ).toLocaleDateString()}
                           </small>
                         </div>
                       </div>
 
                       <div className="mt-3 d-flex flex-wrap gap-2">
+                        <button
+                          className="btn btn-sm btn-outline-secondary flex-grow-1"
+                          style={{ borderRadius: "20px" }}
+                          onClick={() => handleEditClick(tournament)}
+                        >
+                          <i className="bi bi-pencil-square me-1"></i>
+                          Edit
+                        </button>
+
                         <button
                           className="btn btn-sm flex-grow-1"
                           style={{
@@ -585,7 +690,7 @@ export default function Dashboard() {
                           style={{ borderRadius: "20px" }}
                           onClick={() =>
                             router.push(
-                              `/admin/dashboard/tournament/${tournament.id}/schools`
+                              `/admin/dashboard/tournament/${tournament.id}/schools`,
                             )
                           }
                         >
@@ -600,7 +705,7 @@ export default function Dashboard() {
                           }}
                           onClick={() =>
                             router.push(
-                              `/admin/dashboard/tournament/${tournament.id}/brackets`
+                              `/admin/dashboard/tournament/${tournament.id}/brackets`,
                             )
                           }
                         >
@@ -624,7 +729,7 @@ export default function Dashboard() {
                           style={{ borderRadius: "20px" }}
                           onClick={() =>
                             router.push(
-                              `/admin/dashboard/tournament/${tournament.id}/scoreboard`
+                              `/admin/dashboard/tournament/${tournament.id}/scoreboard`,
                             )
                           }
                         >
@@ -640,12 +745,14 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Create Tournament Modal */}
+        {/* Create / Edit Tournament Modal */}
         {showModal && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalPanel}>
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="fw-bold">Create Tournament</h5>
+                <h5 className="fw-bold">
+                  {isEditMode ? "Edit Tournament" : "Create Tournament"}
+                </h5>
                 <button onClick={resetAll} className="btn-close" />
               </div>
               {error && <div className="alert alert-danger">{error}</div>}
@@ -696,7 +803,7 @@ export default function Dashboard() {
                         onChange={(e) =>
                           handleTournamentDataChange(
                             "event_time",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         required
@@ -742,7 +849,7 @@ export default function Dashboard() {
                       onChange={(e) =>
                         handleTournamentDataChange(
                           "description",
-                          e.target.value
+                          e.target.value,
                         )
                       }
                     ></textarea>
@@ -758,7 +865,7 @@ export default function Dashboard() {
                         borderRadius: "30px",
                       }}
                     >
-                      Create Tournament
+                      {isEditMode ? "Update Tournament" : "Create Tournament"}
                     </button>
                   </div>
                 </form>
@@ -768,7 +875,11 @@ export default function Dashboard() {
                     className="spinner-border text-danger"
                     style={{ width: "3rem", height: "3rem" }}
                   />
-                  <p className="mt-3">Creating your tournament...</p>
+                  <p className="mt-3">
+                    {isEditMode
+                      ? "Updating your tournament..."
+                      : "Creating your tournament..."}
+                  </p>
                 </div>
               )}
             </div>
@@ -853,7 +964,7 @@ export default function Dashboard() {
                                   Authorization: `Bearer ${token}`,
                                 },
                                 body: JSON.stringify({ schoolId: id }),
-                              }
+                              },
                             );
 
                             const data = await res.json();
@@ -864,7 +975,7 @@ export default function Dashboard() {
                             failedSchools.push(id);
                             console.error(
                               `Failed to add school ${id}:`,
-                              err.message
+                              err.message,
                             );
                           }
                         }
@@ -882,7 +993,7 @@ export default function Dashboard() {
                           confirmButtonText: "OK",
                         }).then(() => {
                           router.push(
-                            `/admin/dashboard/tournament/${selectedTournamentId}/schools`
+                            `/admin/dashboard/tournament/${selectedTournamentId}/schools`,
                           );
                         });
 

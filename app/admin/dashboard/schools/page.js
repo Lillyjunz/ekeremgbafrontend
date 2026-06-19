@@ -1,6 +1,9 @@
 "use client";
 
 import AddSchoolModal from "@/app/Components/addschool";
+import EditCoordinatorModal from "@/app/Components/editcoordinators";
+import EditSchoolModal from "@/app/Components/editschool";
+import EditStudentModal from "@/app/Components/editstudents";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./schools.module.css";
 
@@ -10,6 +13,12 @@ export default function Schools() {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Selected school + which edit modal is open
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [editSchoolModal, setEditSchoolModal] = useState(false);
+  const [editStudentModal, setEditStudentModal] = useState(false);
+  const [editCoordinatorModal, setEditCoordinatorModal] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,7 +72,7 @@ export default function Schools() {
           totalPages - 3,
           totalPages - 2,
           totalPages - 1,
-          totalPages
+          totalPages,
         );
       } else {
         pages.push(
@@ -73,7 +82,7 @@ export default function Schools() {
           currentPage,
           currentPage + 1,
           "...",
-          totalPages
+          totalPages,
         );
       }
     }
@@ -99,7 +108,7 @@ export default function Schools() {
       setError(null);
 
       const response = await fetch(
-        "https://api.ekeremgbaakpauche.com/api/school/get-schools"
+        "https://api.ekeremgbaakpauche.com/api/school/get-schools",
       );
 
       if (!response.ok) {
@@ -125,6 +134,30 @@ export default function Schools() {
     if (shouldRefresh) {
       fetchSchools();
     }
+  };
+
+  // Open the relevant edit modal for a given school row
+
+  const openEditSchool = (school) => {
+    setSelectedSchool({
+      ...school,
+      school_id: school.school_id || school.id,
+    });
+
+    setEditSchoolModal(true);
+    setDropdownIndex(null);
+  };
+
+  const openEditStudent = (school) => {
+    setSelectedSchool(school);
+    setEditStudentModal(true);
+    setDropdownIndex(null);
+  };
+
+  const openEditCoordinator = (school) => {
+    setSelectedSchool(school);
+    setEditCoordinatorModal(true);
+    setDropdownIndex(null);
   };
 
   if (loading) {
@@ -233,7 +266,7 @@ export default function Schools() {
                 <tbody>
                   {paginationData.currentItems.map((school, index) => (
                     <tr key={`school-${school.school_id}-${index}`}>
-                      <td>{school.id || "N/A"}</td>
+                      <td>{school.school_id || school.id || "N/A"}</td>
                       <td>{capitalizeWords(school.name)}</td>
                       <td>{school.address}</td>
                       <td>{school.phone}</td>
@@ -273,7 +306,7 @@ export default function Schools() {
                               dropdownIndex ===
                                 `dropdown-${school.school_id}-${index}`
                                 ? null
-                                : `dropdown-${school.school_id}-${index}`
+                                : `dropdown-${school.school_id}-${index}`,
                             )
                           }
                         >
@@ -283,13 +316,25 @@ export default function Schools() {
                           `dropdown-${school.school_id}-${index}` && (
                           <div
                             className="position-absolute bg-white border rounded shadow-sm p-2 mt-2"
-                            style={{ right: 0, zIndex: 10 }}
+                            style={{ right: 0, zIndex: 10, minWidth: "170px" }}
                           >
-                            <button className="btn btn-sm w-100 text-start mb-1">
+                            <button
+                              className="btn btn-sm w-100 text-start mb-1"
+                              onClick={() => openEditSchool(school)}
+                            >
                               Edit School
                             </button>
-                            <button className="btn btn-sm text-danger w-100 text-start">
-                              Delete school
+                            <button
+                              className="btn btn-sm w-100 text-start mb-1"
+                              onClick={() => openEditStudent(school)}
+                            >
+                              Edit Student
+                            </button>
+                            <button
+                              className="btn btn-sm w-100 text-start"
+                              onClick={() => openEditCoordinator(school)}
+                            >
+                              Edit Coordinators
                             </button>
                           </div>
                         )}
@@ -375,6 +420,34 @@ export default function Schools() {
         show={showModal}
         onClose={() => setShowModal(false)}
         onSchoolAdded={() => handleModalClose(true)}
+      />
+
+      <EditSchoolModal
+        show={editSchoolModal}
+        school={selectedSchool}
+        onClose={() => setEditSchoolModal(false)}
+        onUpdated={() => {
+          setEditSchoolModal(false);
+          fetchSchools();
+        }}
+      />
+
+      <EditStudentModal
+        show={editStudentModal}
+        school={selectedSchool}
+        onClose={() => setEditStudentModal(false)}
+        onUpdated={() => {
+          fetchSchools();
+        }}
+      />
+
+      <EditCoordinatorModal
+        show={editCoordinatorModal}
+        school={selectedSchool}
+        onClose={() => setEditCoordinatorModal(false)}
+        onUpdated={() => {
+          fetchSchools();
+        }}
       />
     </>
   );
