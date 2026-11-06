@@ -310,7 +310,6 @@ export default function Navbar() {
               onClick={openModal}
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
-              disabled
             >
               Register School (2026)
             </button>

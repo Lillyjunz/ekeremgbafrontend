@@ -301,7 +301,6 @@ const SchoolLegacyStats = () => {
                   className="register-btn"
                   data-aos="fade-up"
                   data-aos-delay="300"
-                  disabled
                 >
                   Register School (2026)
                 </button>

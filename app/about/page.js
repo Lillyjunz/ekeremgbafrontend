@@ -469,7 +469,7 @@ const About = () => {
           <h2 className="fw-bold mb-3 text-light">
             Want to join the next edition?
           </h2>
-          <button disabled onClick={openModal} className="btn registerBtn">
+          <button onClick={openModal} className="btn registerBtn">
             Register School (2026)
           </button>
         </div>

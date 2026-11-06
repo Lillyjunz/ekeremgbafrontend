@@ -237,7 +237,7 @@ const HeroSection = () => {
             data-aos-delay="800"
           >
             <button
-              disabled
+            
               onClick={openModal}
               className="btn btn-primary-custom"
             >
