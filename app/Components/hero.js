@@ -227,7 +227,7 @@ const HeroSection = () => {
 
           <p data-aos="fade-up" data-aos-duration="1000" data-aos-delay="600">
             Next Competition:{" "}
-            <span className="fw-bold">January 20th till February 4th 2026</span>
+            <span className="fw-bold">January 19th till February 3rd 2027</span>
           </p>
 
           <div
@@ -241,7 +241,7 @@ const HeroSection = () => {
               onClick={openModal}
               className="btn btn-primary-custom"
             >
-              Register School (2026)
+              Register School (2027)
             </button>
             <Link href="/fixtures" className="btn btn-secondary-custom">
               View Fixtures

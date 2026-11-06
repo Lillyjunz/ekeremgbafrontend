@@ -311,7 +311,7 @@ export default function Navbar() {
               className="btn btn-light navaa p-3"
               style={{ borderRadius: "35px" }}
             >
-              Register School (2026)
+              Register School (2027)
             </button>
           </div>
         </div>
@@ -420,7 +420,7 @@ export default function Navbar() {
             className="btn text-light navaa p-2 side-butt w-100"
             style={{ borderRadius: "35px" }}
           >
-            Register School (2026)
+            Register School (2027)
           </button>
         </div>
       </div>

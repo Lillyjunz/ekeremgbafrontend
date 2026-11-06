@@ -818,7 +818,7 @@ export default function Dashboard() {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="e.g., 20th Jan 2026"
+                      placeholder="e.g., 20th Jan 2027"
                       value={tournamentData.event_date}
                       onChange={(e) =>
                         handleTournamentDataChange("event_date", e.target.value)
