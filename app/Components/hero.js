@@ -201,7 +201,7 @@ const HeroSection = () => {
             data-aos="fade-down"
             data-aos-duration="1000"
           >
-            Ekeremgba 2.0 is Ongoing now...
+            Ekeremgba 3.0 is coming up soon...
           </div>
 
           <h1
