@@ -11,7 +11,7 @@ export default function FixturesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedTournament, setSelectedTournament] = useState(null);
-  const [selectedYear, setSelectedYear] = useState("2026");
+  const [selectedYear, setSelectedYear] = useState("2027");
 
   const [bracketData, setBracketData] = useState(null);
   const [bracketLoading, setBracketLoading] = useState(false);
@@ -96,7 +96,7 @@ export default function FixturesPage() {
 
     try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
       );
       const data = await res.json();
 
@@ -107,7 +107,7 @@ export default function FixturesPage() {
       }
 
       const champRes = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${tournamentId}`
+        `https://api.ekeremgbaakpauche.com/api/admin/champion?tournamentId=${tournamentId}`,
       );
       const champData = await champRes.json();
 
@@ -129,7 +129,7 @@ export default function FixturesPage() {
 
     try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${tournamentId}/registrations`
+        `https://api.ekeremgbaakpauche.com/api/admin/tournaments/${tournamentId}/registrations`,
       );
 
       const data = await res.json();
@@ -154,7 +154,7 @@ export default function FixturesPage() {
 
     try {
       const res = await fetch(
-        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`
+        `https://api.ekeremgbaakpauche.com/api/admin/bracket/${tournamentId}`,
       );
       const data = await res.json();
 

@@ -33,29 +33,39 @@ export default function EventsPage() {
         const response = await fetch(
           "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
         );
-        const data = await response.json();
+
+        // Read as text first, since the API may return non-JSON when idle
+        const raw = await response.text();
+        let data = null;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          // Not valid JSON -> treat as no ongoing event
+          setMatches([]);
+          setTournamentInfo(null);
+          setError("");
+          return;
+        }
 
         if (!response.ok) {
-          if (data.message === "No active match/game") {
+          if (data?.message === "No active match/game") {
             setMatches([]);
             setTournamentInfo(null);
             setError("");
-            setLoading(false);
             return;
           }
 
           // Real error
-          throw new Error(data.message || "Failed to fetch active matches");
+          throw new Error(data?.message || "Failed to fetch active matches");
         }
 
-        const matchesData = data.data;
+        const matchesData = data?.data;
 
-        // This is NOT an error - just no active matches
+        // Not an error - just no active matches
         if (!matchesData || matchesData.length === 0) {
           setMatches([]);
           setTournamentInfo(null);
-          setError(""); // Clear any previous errors
-          setLoading(false);
+          setError("");
           return;
         }
 
@@ -105,12 +115,12 @@ export default function EventsPage() {
         });
 
         setMatches(processedMatches);
-        setError(""); // Clear any previous errors
+        setError("");
       } catch (err) {
         console.error(err);
         setError(err.message || "Failed to load match data");
-        setMatches([]); // Clear matches on error
-        setTournamentInfo(null); // Clear tournament info on error
+        setMatches([]);
+        setTournamentInfo(null);
       } finally {
         setLoading(false);
       }
@@ -174,7 +184,7 @@ export default function EventsPage() {
           className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
         >
           <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-            No active matches found.
+            No ongoing event at the moment.
           </div>
         </div>
         <Footer />
