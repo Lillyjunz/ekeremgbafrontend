@@ -19,7 +19,7 @@ export default function Dashboard() {
   const [selectedTournamentId, setSelectedTournamentId] = useState(null);
   const [selectedSchools, setSelectedSchools] = useState([]);
   const [availableSchools, setAvailableSchools] = useState([]);
-  const [selectedYear, setSelectedYear] = useState("2026");
+  const [selectedYear, setSelectedYear] = useState("2027");
 
   // Tracks whether the Create/Edit modal is currently editing an existing
   // tournament (vs. creating a brand new one), and which tournament it is.

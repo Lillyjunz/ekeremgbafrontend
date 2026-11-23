@@ -25,7 +25,7 @@ export default function ScoreboardPage() {
     setError("");
     try {
       const res = await fetch(
-        `http://localhost:5100/api/admin/bracket/${tournamentId}`
+        `http://localhost:5100/api/admin/bracket/${tournamentId}`,
       );
       if (!res.ok) throw new Error("Failed to fetch bracket data");
       const data = await res.json();
@@ -71,7 +71,7 @@ export default function ScoreboardPage() {
             school1_score: Number(scores.school1_score),
             school2_score: Number(scores.school2_score),
           }),
-        }
+        },
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to record scores");
@@ -92,7 +92,7 @@ export default function ScoreboardPage() {
     return <p style={{ padding: "2rem" }}>No bracket data found.</p>;
 
   const currentRoundName = Object.keys(bracket).find((round) =>
-    bracket[round].some((match) => match.winner === null)
+    bracket[round].some((match) => match.winner === null),
   );
   const currentMatches = currentRoundName ? bracket[currentRoundName] : [];
 
