@@ -338,3 +338,21 @@
     padding: 18px 35px;
   }
 }
+
+.noMatches {
+  text-align: center;
+  padding: 3rem 1rem;
+  margin: 2rem auto;
+  background: #f8f9fa;
+  border-radius: 12px;
+  color: #555;
+}
+
+.noMatches h3 {
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.noMatches p {
+  margin-bottom: 0;
+}

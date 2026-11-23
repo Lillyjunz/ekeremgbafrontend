@@ -19,7 +19,6 @@ export default function ScoreboardPage() {
   const [token, setToken] = useState(null);
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [tournamentInfo, setTournamentInfo] = useState(null);
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -42,36 +41,49 @@ export default function ScoreboardPage() {
     const authToken = getAuthToken();
     if (authToken) {
       setToken(authToken);
+    } else {
+      // No token -> nothing to load, don't spin forever
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (!token) return;
 
+    const clearMatches = () => {
+      setMatches([]);
+      setTournamentInfo(null);
+    };
+
     const fetchData = async () => {
       try {
-        setLoading(true);
-
         const response = await fetch(
           "https://api.ekeremgbaakpauche.com/api/admin/get-active-match",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
-        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch active matches");
+        // Read as text first, since the API may return non-JSON when idle
+        const raw = await response.text();
+        let data = null;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          data = null;
         }
 
-        const matchesData = data.data;
+        const matchesData = data?.data;
 
-        if (!matchesData || matchesData.length === 0) {
-          setMatches([]);
-          setTournamentInfo(null);
-          setLoading(false);
+        // Non-JSON, non-OK, or empty -> no ongoing event (no error shown)
+        if (
+          !response.ok ||
+          !Array.isArray(matchesData) ||
+          matchesData.length === 0
+        ) {
+          clearMatches();
           return;
         }
 
@@ -116,10 +128,10 @@ export default function ScoreboardPage() {
         });
 
         setMatches(processedMatches);
-        setError("");
       } catch (err) {
+        // Any failure is treated as "no ongoing event" - no error is shown
         console.error(err);
-        setError(err.message || "Failed to load match data");
+        clearMatches();
       } finally {
         setLoading(false);
       }
@@ -173,7 +185,7 @@ export default function ScoreboardPage() {
             school1_score: parseInt(scores.school1_score),
             school2_score: parseInt(scores.school2_score),
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -201,7 +213,7 @@ export default function ScoreboardPage() {
             };
           }
           return match;
-        })
+        }),
       );
     } catch (err) {
       console.error("Error submitting scores:", err);
@@ -228,27 +240,22 @@ export default function ScoreboardPage() {
       </div>
     );
 
-  if (error)
-    return (
-      <div
-        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
-      >
-        <div
-          style={{ color: "#ef4444", fontSize: "1.25rem", fontWeight: "600" }}
-        >
-          {error}
-        </div>
-      </div>
-    );
-
   if (matches.length === 0)
     return (
       <div
-        className={`${pageStyles.pageContainer} d-flex justify-content-center align-items-center`}
+        className={`${pageStyles.pageContainer} d-flex flex-column justify-content-center align-items-center`}
       >
         <div style={{ color: "#cbd5e1", fontSize: "1.125rem" }}>
-          No active matches found.
+          No ongoing event at the moment.
         </div>
+        <Link
+          href="/admin/dashboard"
+          className="mt-3 d-inline-flex align-items-center gap-2"
+          style={{ color: "#cbd5e1" }}
+        >
+          <ArrowLeft size={18} />
+          <span>Back to Home</span>
+        </Link>
       </div>
     );
 
