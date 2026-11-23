@@ -276,7 +276,7 @@ export default function FixturesPage() {
                   All Tournaments
                 </a>
               </li>
-              {[2027, 2026, 2025, 2024, 2023].map((year) => (
+              {[2027, 2026].map((year) => (
                 <li key={year}>
                   <a
                     className="dropdown-item"

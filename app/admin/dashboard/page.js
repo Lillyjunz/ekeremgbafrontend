@@ -538,7 +538,7 @@ export default function Dashboard() {
                       All Tournaments
                     </a>
                   </li>
-                  {[2027, 2026, 2025, 2024, 2023].map((year) => (
+                  {[2027, 2026, 2025].map((year) => (
                     <li key={year}>
                       <a
                         className="dropdown-item"
